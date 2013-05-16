@@ -12,9 +12,12 @@ function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
+    ctx.canvas.width  = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
+
     // Set the fill color and fill the background
     ctx.fillStyle="#FFFFFF";
-    ctx.fillRect(0,0,500,500);
+    ctx.fillRect(0,0,canvas.width,canvas.height);
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
@@ -136,18 +139,41 @@ function createStamp(x1,y1) {
 
 function startLine(x,y) {
     var line = {
-        pts: [[x, y]]
+        pts: [[x, y]],
+        width: 10,
+        bezier: true
     };
     line.draw = function(ctx) {
         ctx.beginPath();
         ctx.moveTo(this.pts[0][0], this.pts[0][1]);
         var last = this.pts[0];
-        for(var i=1; i<this.pts.length; i++) {
-            ctx.lineTo(this.pts[i][0], this.pts[i][1]);
-			ctx.lineJoin = 'round';
-			ctx.lineCap = 'round';
-			ctx.lineWidth = 10;
-        };
+        if(!this.bezier) {
+
+            // Draw the line without beziers
+            for(var i=1; i<this.pts.length; i++) {
+                ctx.lineTo(this.pts[i][0], this.pts[i][1]);
+                        ctx.lineJoin = 'round';
+                        ctx.lineCap = 'round';
+                        ctx.lineWidth = this.width;
+            };
+        } else {
+
+            // Draw the line with beziers
+            for(var i=0; i<this.pts.length; i+=3) {
+                if(this.pts.length <= i+4) {
+                    for(var j=i; j<this.pts.length; j++) {
+                        ctx.lineTo(this.pts[j][0],this.pts[j][1]);
+                    }
+                } else {
+                    ctx.bezierCurveTo(this.pts[i+1][0], this.pts[i+1][1],
+                        this.pts[i+2][0], this.pts[i+2][1],
+                        this.pts[i+3][0], this.pts[i+3][1]);
+                }
+	        ctx.lineJoin = 'round';
+	        ctx.lineCap = 'round';
+	        ctx.lineWidth = this.width;
+            };
+        }
         ctx.stroke();
     };
     assignID(line);
@@ -207,6 +233,11 @@ function redo() {
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
+
+   // Prevent default actions for touch events
+   document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
+   document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
+   document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
