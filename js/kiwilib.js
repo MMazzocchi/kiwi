@@ -44,6 +44,10 @@ function addAction(act) {
 function pointerDown(e) {
     var ofst = $(this).offset();
 
+    if('touches' in e) {
+        e = e.touches[0];
+    }
+
     var x = e.pageX - ofst.left;
     var y = e.pageY - ofst.top;
     isDragging = true;
@@ -56,6 +60,10 @@ function pointerDown(e) {
 
 function pointerMove(e) {
     var ofst = $(this).offset();
+
+    if('touches' in e) {
+        e = e.touches[0];
+    }
 
     var x = e.pageX - ofst.left;
     var y = e.pageY - ofst.top;
