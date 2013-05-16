@@ -51,9 +51,6 @@ function pointerDown(e) {
     var y = e.pageY - ofst.top;
     isDragging = true;
     switch(mode) {
-        case "dot":
-            createDot(x,y);
-            break;
         case "line":
             startLine(x,y);
             break;
@@ -67,9 +64,6 @@ function pointerMove(e) {
     var y = e.pageY - ofst.top;
     if (isDragging){
         switch(mode) {
-            case "dot":
-                createDot(x,y);
-                break;
             case "line":
                 continueLine(x,y);
                 break;
@@ -160,13 +154,34 @@ $().ready( function() {
     $('#drawing_canvas').mousedown( pointerDown );
     $('#drawing_canvas').mousemove( pointerMove );
 	$(document).mouseup( pointerEnd );
+	// For touch events
+	$('#drawing_canvas').bind('touchmove', pointerMove );
+	$('#drawing_canvas').bind('touchstart', pointerDown );
+	$('#drawing_canvas').bind('touchend', pointerEnd );
 
     // Bind the undo function to the undo button.
     $('#undo').click( undo );
 
     // Bind the redo function to the redo button.
     $('#redo').click( redo );
+	
+	$(document).keypress(function(e) {
+		var key = e.which;
 
+		// Ctrl-Z or CMD-Z for Undo   Shift-* for Redo
+		if ((e.ctrlKey) && ((key == 122 || key == 90))) {  // CTRL-Z
+		  if (key == 122 || key == 90){			// UNDO and REDO
+			  if (e.shiftKey) {
+				redo();
+			  }
+			  else {
+				undo();
+			  }
+		  }
+		  return false;
+		}
+	});
+	
     // Redraw.
     refreshCanvas();
 });
