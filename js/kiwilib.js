@@ -159,12 +159,11 @@ $().ready( function() {
     // Bind an action.
     $('#drawing_canvas').mousedown( pointerDown );
     $('#drawing_canvas').mousemove( pointerMove );
-	$(document).mouseup( pointerEnd );
+    $(document).mouseup( pointerEnd );
 
-    $('#drawing_canvas').bind('touchmove', pointerMove );
-    $('#drawing_canvas').bind('touchstart', pointerDown );
-    $('#drawing_canvas').bind('touchend', pointerEnd );
-
+    canvas.addEventListener('touchmove', pointerMove );
+    canvas.addEventListener('touchstart', pointerDown );
+    canvas.addEventListener('touchend', pointerEnd );
 
     // Bind the undo function to the undo button.
     $('#undo').click( undo );
