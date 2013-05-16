@@ -12,13 +12,11 @@ function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
-//    ctx.rotate(window.orientation*Math.PI/180);
-
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
 
-    ctx.rotate(window.orientation*Math.PI/180);
-
+//    ctx.rotate(window.orientation*Math.PI/180);
+//  Possible translation issue afterwards?
 
     // Set the fill color and fill the background
     ctx.fillStyle="#FFFFFF";
