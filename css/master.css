@@ -1,0 +1,47 @@
+@charset "UTF-8";
+
+html,
+body {
+	margin:0;
+	padding:0;	
+}
+body {
+	background:#CCC;
+	margin-top:40px;	
+}
+.clear {
+	clear:both;	
+}
+
+input[type="range"] {
+	height:30px;	
+}
+.add-on {
+	width:75px;
+}
+
+#canvaswrapp {
+	width:800px;
+	height:600px;
+	margin:0 auto;	
+}
+#artcanvas {
+	width:100%;
+	height:100%;
+	background:#FFF;	
+}
+
+
+@media (max-width: 979px) {
+	body { margin-top:0; position:relative; }
+	.navbar { position:absolute; top:0; right:0; }
+	.navbar-inner { background:none; }
+	.nav-collapse { background:#EEE; }
+}
+@media (max-width: 800px) {
+	#canvaswrapp { width:100%; height:100%; }
+}
+@media (max-width: 767px) {
+	.navbar input[type="color"],
+	.navbar .input-prepend { display:block; }
+}
