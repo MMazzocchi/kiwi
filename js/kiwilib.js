@@ -165,6 +165,15 @@ $().ready( function() {
     // Bind the redo function to the redo button.
     $('#redo').click( redo );
 	
+	$('#clear').click( function() {
+		objectList = {};
+		layerList = [];
+		actionList = [];
+		idPtr = 0;
+		actionPtr = 0;
+		refreshCanvas();
+    });
+	
 	$(document).keypress(function(e) {
 		var key = e.which;
 
