@@ -15,6 +15,8 @@ function refreshCanvas() {
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
 
+    ctx.rotate(-window.orientation);
+
     // Set the fill color and fill the background
     ctx.fillStyle="#FFFFFF";
     ctx.fillRect(0,0,canvas.width,canvas.height);
@@ -178,10 +180,12 @@ function redo() {
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
 
-   // Prevent default actions for touch events
-   document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
-   document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
-   document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
+    // Prevent default actions for touch events
+    document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
+    document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
+    document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
+
+    window.addEventListener( 'orientationchange', refreshCanvas );
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
