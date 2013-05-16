@@ -19,38 +19,39 @@
             	<ul class="nav pull-left">
                 	<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">File <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        	<li><a href="#">Save</a></li>
-                            <li><a href="#">Open</a></li>
+                        	<li><a id="save">Save</a></li>
+                            <li><a id="open">Open</a></li>
                             <li class="divider"></li>
                             <li><a id="undo">Undo</a></li>
                    			<li><a id="redo">Redo</a></li>
                             <li class="divider"></li>
-                            <li><a href="#">Clear</a></li>
+                            <li><a id="clear">Clear</a></li>
                         </ul>
 					</li>
                 </ul>
 				<form class="navbar-form pull-left form-inline">
-					<input name="color" type="color" class="input-mini" />
+					<input id="color" type="color" class="input-mini" />
 					<div class="input-prepend">
 						<span class="add-on">Opacity</span>
-						<input name="opacity" type="range" class="input-mini" value="100" min="1" max="100" />
+						<input id="opacity" type="range" class="input-mini" value="100" min="1" max="100" />
                     </div>
 					<div class="input-prepend">
 						<span class="add-on">Thickness</span>
-						<input name="thickness" type="range" class="input-mini" value="50" min="1" max="100" />
+						<input id="thickness" type="range" class="input-mini" value="50" min="1" max="100" />
                     </div>
                 </form>
                 <ul class="nav">
-					<li><a href="#">Brush</a></li>
-                    <li><a href="#">Pencil</a></li>
-                    <li><a href="#">Spraycan</a></li>
-                    <li><a href="#">Fill</a></li>
-                    <li><a href="#">Erase</a></li>
-                    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Stamps <b class="caret"></b></a>
+					<li><a id="hand">Hand</a></li>
+                    <li><a id="brush">Brush</a></li>
+                    <li><a id="pencil">Pencil</a></li>
+                    <li><a id="spraycan">Spraycan</a></li>
+                    <li><a id="fill">Fill</a></li>
+                    <li><a id="erase">Erase</a></li>
+                    <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown">Stamps <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        	<li><a href="#">Mickey</a></li>
-                            <li><a href="#">BnL</a></li>
-                            <li><a href="#">Butterfly</a></li>
+                        	<li><a id="mickey">Mickey</a></li>
+                            <li><a id="bnl">BnL</a></li>
+                            <li><a id="butterfly">Butterfly</a></li>
                         </ul>
 					</li>
 				</ul>
