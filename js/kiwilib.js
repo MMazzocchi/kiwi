@@ -10,10 +10,7 @@ var isDragging = false;
 // Refresh the canvas; draw everything
 function refreshCanvas() {
 
-    //Set up the canvas so that it fills the screen
     var ctx = canvas.getContext('2d');
-    ctx.canvas.width = window.innerWidth;
-    ctx.canvas.height = window.innerHeight;
 
     // Set the fill color and fill the background
     ctx.fillStyle="#FFFFFF";
