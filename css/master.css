@@ -13,6 +13,10 @@ body {
 	clear:both;	
 }
 
+.navbar a,
+.navbar input {
+	cursor:pointer;	
+}
 input[type="range"] {
 	height:30px;	
 }
