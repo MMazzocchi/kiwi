@@ -45,37 +45,45 @@ function addAction(act) {
 }
 
 function pointerDown(e) {
-	isDragging = true;
+    var ofst = $(this).offset();
+
+    var x = e.pageX - ofst.left;
+    var y = e.pageY - ofst.top;
+    isDragging = true;
     switch(mode) {
         case "dot":
-            createDot(e);
+            createDot(x,y);
             break;
         case "line":
-            startLine(e);
+            startLine(x,y);
             break;
     }
 }
 
 function pointerMove(e) {
-  if (isDragging){
-    switch(mode) {
-        case "dot":
-            createDot(e);
-            break;
-        case "line":
-            continueLine(e);
-            break;
+    var ofst = $(this).offset();
+
+    var x = e.pageX - ofst.left;
+    var y = e.pageY - ofst.top;
+    if (isDragging){
+        switch(mode) {
+            case "dot":
+                createDot(x,y);
+                break;
+            case "line":
+                continueLine(x,y);
+                break;
+        }
     }
-  }
 }
 
 function pointerEnd(e) {
     isDragging = false;
 }
 
-function startLine(e) {
+function startLine(x,y) {
     var line = {
-        pts: [[e.pageX, e.pageY]]
+        pts: [[x, y]]
     };
     line.draw = function(ctx) {
         ctx.beginPath();
@@ -98,7 +106,7 @@ function startLine(e) {
         },
         redo: function() {
             // Put this object back in layerList.
-            layerList[layerList.length] = dot.id;
+            layerList[layerList.length] = line.id;
         }
     };
 
@@ -107,9 +115,9 @@ function startLine(e) {
     refreshCanvas();
 }
 
-function continueLine(e) {
+function continueLine(x,y) {
     var line = objectList[layerList[layerList.length-1]];
-    line.pts.push([e.pageX, e.pageY]);
+    line.pts.push([x, y]);
     refreshCanvas();
 }
 
@@ -149,10 +157,6 @@ $().ready( function() {
     canvas = document.getElementById('drawing_canvas');
 
     // Bind an action.
-
-    // Here, we get the drawing canvas using JQuery (that's what the $ means). Then we "bind" a 
-    // function to the mousedown; this means that whenever the canvas is clicked, "createDot"
-    // will be called.
     $('#drawing_canvas').mousedown( pointerDown );
     $('#drawing_canvas').mousemove( pointerMove );
 	$(document).mouseup( pointerEnd );
