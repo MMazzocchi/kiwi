@@ -161,6 +161,11 @@ $().ready( function() {
     $('#drawing_canvas').mousemove( pointerMove );
 	$(document).mouseup( pointerEnd );
 
+    $('#drawing_canvas').bind('touchmove', pointerMove );
+    $('#drawing_canvas').bind('touchstart', pointerDown );
+    $('#drawing_canvas').bind('touchend', pointerEnd );
+
+
     // Bind the undo function to the undo button.
     $('#undo').click( undo );
 
