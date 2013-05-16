@@ -15,7 +15,7 @@ function refreshCanvas() {
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
 
-    ctx.rotate(-(window.orientation/180.0)*Math.PI);
+//    ctx.rotate(-(window.orientation/180.0)*Math.PI);
 
     // Set the fill color and fill the background
     ctx.fillStyle="#FFFFFF";
