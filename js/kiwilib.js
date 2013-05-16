@@ -55,6 +55,10 @@ function pointerDown(e) {
         case "line":
             startLine(x,y);
             break;
+		case "stamp":
+            createStamp(x,y);
+			isDragging = false;
+            break;
     }
 }
 
@@ -79,6 +83,56 @@ function pointerMove(e) {
 function pointerEnd(e) {
     isDragging = false;
 }
+
+function createStamp(x1,y1) {
+
+    // Initialize a 'dot'; a dot is a hash with two parts: an (x,y) coordinate, and a draw function.
+    var stamp = {
+        x:x1,
+        y:y1
+    };
+
+    // Set the dot's draw function.
+
+    // This is actually really important; every object that gets drawn MUST have a draw function.
+    // This is because RefreshCanvas() loops through all the objects, and calls all of their
+    // draw functions. If it doesn't have a draw function, the script breaks.
+
+    // The draw function is NOT called here, it's just defined. It will get called later.
+    stamp.draw = function(ctx) {
+        // Begin a 'path'. A path tells the canvas where to draw or fill.
+        ctx.beginPath();
+		//ctx.fillRect(this.x,this.y,10,10);
+        // Make an arc centered at x and y with radius 4 that goes from angle 0 to angle 2*PI
+        ctx.arc(this.x-2, this.y-2, 4, 0, 2*Math.PI);
+		console.log(this.x + this.y);
+        // Draw the arc.
+        ctx.stroke();
+    };
+
+    // Give this dot an ID.
+    assignID(stamp);
+
+    // We just made a dot, so let's make an action for it so we can undo it later.
+
+    // An 'action' is a hash which MUST contain two functions: undo and redo. These will get called later.
+    var newAct = {
+        undo: function() {
+            // Take the top layer off of layerList. The object still exists in the objects hash, but
+            // doesn't get drawn because ONLY the objects in layerList get drawn.
+            layerList.splice(layerList.length-1,1);
+        },
+        redo: function() {
+            // Put this object back in layerList.
+            layerList[layerList.length] = stamp.id;
+        }
+    };
+
+    // Add the new action and redraw.
+    addAction(newAct);
+    refreshCanvas();
+}
+
 
 function startLine(x,y) {
     var line = {
@@ -148,6 +202,8 @@ function redo() {
         refreshCanvas();
     }
 }
+  
+
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
