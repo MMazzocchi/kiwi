@@ -1,3 +1,7 @@
+var canvas;           // This will hold our canvas
+var objectList = {};  // This is a hash that maps an object's id to the object itself
+var layerList = [];   // This is the list of layers. Each element is an object id.
+var actionList = [];  // This is the list of actions. Each element is an "event", which gets defined later on.
 var idPtr = 0;        // This is the next available id.
 var actionPtr = 0;    // This is the action stack pointer; anything below this is real, and anything above it has been undo'd.
 var mode = "line";
