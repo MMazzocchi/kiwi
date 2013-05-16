@@ -152,6 +152,11 @@ function redo() {
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
 
+   // Prevent default actions for touch events
+   document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
+   document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
+   document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
+
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
 
