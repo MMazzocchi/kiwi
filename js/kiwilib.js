@@ -12,6 +12,9 @@ function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
+    ctx.canvas.width  = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
+
     // Set the fill color and fill the background
     ctx.fillStyle="#FFFFFF";
     ctx.fillRect(0,0,500,500);
