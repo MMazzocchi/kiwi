@@ -59,7 +59,7 @@ function refreshCanvas() {
             tx=0; ty=-window.innerWidth;
             break;
         case 90:
-            tx = -window.innerHeight; ty=0;
+            tx=-window.innerHeight; ty=0;
 //            ctx.translate(-window.innerHeight,0);
 //            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
@@ -74,7 +74,7 @@ function refreshCanvas() {
     ctx.fillRect(0,0,window.innerHight,window.innerWidth);
 
     ctx.fillStyle="#FFFFFF";
-    ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+//    ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
