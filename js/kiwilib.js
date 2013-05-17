@@ -17,7 +17,7 @@ function refreshCanvas() {
 //    ctx.canvas.width  = window.innerWidth;
 //    ctx.canvas.height = window.innerHeight;
 
-    ctx.rotate((prevOrientation-window.orientation)*Math.PI/180);
+    ctx.rotate(-(prevOrientation-window.orientation)*Math.PI/180);
 
     switch(window.orientation-prevOrientation) {
         case -90:
