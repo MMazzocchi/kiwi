@@ -51,14 +51,18 @@ function refreshCanvas() {
     switch(window.orientation) {
         case 0:
 //            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
-           tx=0; ty=0; 
-           break;
+            ctx.canvas.width  = window.innerHeight;
+            ctx.canvas.height = window.innerWidth;
+            tx=0; ty=0; 
+            break;
         case -90:
 //            ctx.translate(0,-window.innerWidth);
 //            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             tx=0; ty=-window.innerWidth;
             break;
         case 90:
+            ctx.canvas.width  = window.innerHeight;
+            ctx.canvas.height = window.innerWidth;
             tx=-window.innerHeight; ty=0;
 //            ctx.translate(-window.innerHeight,0);
 //            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
@@ -69,6 +73,8 @@ function refreshCanvas() {
 //            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
     }
+
+    ctx.rotate(-window.orientation*Math.PI/180);
 
     ctx.translate(tx,ty);
 //    ctx.fillRect(0,0,window.innerHight,window.innerWidth);
