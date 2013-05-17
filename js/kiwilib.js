@@ -6,7 +6,7 @@ var idPtr = 0;        // This is the next available id.
 var actionPtr = 0;    // This is the action stack pointer; anything below this is real, and anything above it has been undo'd.
 var mode = "line";
 var isDragging = false;
-var prevOrientation;
+var prevOrientation = 0;
 
 
 // Refresh the canvas; draw everything
@@ -14,8 +14,8 @@ function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
-//    ctx.canvas.width  = window.innerWidth;
-//    ctx.canvas.height = window.innerHeight;
+    ctx.canvas.width  = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
 
     ctx.rotate(-(prevOrientation-window.orientation)*Math.PI/180);
 
