@@ -71,10 +71,10 @@ function refreshCanvas() {
     }
 
     ctx.translate(tx,ty);
-    ctx.fillRect(0,0,window.innerHight,window.innerWidth);
+//    ctx.fillRect(0,0,window.innerHight,window.innerWidth);
 
     ctx.fillStyle="#FFFFFF";
-//    ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+    ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
