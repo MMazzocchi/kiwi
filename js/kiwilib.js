@@ -20,7 +20,7 @@ function refreshCanvas() {
 //    ctx.rotate((window.orientation-prevOrientation)*Math.PI/180);
     ctx.rotate(-window.orientation*Math.PI/180);
 
-    switch(window.orientation) {
+    switch(-window.orientation) {
         case 90:
             ctx.translate(0,-window.innerWidth);
             break;
