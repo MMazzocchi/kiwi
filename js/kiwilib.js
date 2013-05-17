@@ -41,50 +41,39 @@ function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
-//    ctx.canvas.width  = window.innerWidth;
-//    ctx.canvas.height = window.innerHeight;
+    ctx.canvas.width  = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
 
-//    ctx.rotate(-window.orientation*Math.PI/180);
+    ctx.rotate(-window.orientation*Math.PI/180);
 
     ctx.fillStyle="#FFFFFF";
 
     switch(window.orientation) {
         case 0:
-            ctx.canvas.width  = window.innerWidth;
-            ctx.canvas.height = window.innerHeight;
-//            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             tx=0; ty=0; 
             break;
         case -90:
             tx=0; ty=-window.innerWidth;
-//            ctx.translate(0,-window.innerWidth);
-//            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
-            ctx.canvas.width  = window.innerHeight;
-            ctx.canvas.height = window.innerWidth;
+            ctx.translate(0,-window.innerWidth);
+            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
         case 90:
             tx=-window.innerHeight; ty=0;
-            ctx.canvas.width  = window.innerHeight;
-            ctx.canvas.height = window.innerWidth;
-//            ctx.translate(-window.innerHeight,0);
-//            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+            ctx.translate(-window.innerHeight,0);
+            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
         case 180:
-            ctx.canvas.width  = window.innerWidth;
-            ctx.canvas.height = window.innerHeight;
             tx=-window.innerWidth; ty=-window.innerHeight;
-//            ctx.translate(-window.innerWidth,-window.innerHeight);
-//            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+            ctx.translate(-window.innerWidth,-window.innerHeight);
+            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
     }
 
-    ctx.rotate(-window.orientation*Math.PI/180);
-
-    ctx.translate(tx,ty);
-    ctx.fillRect(0,0,window.innerHight,window.innerWidth);
+//    ctx.fillRect(0,0,window.innerHight,window.innerWidth);
 
     ctx.fillStyle="#FFFFFF";
-    ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+//    ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
