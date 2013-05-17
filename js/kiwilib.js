@@ -111,7 +111,7 @@ function pointerDown(e) {
     switch(orientation) {
         case 90:
 //            var t=-x+ty;
-            x=y;
+            y=x;//+ty;
 //            y=t;
             break;
         case 180:
@@ -145,8 +145,12 @@ function pointerDown(e) {
             break;
 
         case "stamp":
-            createStamp(x,y);
-            isDragging = false;
+			var dObj = {
+				svg: svgList[ curStamp ].url,
+				rotation: 0.70,
+				pts: [x, y],
+			};	
+            createStamp(dObj);
             break;
     }
 }
@@ -164,7 +168,7 @@ function pointerMove(e) {
     switch(orientation) {
         case 90:
 //            var t=-x+ty;
-            x=y;
+            y=x;//+ty;
 //            y=t;
             break;
         case 180:
@@ -186,33 +190,20 @@ function pointerEnd(e) {
     isDragging = false;
 }
 
-function createStamp(x1,y1) {
+function createStamp(dObj) {
+    assignID(dObj);
 
-    // Initialize a 'dot'; a dot is a hash with two parts: an (x,y) coordinate, and a draw function.
-    var stamp = {
-        svg: svgList[ curStamp ].url,
-		rotation: 0.70,
-        x:x1,
-        y:y1
-    };	
-		
-    // Set the dot's draw function.
-
-    // This is actually really important; every object that gets drawn MUST have a draw function.
-    // This is because RefreshCanvas() loops through all the objects, and calls all of their
-    // draw functions. If it doesn't have a draw function, the script breaks.
-
-    // The draw function is NOT called here, it's just defined. It will get called later.
-    stamp.draw = function(ctx) {
+    dObj.draw = function(ctx) {
         // Begin a 'path'. A path tells the canvas where to draw or fill.
         
 		
 		ctx.save();
 			ctx.beginPath();
-			ctx.fillStyle="#00CC00";
-			ctx.translate(this.x,this.y);
-			ctx.rotate(this.rotation);
-			ctx.fillRect(0,0,20,20);
+			//ctx.fillStyle="#000000";
+			ctx.translate(this.pts[0],this.pts[1]);
+			//ctx.rotate(this.rotation);
+			ctx.drawSvg(this.svg, 0, 0, 0, 0);
+			//ctx.fillRect(0,0,20,20);
 			ctx.stroke();
 		ctx.restore();
 		//console.log(this.svg);
@@ -222,12 +213,6 @@ function createStamp(x1,y1) {
        
     };
 
-    // Give this dot an ID.
-    assignID(stamp);
-
-    // We just made a dot, so let's make an action for it so we can undo it later.
-
-    // An 'action' is a hash which MUST contain two functions: undo and redo. These will get called later.
     var newAct = {
         undo: function() {
             // Take the top layer off of layerList. The object still exists in the objects hash, but
@@ -236,7 +221,7 @@ function createStamp(x1,y1) {
         },
         redo: function() {
             // Put this object back in layerList.
-            layerList[layerList.length] = stamp.id;
+            layerList[layerList.length] = dObj.id;
         }
     };
 
