@@ -21,7 +21,7 @@ function refreshCanvas() {
 
     switch(window.orientation-prevOrientation) {
         case -90:
-            ctx.translate(0,window.innerHeight);
+//            ctx.translate(0,window.innerHeight);
             break;
     }
 
