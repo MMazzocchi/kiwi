@@ -18,7 +18,7 @@ function refreshCanvas() {
     ctx.canvas.height = window.innerHeight;
 
 //    ctx.rotate((window.orientation-prevOrientation)*Math.PI/180);
-    ctx.rotate(window.orientation*Math.PI/180);
+    ctx.rotate(-window.orientation*Math.PI/180);
 
     switch(window.orientation) {
         case 90:
