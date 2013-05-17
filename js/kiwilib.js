@@ -9,14 +9,28 @@ var brushMode = 'simple';/////////
 var thickness = 10;   	// Thickness of the line to be drawn
 var alpha = 1;			// Opacity of the object to be drawn
 var isDragging = false;
+var prevOrientation = 0;
+
 
 // Refresh the canvas; draw everything
 function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
-    ctx.canvas.width  = window.innerWidth;
-    ctx.canvas.height = window.innerHeight;
+//    ctx.canvas.width  = window.innerWidth;
+//    ctx.canvas.height = window.innerHeight;
+
+//    ctx.rotate((window.orientation-prevOrientation)*Math.PI/180);
+    ctx.rotate(-window.orientation*Math.PI/180);
+
+    switch(-window.orientation) {
+        case 90:
+            ctx.translate(0,-window.innerWidth);
+            break;
+    }
+
+//    ctx.canvas.width  = window.innerWidth;
+//    ctx.canvas.height = window.innerHeight;
 
     // Set the fill color and fill the background
     ctx.fillStyle="#FFFFFF";
@@ -244,10 +258,13 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
 
-   // Prevent default actions for touch events
-   document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
-   document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
-   document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
+    // Prevent default actions for touch events
+    document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
+    document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
+    document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
+
+    window.addEventListener( 'resize', refreshCanvas );
+    prevOrientation = window.orientation;
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
