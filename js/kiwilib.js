@@ -16,7 +16,7 @@ var tx=0;
 var ty=0;
 var rx;
 var ry;
-var orientation=0;
+var orientation=window.orientation;
 
 var svgList = {
     'butterfly':{
