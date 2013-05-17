@@ -12,10 +12,11 @@ var alpha = 1;          // Opacity of the object to be drawn
 var isDragging = false;
 var curStamp = '';
 
-var tx;
-var ty;
+var tx=0;
+var ty=0;
 var rx;
 var ry;
+var orientation=0;
 
 var svgList = {
     'butterfly':{
@@ -41,50 +42,36 @@ function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
-//    ctx.canvas.width  = window.innerWidth;
-//    ctx.canvas.height = window.innerHeight;
+    ctx.canvas.width  = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
 
-//    ctx.rotate(-window.orientation*Math.PI/180);
+    orientation = window.orientation;
+
+    ctx.rotate(-orientation*Math.PI/180);
 
     ctx.fillStyle="#FFFFFF";
 
-    switch(window.orientation) {
+    switch(orientation) {
         case 0:
-            ctx.canvas.width  = window.innerWidth;
-            ctx.canvas.height = window.innerHeight;
-//            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+            ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
             tx=0; ty=0; 
             break;
         case -90:
             tx=0; ty=-window.innerWidth;
-//            ctx.translate(0,-window.innerWidth);
-//            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
-            ctx.canvas.width  = window.innerHeight;
-            ctx.canvas.height = window.innerWidth;
+            ctx.translate(0,-window.innerWidth);
+            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
         case 90:
             tx=-window.innerHeight; ty=0;
-            ctx.canvas.width  = window.innerHeight;
-            ctx.canvas.height = window.innerWidth;
-//            ctx.translate(-window.innerHeight,0);
-//            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+            ctx.translate(-window.innerHeight,0);
+            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
         case 180:
-            ctx.canvas.width  = window.innerWidth;
-            ctx.canvas.height = window.innerHeight;
             tx=-window.innerWidth; ty=-window.innerHeight;
-//            ctx.translate(-window.innerWidth,-window.innerHeight);
-//            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+            ctx.translate(-window.innerWidth,-window.innerHeight);
+            ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
             break;
     }
-
-    ctx.rotate(-window.orientation*Math.PI/180);
-
-    ctx.translate(tx,ty);
-    ctx.fillRect(0,0,window.innerHight,window.innerWidth);
-
-    ctx.fillStyle="#FFFFFF";
-    ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
@@ -120,6 +107,18 @@ function pointerDown(e) {
 
     var x = e.pageX - ofst.left;
     var y = e.pageY - ofst.top;
+
+    switch(orientation) {
+        case 90:
+            y=x+ty;
+            x=y+tx;
+            break;
+        case 180:
+            x=-x-tx;
+            y=-y-ty;
+            break;
+    }
+
 
     switch(curTool) {			
         case "draw":
@@ -160,6 +159,18 @@ function pointerMove(e) {
 
     var x = e.pageX - ofst.left;
     var y = e.pageY - ofst.top;
+
+    switch(orientation) {
+        case 90:
+            y=x+ty;
+            x=y+tx;
+            break;
+        case 180:
+            x=-x-tx;
+            y=-y-ty;
+            break;
+    }
+
     if (isDragging){
         switch(curTool) {
             case "draw":
