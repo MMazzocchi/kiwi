@@ -34,8 +34,11 @@ var svgList = {
         bounds:[0,0,378,302],
         url:'svg/BnL.svg' }
 		
-    };
+};
 
+function orienting() {
+    return (typeof window.orientation != "undefined");
+}
 
 // Refresh the canvas; draw everything
 function refreshCanvas() {
@@ -45,6 +48,7 @@ function refreshCanvas() {
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
 
+    if(orienting()) {
     orientation = window.orientation;
 
     ctx.rotate(-orientation*Math.PI/180);
@@ -71,6 +75,8 @@ function refreshCanvas() {
             ctx.translate(-window.innerWidth,-window.innerHeight);
             ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
             break;
+    } else {
+            ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
     }
 
     // For each id in layerList, call this function:
