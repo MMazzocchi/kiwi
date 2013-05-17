@@ -9,8 +9,6 @@ var brushMode = 'simple';/////////
 var thickness = 10;   	// Thickness of the line to be drawn
 var alpha = 1;			// Opacity of the object to be drawn
 var isDragging = false;
-var prevOrientation = 0;
-
 
 // Refresh the canvas; draw everything
 function refreshCanvas() {
@@ -274,8 +272,7 @@ $().ready( function() {
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
-    window.addEventListener( 'resize', function(e) { e.preventDefault(); refreshCanvas(); );
-    prevOrientation = window.orientation;
+    window.addEventListener( 'resize', function(e) { e.preventDefault(); refreshCanvas(); }, false );
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
