@@ -191,7 +191,7 @@ $().ready( function() {
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
     window.addEventListener( 'resize', refreshCanvas );
-    canvas.addEventListener( 'resize', function(e) { e.preventDefault(); });
+    canvas.addEventListener( 'orientationchange', function(e) { e.preventDefault(); });
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
