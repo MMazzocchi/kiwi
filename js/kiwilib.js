@@ -110,8 +110,9 @@ function pointerDown(e) {
 
     switch(orientation) {
         case 90:
-            y=x+ty;
+            var t=x+ty;
             x=y+tx;
+            y=t;
             break;
         case 180:
             x=-x-tx;
@@ -162,8 +163,9 @@ function pointerMove(e) {
 
     switch(orientation) {
         case 90:
-            y=x+ty;
+            var t=x+ty;
             x=y+tx;
+            y=t;
             break;
         case 180:
             x=-x-tx;
