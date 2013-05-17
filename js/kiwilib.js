@@ -4,9 +4,12 @@ var layerList = [];   // This is the list of layers. Each element is an object i
 var actionList = [];  // This is the list of actions. Each element is an "event", which gets defined later on.
 var idPtr = 0;        // This is the next available id.
 var actionPtr = 0;    // This is the action stack pointer; anything below this is real, and anything above it has been undo'd.
-var mode = "line";
+var mode = "stamp";
 var isDragging = false;
-
+var svgList = {'butterfly':{ svg:null, cx:209, cy:164, bounds:[0,0,410,286], url:'svg/butterfly.svg' },
+                 'bnl':{ svg:null, cx:197, cy:154, bounds:[0,0,378,302],url:'svg/BnL.svg' }
+              };
+var curStamp = 'bnl';
 // Refresh the canvas; draw everything
 function refreshCanvas() {
 
@@ -91,10 +94,13 @@ function createStamp(x1,y1) {
 
     // Initialize a 'dot'; a dot is a hash with two parts: an (x,y) coordinate, and a draw function.
     var stamp = {
+		svg: svgList[ curStamp ].url,
         x:x1,
         y:y1
     };
-
+	
+	
+		
     // Set the dot's draw function.
 
     // This is actually really important; every object that gets drawn MUST have a draw function.
@@ -105,10 +111,13 @@ function createStamp(x1,y1) {
     stamp.draw = function(ctx) {
         // Begin a 'path'. A path tells the canvas where to draw or fill.
         ctx.beginPath();
-		//ctx.fillRect(this.x,this.y,10,10);
+		//ctx.fillStyle="#000000";
+		//ctx.fillRect(this.x,this.y,20,20);
+		console.log(this.svg);
+		ctx.drawSvg(this.svg, this.x, this.y, 197, 154);
         // Make an arc centered at x and y with radius 4 that goes from angle 0 to angle 2*PI
-        ctx.arc(this.x-2, this.y-2, 4, 0, 2*Math.PI);
-		console.log(this.x + this.y);
+        //ctx.arc(this.x-2, this.y-2, 4, 0, 2*Math.PI);
+		//console.log(this.x +" "+ this.y);
         // Draw the arc.
         ctx.stroke();
     };
