@@ -1,5 +1,8 @@
 @charset "UTF-8";
 
+/* Icons from http://www.iconfinder.com/iconsets/Momentum_GlossyEntireSet
+ 			  http://www.iconfinder.com/iconsets/32x32-free-design-icons */
+
 html,
 body {
 	margin:0;
@@ -24,6 +27,13 @@ input[type="range"] {
 	width:75px;
 }
 
+.icon span {
+	display:none;
+}
+a.icon:hover {
+	background:#DDD!important;	
+}
+
 #canvaswrapp {
 	margin:0 auto;	
 }
@@ -39,6 +49,7 @@ input[type="range"] {
 	.navbar { position:absolute; top:0; right:0; }
 	.navbar-inner { background:none; }
 	.nav-collapse { background:#EEE; }
+	.icon span { display:inline-block; }
 }
 @media (max-width: 800px) {
 	#canvaswrapp { width:100%; height:100%; }
