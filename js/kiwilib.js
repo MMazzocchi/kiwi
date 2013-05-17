@@ -110,8 +110,8 @@ function pointerDown(e) {
 
     switch(orientation) {
         case 180:
-            x=-x+tx;
-            y=-y+ty;
+            x=x+tx;
+            y=y+ty;
             break;
     }
 
