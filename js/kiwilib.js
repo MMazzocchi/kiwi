@@ -12,8 +12,8 @@ var thickness = 10;     // Thickness of the line to be drawn
 var alpha = 1;          // Opacity of the object to be drawn
 var isDragging = false;
 
-var ctx;
-var cty;
+var tx;
+var ty;
 var rx;
 var ry;
 
@@ -50,21 +50,28 @@ function refreshCanvas() {
 
     switch(window.orientation) {
         case 0:
-            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
-            break;
+//            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+           tx=0; ty=0; 
+           break;
         case -90:
-            ctx.translate(0,-window.innerWidth);
-            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+//            ctx.translate(0,-window.innerWidth);
+//            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+            tx=0; ty=-window.innerWidth;
             break;
         case 90:
-            ctx.translate(-window.innerHeight,0);
-            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+            tx = -window.innerHeight; ty=0;
+//            ctx.translate(-window.innerHeight,0);
+//            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
         case 180:
-            ctx.translate(-window.innerWidth,-window.innerHeight);
-            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+            tx=-window.innerWidth; ty=-window.innerHeight;
+//            ctx.translate(-window.innerWidth,-window.innerHeight);
+//            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
     }
+
+    ctx.translate(tx,ty);
+    ctx.fillRect(0,0,window.innerHight,window.innerWidth);
 
     ctx.fillStyle="#FFFFFF";
     ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
