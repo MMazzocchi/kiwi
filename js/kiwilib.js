@@ -30,12 +30,20 @@ function refreshCanvas() {
 
     ctx.fillStyle="#FFFFFF";
 
-    switch(-window.orientation) {
+    switch(window.orientation) {
         case 0:
             ctx.fillRect(0,0,canvas.width,canvas.height);
             break;
-        case 90:
+        case -90:
             ctx.translate(0,-window.innerWidth);
+            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+            break;
+        case 90:
+            ctx.translate(-window.innerHeight,0);
+            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+            break;
+        case 180:
+            ctx.translate(-window.innerWidth,-window.innerHeight);
             ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
     }
@@ -333,7 +341,7 @@ $().ready( function() {
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
-    window.addEventListener( 'resize', refreshCanvas );
+    window.addEventListener( 'resize', function(e) { e.preventDefault(); refreshCanvas(); );
     prevOrientation = window.orientation;
 
     // Get our canvas.
