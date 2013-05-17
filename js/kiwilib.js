@@ -27,12 +27,12 @@ function refreshCanvas() {
         // Get the object for this layer
         var dObj = objectList[id];
 
-        ctx.rotate(-window.orientation*Math.PI/180);
+//        ctx.rotate(-window.orientation*Math.PI/180);
         switch(window.orientation) {
             case 90:
                 break;
             case 180:
-                ctx.translate(window.innerWidth,0);
+//                ctx.translate(window.innerWidth,0);
                 break;
         }
         // Draw the object
