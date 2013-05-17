@@ -5,15 +5,30 @@ var layerList = [];   	// This is the list of layers. Each element is an object 
 var actionList = [];  	// This is the list of actions. Each element is an "event", which gets defined later on.
 var idPtr = 0;        	// This is the next available id.
 var actionPtr = 0;    	// This is the action stack pointer; anything below this is real, and anything above it has been undo'd.
-var curTool = "draw"; 	// This is the current tool selected by the user
-var brushMode = 'simple';/////////
-var thickness = 10;   	// Thickness of the line to be drawn
-var alpha = 1;			// Opacity of the object to be drawn
+
+var curTool = "draw";   // This is the current tool selected by the user
+var brushMode = 'simple';
+var thickness = 10;     // Thickness of the line to be drawn
+var alpha = 1;          // Opacity of the object to be drawn
 var isDragging = false;
-var svgList = {'butterfly':{ svg:null, cx:209, cy:164, bounds:[0,0,410,286], url:'svg/butterfly.svg' },
-				'mickey':{ svg:null, bounds:[0,0,313,290],url:'svg/mickey.svg' },
-                 'bnl':{ svg:null, cx:197, cy:154, bounds:[0,0,378,302],url:'svg/BnL.svg' }
-              };
+
+var svgList = {
+    'butterfly':{
+        svg:null, 
+        cx:209, cy:164, 
+        bounds:[0,0,410,286], 
+        url:'svg/butterfly.svg' },
+	'mickey':{
+		svg:null, 
+		bounds:[0,0,313,290],
+		url:'svg/mickey.svg' },
+    'bnl':{
+        svg:null,
+        cx:197, cy:154,
+        bounds:[0,0,378,302],
+        url:'svg/BnL.svg' }
+		
+    };
 var curStamp = 'bnl';
 
 // Refresh the canvas; draw everything
@@ -21,11 +36,9 @@ function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
-
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
 
-//    ctx.rotate((window.orientation-prevOrientation)*Math.PI/180);
     ctx.rotate(-window.orientation*Math.PI/180);
 
     ctx.fillStyle="#FFFFFF";
@@ -55,10 +68,9 @@ function refreshCanvas() {
     $.each(layerList, function(i, id) {
         // Get the object for this layer
         var dObj = objectList[id];
-		ctx.save(); // saves state of canvas
+
         // Draw the object
         dObj.draw(ctx);
-		ctx.restore(); // loads last saved state of canvas
     });
 }
 
@@ -88,30 +100,31 @@ function pointerDown(e) {
     var y = e.pageY - ofst.top;
 
     switch(curTool) {			
-		case "draw":
-			isDragging = true;
-			var dObj = {
-				pts: [[x, y]],
-				width: thickness,
-				opacity: alpha,
-				bezier: true
-			};
-            startLine(dObj);
-            break;	
-		// These have no functionality yet, need to figure out how to find object based on mouse coordinates
-		case "select":
-            
-            break;
-		case "erase":
+        case "draw":
             isDragging = true;
-			
+            var dObj = {
+	        pts: [[x, y]],
+	        width: thickness,
+	        opacity: alpha,
+	        bezier: true
+            };
+            startLine(dObj);
+        break;	
+
+        // These have no functionality yet, need to figure out how to find object based on mouse coordinates
+        case "select":
             break;
-		case "fill":
-            
+
+        case "erase":
+            isDragging = true;		
             break;
-		case "stamp":
+
+        case "fill":
+            break;
+
+        case "stamp":
             createStamp(x,y);
-			isDragging = false;
+            isDragging = false;
             break;
     }
 }
@@ -142,12 +155,10 @@ function createStamp(x1,y1) {
 
     // Initialize a 'dot'; a dot is a hash with two parts: an (x,y) coordinate, and a draw function.
     var stamp = {
-		svg: svgList[ curStamp ].url,
+        svg: svgList[ curStamp ].url,
         x:x1,
         y:y1
-    };
-	
-	
+    };	
 		
     // Set the dot's draw function.
 
@@ -159,11 +170,13 @@ function createStamp(x1,y1) {
     stamp.draw = function(ctx) {
         // Begin a 'path'. A path tells the canvas where to draw or fill.
         ctx.beginPath();
+
 		ctx.fillStyle="#000000";
 		ctx.fillRect(this.x,this.y,20,20);
 		//console.log(this.svg);
 		//ctx.drawSvg(this.svg, this.x, this.y, 197, 154);
 		//console.log(this.x +" "+ this.y);
+
         ctx.stroke();
     };
 
@@ -193,7 +206,7 @@ function createStamp(x1,y1) {
 
 
 function startLine(dObj) {
-	assignID(dObj);
+    assignID(dObj);
 
     dObj.draw = function(ctx) {
         ctx.beginPath();
@@ -207,7 +220,7 @@ function startLine(dObj) {
                         ctx.lineJoin = 'round';
                         ctx.lineCap = 'round';
                         ctx.lineWidth = this.width;
-						ctx.globalAlpha = this.opacity;
+                        ctx.globalAlpha = this.opacity;
             };
         } else {
 
@@ -288,46 +301,46 @@ function redo() {
 
 function SetDrawThick(t)	// sets the thickness
 {
-  thickness = t;
+    thickness = t;
 //  $( "#linethickSlider" ).slider( "value", gVars.curDrawThick);
 }
 
 function SetDrawAlpha(t)	// sets the opacity
 {
-  alpha = t;
+    alpha = t;
 //  $( "#alphaSlider" ).slider( "value", gVars.curDrawAlpha*100);
 }
 
 function SelectTool(toolName) // selects proper tool based off of what user has clicked
 {
-  switch (toolName) {
-  case 'draw':
-    curTool = 'draw';
-    brushMode = 'simple';
-    SetDrawThick(thickness > 8? 8 : thickness);
-    SetDrawAlpha(1);
-    break;
-  case 'spraycan':
-    curTool = 'draw';
-    brushMode = 'round';
-	SetDrawThick(50);
-    SetDrawAlpha(0.10);
-    break;
-  case 'select':
-    curTool = 'select';
-    SetDrawAlpha(1);
-    break;
-  case 'pencil':
-    curTool = 'draw';
-    brushMode = 'graphite';
-    SetDrawAlpha(1);
-    break;
-  default:
-    curTool = toolName;
-    SetDrawAlpha(1);
-    break;
-  }
-  refreshCanvas();
+    switch (toolName) {
+        case 'draw':
+            curTool = 'draw';
+            brushMode = 'simple';
+            SetDrawThick(thickness > 8? 8 : thickness);
+            SetDrawAlpha(1);
+            break;
+        case 'spraycan':
+            curTool = 'draw';
+            brushMode = 'round';
+            SetDrawThick(50);
+            SetDrawAlpha(0.10);
+            break;
+        case 'select':
+            curTool = 'select';
+            SetDrawAlpha(1);
+            break;
+        case 'pencil':
+            curTool = 'draw';
+            brushMode = 'graphite';
+            SetDrawAlpha(1);
+            break;
+        default:
+            curTool = toolName;
+            SetDrawAlpha(1);
+            break;
+    }
+    refreshCanvas();
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
@@ -359,34 +372,33 @@ $().ready( function() {
     $('#redo').click( redo );
 	
 	
-	/////////////////////////////////////////////////////////////////////////////////////
-	// ADDED BUTTONS
-	//.attr etc is to address a firefox bug that caches the disabled state of the redo button
+    /////////////////////////////////////////////////////////////////////////////////////
+    // ADDED BUTTONS
+    //.attr etc is to address a firefox bug that caches the disabled state of the redo button
     // http://stackoverflow.com/questions/2719044/jquery-ui-button-gets-disabled-on-refresh
-	$('#undo_button').attr('disabled', true);
-	$('#redo_button').attr('disabled', true);
-	$('button').button().attr("autocomplete", "off");
-  
-  
-	$('#brush').click( function() {
-		SelectTool('draw');
-	});
+    $('#undo_button').attr('disabled', true);
+    $('#redo_button').attr('disabled', true);
+    $('button').button().attr("autocomplete", "off");
 
-	$('#spraycan').click( function() {
-		SelectTool('spraycan');
-	});
+    $('#brush').click( function() {
+        SelectTool('draw');
+    });
 
-	$('#hand').click( function() {
-		SelectTool('select');
-	});
+    $('#spraycan').click( function() {
+        SelectTool('spraycan');
+    });
 
-	$('#pencil').click( function() {
-		SelectTool('pencil');
-	});
+    $('#hand').click( function() {
+        SelectTool('select');
+    });
+
+    $('#pencil').click( function() {
+        SelectTool('pencil');
+    });
 	
-	$('#erase').click( function() {
-		SelectTool('erase');
-	});
+    $('#erase').click( function() {
+        SelectTool('erase');
+    });
 	
 	$('#butterfly').click( function() {
 		SelectTool('stamp');
@@ -400,33 +412,35 @@ $().ready( function() {
 		SelectTool('stamp');
 		curStamp = 'bnl'
 	});
-	//////////////////////////////////////////////////////////////////////////////////////
+    $('#stamp').click( function() {
+        SelectTool('stamp');
+    });
+    //////////////////////////////////////////////////////////////////////////////////////
 	
-	$('#clear').click( function() {
-		objectList = {};
-		layerList = [];
-		actionList = [];
-		idPtr = 0;
-		actionPtr = 0;
-		refreshCanvas();
+    $('#clear').click( function() {
+        objectList = {};
+        layerList = [];
+        actionList = [];
+        idPtr = 0;
+        actionPtr = 0;
+        refreshCanvas();
     });
 	
-	$(document).keypress(function(e) {
-		var key = e.which;
+    $(document).keypress(function(e) {
+        var key = e.which;
 
-		// Ctrl-Z or CMD-Z for Undo   Shift-* for Redo
-		if ((e.ctrlKey) && ((key == 122 || key == 90))) {  // CTRL-Z
-		  if (key == 122 || key == 90){			// UNDO and REDO
-			  if (e.shiftKey) {
-				redo();
-			  }
-			  else {
-				undo();
-			  }
-		  }
-		  return false;
-		}
-	});
+        // Ctrl-Z or CMD-Z for Undo   Shift-* for Redo
+        if ((e.ctrlKey) && ((key == 122 || key == 90))) {  // CTRL-Z
+            if (key == 122 || key == 90){			// UNDO and REDO
+                if (e.shiftKey) {
+                    redo();
+                } else {
+                    undo();
+                }
+            }
+            return false;
+        }
+    });
 	
     // Redraw.
     refreshCanvas();
