@@ -212,9 +212,9 @@ function createStamp(dObj) {
 			ctx.fillStyle="#000000";
 			ctx.translate(this.pts[0],this.pts[1]);
 			ctx.rotate(this.rotation);
-			
-			ctx.fillRect(0,0,20,20);
-			ctx.stroke();
+			ctx.drawSvg(this.svg, 0, 0, 0, 0);
+//			ctx.fillRect(0,0,20,20);
+//			ctx.stroke();
 		ctx.restore();
 		//console.log(this.svg);
 		//ctx.drawSvg(this.svg, this.x, this.y, 197, 154);
