@@ -191,7 +191,7 @@ $().ready( function() {
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
 
-    canvas.addEventListener( 'orientationchange', function(e) { e.preventDefault(); });
+    canvas.addEventListener( 'rezise', function(e) { e.preventDefault(); });
 
     // Bind an action.
     $('#drawing_canvas').mousedown( pointerDown );
