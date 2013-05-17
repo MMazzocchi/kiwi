@@ -32,7 +32,7 @@ function refreshCanvas() {
             break;
         case 90:
             ctx.translate(0,-window.innerWidth);
-            ctx.fillRect(0,window.innerWidth,window.innerWidth,window.innerHeight);
+            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
     }
 
