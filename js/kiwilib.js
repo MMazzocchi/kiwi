@@ -62,7 +62,7 @@ function refreshCanvas() {
             tx=-window.innerHeight; ty=0;
 //            ctx.translate(-window.innerHeight,0);
 //            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
-            ctx.canvas.height = window.innerWidth;
+            ctx.canvas.width = window.innerWidth;
             break;
         case 180:
             tx=-window.innerWidth; ty=-window.innerHeight;
