@@ -5,12 +5,12 @@ var layerList = [];   	// This is the list of layers. Each element is an object 
 var actionList = [];  	// This is the list of actions. Each element is an "event", which gets defined later on.
 var idPtr = 0;        	// This is the next available id.
 var actionPtr = 0;    	// This is the action stack pointer; anything below this is real, and anything above it has been undo'd.
-
 var curTool = "draw";   // This is the current tool selected by the user
 var brushMode = 'simple';
 var thickness = 10;     // Thickness of the line to be drawn
 var alpha = 1;          // Opacity of the object to be drawn
 var isDragging = false;
+var curStamp = '';
 
 var tx;
 var ty;
@@ -34,7 +34,7 @@ var svgList = {
         url:'svg/BnL.svg' }
 		
     };
-var curStamp = 'bnl';
+
 
 // Refresh the canvas; draw everything
 function refreshCanvas() {
@@ -167,6 +167,7 @@ function createStamp(x1,y1) {
     // Initialize a 'dot'; a dot is a hash with two parts: an (x,y) coordinate, and a draw function.
     var stamp = {
         svg: svgList[ curStamp ].url,
+		rotation: 0.70,
         x:x1,
         y:y1
     };	
@@ -180,15 +181,22 @@ function createStamp(x1,y1) {
     // The draw function is NOT called here, it's just defined. It will get called later.
     stamp.draw = function(ctx) {
         // Begin a 'path'. A path tells the canvas where to draw or fill.
-        ctx.beginPath();
-
-		ctx.fillStyle="#000000";
-		ctx.fillRect(this.x,this.y,20,20);
+        
+		
+		ctx.save();
+			ctx.beginPath();
+			ctx.fillStyle="#000000";
+			ctx.translate(this.x,this.y);
+			ctx.rotate(this.rotation);
+			
+			ctx.fillRect(0,0,20,20);
+			ctx.stroke();
+		ctx.restore();
 		//console.log(this.svg);
 		//ctx.drawSvg(this.svg, this.x, this.y, 197, 154);
 		//console.log(this.x +" "+ this.y);
 
-        ctx.stroke();
+       
     };
 
     // Give this dot an ID.
