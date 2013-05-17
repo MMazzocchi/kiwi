@@ -11,6 +11,7 @@ var thickness = 10;   	// Thickness of the line to be drawn
 var alpha = 1;			// Opacity of the object to be drawn
 var isDragging = false;
 var svgList = {'butterfly':{ svg:null, cx:209, cy:164, bounds:[0,0,410,286], url:'svg/butterfly.svg' },
+				'mickey':{ svg:null, bounds:[0,0,313,290],url:'svg/mickey.svg' },
                  'bnl':{ svg:null, cx:197, cy:154, bounds:[0,0,378,302],url:'svg/BnL.svg' }
               };
 var curStamp = 'bnl';
@@ -162,10 +163,7 @@ function createStamp(x1,y1) {
 		ctx.fillRect(this.x,this.y,20,20);
 		//console.log(this.svg);
 		//ctx.drawSvg(this.svg, this.x, this.y, 197, 154);
-        // Make an arc centered at x and y with radius 4 that goes from angle 0 to angle 2*PI
-        //ctx.arc(this.x-2, this.y-2, 4, 0, 2*Math.PI);
 		//console.log(this.x +" "+ this.y);
-        // Draw the arc.
         ctx.stroke();
     };
 
@@ -390,8 +388,17 @@ $().ready( function() {
 		SelectTool('erase');
 	});
 	
-	$('#stamp').click( function() {
+	$('#butterfly').click( function() {
 		SelectTool('stamp');
+		curStamp = 'butterfly'
+	});
+	$('#mickey_button').click( function() {
+		SelectTool('stamp');
+		curStamp = 'mickey'
+	});
+	$('#bnl').click( function() {
+		SelectTool('stamp');
+		curStamp = 'bnl'
 	});
 	//////////////////////////////////////////////////////////////////////////////////////
 	
