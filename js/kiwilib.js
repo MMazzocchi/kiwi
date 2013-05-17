@@ -109,6 +109,8 @@ function pointerDown(e) {
     var y = e.pageY - ofst.top;
 
     switch(orientation) {
+        case 90:
+            y=-x-tx;
         case 180:
             x=-x-tx;
             y=-y-ty;
@@ -157,6 +159,9 @@ function pointerMove(e) {
     var y = e.pageY - ofst.top;
 
     switch(orientation) {
+        case 90:
+            y=-x-tx;
+            break;
         case 180:
             x=-x-tx;
             y=-y-ty;
