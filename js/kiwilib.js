@@ -108,6 +108,14 @@ function pointerDown(e) {
     var x = e.pageX - ofst.left;
     var y = e.pageY - ofst.top;
 
+    switch(orientation) {
+        case 180:
+            x=-x;
+            y=-y
+            break;
+    }
+
+
     switch(curTool) {			
         case "draw":
             isDragging = true;
@@ -147,6 +155,14 @@ function pointerMove(e) {
 
     var x = e.pageX - ofst.left;
     var y = e.pageY - ofst.top;
+
+    switch(orientation) {
+        case 180:
+            x=-x;
+            y=-y
+            break;
+    }
+
     if (isDragging){
         switch(curTool) {
             case "draw":
