@@ -17,11 +17,12 @@ function refreshCanvas() {
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
 
-    ctx.rotate((window.orientation-prevOrientation)*Math.PI/180);
+//    ctx.rotate((window.orientation-prevOrientation)*Math.PI/180);
+    ctx.rotate(window.orientation);
 
-    switch(window.orientation-prevOrientation) {
+    switch(window.orientation) {
         case 90:
-            ctx.translate(0,-window.innerHeight);
+            ctx.translate(0,-window.innerWidth);
             break;
     }
 
