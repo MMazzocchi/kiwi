@@ -16,7 +16,7 @@ var tx=0;
 var ty=0;
 var rx;
 var ry;
-var orientation=window.orientation;
+var orientation = orienting() ? window.orientation : 0;
 
 var svgList = {
     'butterfly':{
@@ -49,33 +49,33 @@ function refreshCanvas() {
     ctx.canvas.height = window.innerHeight;
 
     if(orienting()) {
-    orientation = window.orientation;
+        orientation = window.orientation;
 
-    ctx.rotate(-orientation*Math.PI/180);
+        ctx.rotate(-orientation*Math.PI/180);
 
-    ctx.fillStyle="#FFFFFF";
+        ctx.fillStyle="#FFFFFF";
 
-    switch(orientation) {
-        case 0:
-            ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
-            tx=0; ty=0; 
-            break;
-        case -90:
-            tx=0; ty=-window.innerWidth;
-            ctx.translate(0,-window.innerWidth);
-            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
-            break;
-        case 90:
-            tx=-window.innerHeight; ty=0;
-            ctx.translate(-window.innerHeight,0);
-            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
-            break;
-        case 180:
-            tx=-window.innerWidth; ty=-window.innerHeight;
-            ctx.translate(-window.innerWidth,-window.innerHeight);
-            ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
-            break;
-    } 
+        switch(orientation) {
+            case 0:
+                ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+                tx=0; ty=0; 
+                break;
+            case -90:
+                tx=0; ty=-window.innerWidth;
+                ctx.translate(0,-window.innerWidth);
+                ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+                break;
+            case 90:
+                tx=-window.innerHeight; ty=0;
+                ctx.translate(-window.innerHeight,0);
+                ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+                break;
+            case 180:
+                tx=-window.innerWidth; ty=-window.innerHeight;
+                ctx.translate(-window.innerWidth,-window.innerHeight);
+                ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+                break;
+        } 
     } else {
         ctx.fillStyle="#FFFFFF";
         ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
@@ -116,23 +116,24 @@ function pointerDown(e) {
     var x = e.pageX - ofst.left;
     var y = e.pageY - ofst.top;
 
-    switch(orientation) {
-        case 90:
-            var t=x;
-            x=-y-tx;
-            y=t;
-            break;
-        case -90:
-            var t=-x-ty;
-            x=y;
-            y=t;
-            break;
-        case 180:
-            x=-x-tx;
-            y=-y-ty;
-            break;
+    if(orienting()) {
+        switch(orientation) {
+            case 90:
+                var t=x;
+                x=-y-tx;
+                y=t;
+                break;
+            case -90:
+                var t=-x-ty;
+                x=y;
+                y=t;
+                break;
+            case 180:
+                x=-x-tx;
+                y=-y-ty;
+                break;
+        }
     }
-
 
     switch(curTool) {			
         case "draw":
@@ -178,21 +179,23 @@ function pointerMove(e) {
     var x = e.pageX - ofst.left;
     var y = e.pageY - ofst.top;
 
-    switch(orientation) {
-        case 90:
-            var t=x;
-            x=-y-tx;
-            y=t;
-            break;
-        case -90:
-            var t=-x-ty;
-            x=y;
-            y=t;
-            break;
-        case 180:
-            x=-x-tx;
-            y=-y-ty;
-            break;
+    if(orienting()) {
+        switch(orientation) {
+            case 90:
+                var t=x;
+                x=-y-tx;
+                y=t;
+                break;
+            case -90:
+                var t=-x-ty;
+                x=y;
+                y=t;
+                break;
+            case 180:
+                x=-x-tx;
+                y=-y-ty;
+                break;
+        }
     }
 
     if (isDragging){
