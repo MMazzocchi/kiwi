@@ -16,7 +16,7 @@ var tx=0;
 var ty=0;
 var rx;
 var ry;
-var orientation=0;
+var orientation=window.orientation;
 
 var svgList = {
     'butterfly':{
@@ -34,8 +34,11 @@ var svgList = {
         bounds:[0,0,378,302],
         url:'svg/BnL.svg' }
 		
-    };
+};
 
+function orienting() {
+    return (typeof window.orientation != "undefined");
+}
 
 // Refresh the canvas; draw everything
 function refreshCanvas() {
@@ -45,6 +48,7 @@ function refreshCanvas() {
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
 
+    if(orienting()) {
     orientation = window.orientation;
 
     ctx.rotate(-orientation*Math.PI/180);
@@ -71,6 +75,10 @@ function refreshCanvas() {
             ctx.translate(-window.innerWidth,-window.innerHeight);
             ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
             break;
+    } 
+    } else {
+        ctx.fillStyle="#FFFFFF";
+        ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
     }
 
     // For each id in layerList, call this function:
@@ -110,9 +118,14 @@ function pointerDown(e) {
 
     switch(orientation) {
         case 90:
-//            var t=-x+ty;
-            y=x;//+ty;
-//            y=t;
+            var t=x;
+            x=-y-tx;
+            y=t;
+            break;
+        case -90:
+            var t=-x-ty;
+            x=y;
+            y=t;
             break;
         case 180:
             x=-x-tx;
@@ -167,9 +180,14 @@ function pointerMove(e) {
 
     switch(orientation) {
         case 90:
-//            var t=-x+ty;
-            y=x;//+ty;
-//            y=t;
+            var t=x;
+            x=-y-tx;
+            y=t;
+            break;
+        case -90:
+            var t=-x-ty;
+            x=y;
+            y=t;
             break;
         case 180:
             x=-x-tx;
@@ -201,10 +219,10 @@ function createStamp(dObj) {
 			ctx.beginPath();
 			//ctx.fillStyle="#000000";
 			ctx.translate(this.pts[0],this.pts[1]);
-			//ctx.rotate(this.rotation);
+			ctx.rotate(this.rotation);
 			ctx.drawSvg(this.svg, 0, 0, 0, 0);
-			//ctx.fillRect(0,0,20,20);
-			ctx.stroke();
+//			ctx.fillRect(0,0,20,20);
+//			ctx.stroke();
 		ctx.restore();
 		//console.log(this.svg);
 		//ctx.drawSvg(this.svg, this.x, this.y, 197, 154);
