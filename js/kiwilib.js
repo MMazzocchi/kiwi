@@ -196,10 +196,9 @@ function createStamp(x1,y1) {
 		
 		ctx.save();
 			ctx.beginPath();
-			ctx.fillStyle="#000000";
+			ctx.fillStyle="#00CC00";
 			ctx.translate(this.x,this.y);
 			ctx.rotate(this.rotation);
-			
 			ctx.fillRect(0,0,20,20);
 			ctx.stroke();
 		ctx.restore();
