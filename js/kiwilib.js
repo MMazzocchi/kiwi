@@ -1,3 +1,4 @@
+
 var canvas;           	// This will hold our canvas
 var objectList = {};  	// This is a hash that maps an object's id to the object itself
 var layerList = [];   	// This is the list of layers. Each element is an object id.
@@ -10,7 +11,10 @@ var thickness = 10;   	// Thickness of the line to be drawn
 var alpha = 1;			// Opacity of the object to be drawn
 var isDragging = false;
 var prevOrientation = 0;
-
+var svgList = {'butterfly':{ svg:null, cx:209, cy:164, bounds:[0,0,410,286], url:'svg/butterfly.svg' },
+                 'bnl':{ svg:null, cx:197, cy:154, bounds:[0,0,378,302],url:'svg/BnL.svg' }
+              };
+var curStamp = 'bnl';
 
 // Refresh the canvas; draw everything
 function refreshCanvas() {
@@ -38,9 +42,9 @@ function refreshCanvas() {
             ctx.translate(-window.innerHeight,0);
             ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
-        case -180:
-            ctx.translate(0,-window.innerWidth);
-       //     ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+        case 180:
+            ctx.translate(-window.innerWidth,-window.innerHeight);
+            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
     }
 
@@ -105,6 +109,10 @@ function pointerDown(e) {
 		case "fill":
             
             break;
+		case "stamp":
+            createStamp(x,y);
+			isDragging = false;
+            break;
     }
 }
 
@@ -129,6 +137,63 @@ function pointerMove(e) {
 function pointerEnd(e) {
     isDragging = false;
 }
+
+function createStamp(x1,y1) {
+
+    // Initialize a 'dot'; a dot is a hash with two parts: an (x,y) coordinate, and a draw function.
+    var stamp = {
+		svg: svgList[ curStamp ].url,
+        x:x1,
+        y:y1
+    };
+	
+	
+		
+    // Set the dot's draw function.
+
+    // This is actually really important; every object that gets drawn MUST have a draw function.
+    // This is because RefreshCanvas() loops through all the objects, and calls all of their
+    // draw functions. If it doesn't have a draw function, the script breaks.
+
+    // The draw function is NOT called here, it's just defined. It will get called later.
+    stamp.draw = function(ctx) {
+        // Begin a 'path'. A path tells the canvas where to draw or fill.
+        ctx.beginPath();
+		ctx.fillStyle="#000000";
+		ctx.fillRect(this.x,this.y,20,20);
+		//console.log(this.svg);
+		//ctx.drawSvg(this.svg, this.x, this.y, 197, 154);
+        // Make an arc centered at x and y with radius 4 that goes from angle 0 to angle 2*PI
+        //ctx.arc(this.x-2, this.y-2, 4, 0, 2*Math.PI);
+		//console.log(this.x +" "+ this.y);
+        // Draw the arc.
+        ctx.stroke();
+    };
+
+    // Give this dot an ID.
+    assignID(stamp);
+
+    // We just made a dot, so let's make an action for it so we can undo it later.
+
+    // An 'action' is a hash which MUST contain two functions: undo and redo. These will get called later.
+    var newAct = {
+        undo: function() {
+            // Take the top layer off of layerList. The object still exists in the objects hash, but
+            // doesn't get drawn because ONLY the objects in layerList get drawn.
+            layerList.splice(layerList.length-1,1);
+        },
+        redo: function() {
+            // Put this object back in layerList.
+            layerList[layerList.length] = stamp.id;
+        }
+    };
+
+    // Add the new action and redraw.
+    addAction(newAct);
+    refreshCanvas();
+}
+
+
 
 function startLine(dObj) {
 	assignID(dObj);
@@ -220,6 +285,8 @@ function redo() {
         refreshCanvas();
     }
 }
+  
+
 
 
 function SetDrawThick(t)	// sets the thickness
@@ -274,7 +341,7 @@ $().ready( function() {
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
-    window.addEventListener( 'resize', refreshCanvas );
+    window.addEventListener( 'resize', function(e) { e.preventDefault(); refreshCanvas(); );
     prevOrientation = window.orientation;
 
     // Get our canvas.
