@@ -28,6 +28,7 @@ function refreshCanvas() {
         var dObj = objectList[id];
 
         ctx.rotate(-window.orientation*Math.PI/180);
+        ctx.translate(-window.innerWidth,0);
 
         // Draw the object
         dObj.draw(ctx);
