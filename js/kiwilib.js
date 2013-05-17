@@ -44,7 +44,7 @@ function refreshCanvas() {
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
 
-    ctx.rotate(-window.orientation*Math.PI/180);
+//    ctx.rotate(-window.orientation*Math.PI/180);
 
     ctx.fillStyle="#FFFFFF";
 
