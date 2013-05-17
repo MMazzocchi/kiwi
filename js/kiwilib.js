@@ -324,6 +324,10 @@ $().ready( function() {
 	$('#erase').click( function() {
 		SelectTool('erase');
 	});
+	
+	$('#stamp').click( function() {
+		SelectTool('stamp');
+	});
 	//////////////////////////////////////////////////////////////////////////////////////
 	
 	$('#clear').click( function() {
