@@ -26,12 +26,16 @@ function refreshCanvas() {
 
     ctx.fillStyle="#FFFFFF";
 
-    switch(-window.orientation) {
+    switch(window.orientation) {
         case 0:
             ctx.fillRect(0,0,canvas.width,canvas.height);
             break;
-        case 90:
+        case -90:
             ctx.translate(0,-window.innerWidth);
+            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+            break;
+        case 90:
+            ctx.translate(0,window.innerWidth);
             ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
     }
