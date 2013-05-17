@@ -24,10 +24,12 @@ function refreshCanvas() {
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
-        // Get the dot for this layer
+        // Get the object for this layer
         var dObj = objectList[id];
 
-        // Draw the dot
+        ctx.rotate(window.orientation*Math.PI/180);
+
+        // Draw the object
         dObj.draw(ctx);
     });
 }
@@ -190,8 +192,6 @@ $().ready( function() {
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
-
-    canvas.addEventListener( 'rezise', function(e) { e.preventDefault(); });
 
     // Bind an action.
     $('#drawing_canvas').mousedown( pointerDown );
