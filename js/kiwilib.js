@@ -34,7 +34,7 @@ function refreshCanvas() {
 
     // Set the fill color and fill the background
     ctx.fillStyle="#FFFFFF";
-    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.fillRect(0,0,window.innerWidth,window.innerheight);
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
