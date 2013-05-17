@@ -6,17 +6,26 @@ var idPtr = 0;        // This is the next available id.
 var actionPtr = 0;    // This is the action stack pointer; anything below this is real, and anything above it has been undo'd.
 var mode = "line";
 var isDragging = false;
+var prevOrientation;
+
 
 // Refresh the canvas; draw everything
 function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
-    ctx.canvas.width  = window.innerWidth;
-    ctx.canvas.height = window.innerHeight;
+//    ctx.canvas.width  = window.innerWidth;
+//    ctx.canvas.height = window.innerHeight;
 
-//    ctx.rotate(window.orientation*Math.PI/180);
-//  Possible translation issue afterwards?
+    ctx.rotate((window.orientation-prevOrientation)*Math.PI/180);
+
+    switch(window.orientation-prevOrientation) {
+        case 90:
+            ctx.translate(0,window.innerHeight);
+            break;
+    }
+
+    prevOrientation = window.orientation;
 
     // Set the fill color and fill the background
     ctx.fillStyle="#FFFFFF";
@@ -27,14 +36,6 @@ function refreshCanvas() {
         // Get the object for this layer
         var dObj = objectList[id];
 
-//        ctx.rotate(-window.orientation*Math.PI/180);
-        switch(window.orientation) {
-            case 90:
-                break;
-            case 180:
-//                ctx.translate(window.innerWidth,0);
-                break;
-        }
         // Draw the object
         dObj.draw(ctx);
     });
@@ -195,6 +196,7 @@ $().ready( function() {
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
     window.addEventListener( 'resize', refreshCanvas );
+    prevOrientation = window.orientation;
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
