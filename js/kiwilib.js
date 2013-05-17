@@ -50,7 +50,7 @@ function refreshCanvas() {
 
     switch(window.orientation) {
         case 0:
-            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+            ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
             tx=0; ty=0; 
             break;
         case -90:
@@ -66,7 +66,7 @@ function refreshCanvas() {
         case 180:
             tx=-window.innerWidth; ty=-window.innerHeight;
             ctx.translate(-window.innerWidth,-window.innerHeight);
-            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+            ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
             break;
     }
 
