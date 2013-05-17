@@ -16,6 +16,7 @@ var tx;
 var ty;
 var rx;
 var ry;
+var orientation;
 
 var svgList = {
     'butterfly':{
@@ -44,11 +45,13 @@ function refreshCanvas() {
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
 
-    ctx.rotate(-window.orientation*Math.PI/180);
+    orientation = window.orientation;
+
+    ctx.rotate(-orientation*Math.PI/180);
 
     ctx.fillStyle="#FFFFFF";
 
-    switch(window.orientation) {
+    switch(orientation) {
         case 0:
             ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
             tx=0; ty=0; 
@@ -69,11 +72,6 @@ function refreshCanvas() {
             ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
             break;
     }
-
-//    ctx.fillRect(0,0,window.innerHight,window.innerWidth);
-
-    ctx.fillStyle="#FFFFFF";
-//    ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
