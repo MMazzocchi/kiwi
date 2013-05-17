@@ -7,7 +7,7 @@ body {
 }
 body {
 	background:#CCC;
-	margin-top:40px;	
+	/*margin-top:40px; */
 }
 .clear {
 	clear:both;	
@@ -25,8 +25,6 @@ input[type="range"] {
 }
 
 #canvaswrapp {
-	width:800px;
-	height:600px;
 	margin:0 auto;	
 }
 #artcanvas {
