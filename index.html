@@ -9,6 +9,13 @@
 <link rel="stylesheet" type="text/css" href="css/master.css" />
 <script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
 <script type="text/javascript" src="js/kiwilib.js"></script>
+<script type="text/javascript" src="js/raphael-min.js"></script>
+
+<!-- SVG conversion library -->
+<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script> 
+<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
+
+
 </head>
 <body>
 <div class="navbar navbar-fixed-top">
@@ -49,9 +56,9 @@
                     <li><span class="icon" id="erase"><img src="img/eraser_icon.png" /></span></li>
                     <li class="dropdown"><a class="dropdown-toggle" data-toggle="dropdown">Stamps <b class="caret"></b></a>
                         <ul class="dropdown-menu">
-                        	<li><a id="mickey">Mickey</a></li>
-                            <li><a id="bnl">BnL</a></li>
-                            <li><a id="butterfly">Butterfly</a></li>
+                        	<li><a class="icon" id="mickey_button"><img src="img/mickey_icon.png" /></a></li>
+                            <li><a class="icon" id="bnl"><img src="img/bnl_icon.png" /></a></li>
+                            <li><a class="icon" id="butterfly"><img src="img/butterfly_icon.png" /></a></li>
                         </ul>
 					</li>
 				</ul>
@@ -62,7 +69,6 @@
 <div id="canvaswrapp">
 	<canvas id="drawing_canvas"></canvas>
 </div>
-
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 </body>
 </html>
