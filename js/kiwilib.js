@@ -274,7 +274,7 @@ $().ready( function() {
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
-    window.addEventListener( 'resize', refreshCanvas );
+    window.addEventListener( 'resize', function(e) { e.preventDefault(); refreshCanvas(); );
     prevOrientation = window.orientation;
 
     // Get our canvas.
