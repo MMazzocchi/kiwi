@@ -12,11 +12,11 @@ var alpha = 1;          // Opacity of the object to be drawn
 var isDragging = false;
 var curStamp = '';
 
-var tx;
-var ty;
+var tx=0;
+var ty=0;
 var rx;
 var ry;
-var orientation;
+var orientation=0;
 
 var svgList = {
     'butterfly':{
