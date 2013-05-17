@@ -12,6 +12,11 @@ var thickness = 10;     // Thickness of the line to be drawn
 var alpha = 1;          // Opacity of the object to be drawn
 var isDragging = false;
 
+var ctx;
+var cty;
+var rx;
+var ry;
+
 var svgList = {
     'butterfly':{
         svg:null, 
@@ -45,7 +50,7 @@ function refreshCanvas() {
 
     switch(window.orientation) {
         case 0:
-            ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
             break;
         case -90:
             ctx.translate(0,-window.innerWidth);
