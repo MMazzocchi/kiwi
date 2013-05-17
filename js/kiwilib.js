@@ -75,6 +75,7 @@ function refreshCanvas() {
             ctx.translate(-window.innerWidth,-window.innerHeight);
             ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
             break;
+    } 
     } else {
             ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
     }
