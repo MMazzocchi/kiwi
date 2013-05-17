@@ -17,6 +17,9 @@ function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
+    // Set the fill color and fill the background
+    ctx.fillStyle="#FFFFFF";
+
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
 
@@ -24,17 +27,16 @@ function refreshCanvas() {
     ctx.rotate(-window.orientation*Math.PI/180);
 
     switch(-window.orientation) {
+        case 0:
+//            ctx.fillRect(0,0,canvas.width,canvas.height);
+            break;
         case 90:
             ctx.translate(0,-window.innerWidth);
             break;
     }
 
-//    ctx.canvas.width  = window.innerWidth;
-//    ctx.canvas.height = window.innerHeight;
 
-    // Set the fill color and fill the background
-    ctx.fillStyle="#FFFFFF";
-    ctx.fillRect(0,0,window.innerWidth,window.innerheight);
+    ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
