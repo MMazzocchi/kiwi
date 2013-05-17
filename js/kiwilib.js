@@ -17,7 +17,6 @@ function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
-    // Set the fill color and fill the background
 
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
@@ -25,12 +24,15 @@ function refreshCanvas() {
 //    ctx.rotate((window.orientation-prevOrientation)*Math.PI/180);
     ctx.rotate(-window.orientation*Math.PI/180);
 
+    ctx.fillStyle="#FFFFFF";
+
     switch(-window.orientation) {
         case 0:
-//            ctx.fillRect(0,0,canvas.width,canvas.height);
+            ctx.fillRect(0,0,canvas.width,canvas.height);
             break;
         case 90:
             ctx.translate(0,-window.innerWidth);
+            ctx.fillRect(0,-window.innerWidth,window.innerWidth,window.innerHeight);
             break;
     }
 
