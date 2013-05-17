@@ -12,8 +12,6 @@ function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
-    ctx.rotate(Math.PI/2);//window.orientation*Math.PI/180);
-
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
 
@@ -109,8 +107,6 @@ function startLine(x,y) {
             };
         } else {
 
-//            ctx.rotate(Math.PI/2);
-
             // Draw the line with beziers
             for(var i=0; i<this.pts.length; i+=3) {
                 if(this.pts.length <= i+4) {
@@ -191,10 +187,11 @@ $().ready( function() {
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
     window.addEventListener( 'resize', refreshCanvas );
-    canvas.addEventListener( 'orientationchange', function(e) { e.preventDefault(); });
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
+
+    canvas.addEventListener( 'orientationchange', function(e) { e.preventDefault(); });
 
     // Bind an action.
     $('#drawing_canvas').mousedown( pointerDown );
