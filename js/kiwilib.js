@@ -114,6 +114,11 @@ function pointerDown(e) {
             x=-y-tx;
             y=t;
             break;
+        case -90:
+            var t=-x-ty;
+            x=y;
+            y=t;
+            break;
         case 180:
             x=-x-tx;
             y=-y-ty;
@@ -169,6 +174,11 @@ function pointerMove(e) {
         case 90:
             var t=x;
             x=-y-tx;
+            y=t;
+            break;
+        case -90:
+            var t=-x-ty;
+            x=y;
             y=t;
             break;
         case 180:
