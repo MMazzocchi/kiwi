@@ -109,7 +109,7 @@ function startLine(x,y) {
             };
         } else {
 
-            ctx.rotate(Math.PI/2);
+//            ctx.rotate(Math.PI/2);
 
             // Draw the line with beziers
             for(var i=0; i<this.pts.length; i+=3) {
@@ -191,6 +191,7 @@ $().ready( function() {
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
     window.addEventListener( 'resize', refreshCanvas );
+    canvas.addEventListener( 'resize', function(e) { e.preventDefault(); });
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
