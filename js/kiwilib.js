@@ -49,7 +49,7 @@ function refreshCanvas() {
     ctx.canvas.height = window.innerHeight;
 
     if(orienting()) {
-/*        orientation = window.orientation;
+        orientation = window.orientation;
 
         ctx.rotate(-orientation*Math.PI/180);
 
@@ -76,13 +76,6 @@ function refreshCanvas() {
                 ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
                 break;
         }
-*/        ctx.fillStyle="#FFFFFF";
-        ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
-
-        orientation = window.orientation;
-
-        ctx.rotate(-orientation*Math.PI/180);
-
     } else {
         ctx.fillStyle="#FFFFFF";
         ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
