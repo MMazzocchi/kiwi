@@ -164,9 +164,9 @@ function pointerDown(e) {
 				svg: svgList[ curStamp ].url,
 				cx: svgList[ curStamp ].cx,
 				cy: svgList[ curStamp ].cy,
-				scale: 0.5,
+				scale: 0.5, 
 				bound: svgList[ curStamp ].bounds,
-				rotation: 0.70,
+				rotation: Math.random()*2*Math.PI, //eventually user specified
 				pts: [x, y],
 			};	
             createStamp(dObj);
@@ -227,6 +227,7 @@ function createStamp(dObj) {
 		ctx.save();
 			ctx.beginPath();
 			ctx.translate(this.pts[0],this.pts[1]);
+			ctx.scale(scale,scale);
 			ctx.rotate(this.rotation);
 			ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
 		ctx.restore();
