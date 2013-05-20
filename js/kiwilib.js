@@ -409,7 +409,7 @@ function resize() {
     ctx.fillStyle="#000000";
     ctx.fillRect(0,0,maxDimen,maxDimen);
 
-    refreshCanvas();
+    setTimeout(refreshCanvas, 1000);
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
