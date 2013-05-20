@@ -260,7 +260,14 @@ function startLine(dObj) {
         ctx.beginPath();
         ctx.moveTo(this.pts[0][0], this.pts[0][1]);
         var last = this.pts[0];
-        if(!this.bezier) {
+        if(this.pts.length == 1) {
+            ctx.fillStyle = '#000000';
+            ctx.lineTo(this.pts[0][0], this.pts[0][1]);
+                        ctx.lineJoin = 'round';
+                        ctx.lineCap = 'round';
+                        ctx.lineWidth = this.width;
+                        ctx.globalAlpha = this.opacity;
+        } else if(!this.bezier) {
 
             // Draw the line without beziers
             for(var i=1; i<this.pts.length; i++) {
