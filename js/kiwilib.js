@@ -265,6 +265,7 @@ function startLine(dObj) {
         ctx.beginPath();
         ctx.moveTo(this.pts[0][0], this.pts[0][1]);
         var last = this.pts[0];
+		
         if(this.pts.length == 1) {
             ctx.fillStyle = '#000000';
             ctx.lineTo(this.pts[0][0], this.pts[0][1]);
@@ -403,20 +404,6 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
     refreshCanvas();
 }
 
-function resize() {
-    var maxDimen = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
-
-    var ctx = canvas.getContext('2d');
-
-    ctx.canvas.width  = maxDimen;
-    ctx.canvas.height = maxDimen;
-
-    ctx.fillStyle="#000000";
-    ctx.fillRect(-maxDimen,-maxDimen,2*maxDimen,2*maxDimen);
-
-//    refreshCanvas();
-}
-
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
 
@@ -425,8 +412,8 @@ $().ready( function() {
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
-    window.addEventListener( 'resize', resize );
-    window.addEventListener( 'orientationchange', resize );
+    window.addEventListener( 'resize', refreshCanvas );
+    window.addEventListener( 'orientationchange', refreshCanvas );
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
