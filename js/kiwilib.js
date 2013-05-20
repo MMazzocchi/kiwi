@@ -385,6 +385,13 @@ function redo() {
     }
 }
 
+function updateThick(slideAmount) {
+	thickness = slideAmount;
+}
+function updateOpac(slideAmount) {
+	alpha = slideAmount/100;
+}
+
 function SetDrawThick(t)	// sets the thickness
 {
     thickness = t;
