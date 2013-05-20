@@ -403,7 +403,7 @@ function resize() {
 
     ctx.fillStyle="#000000";
     ctx.fillRect(-window.innerWidth,-window.innerHeight,2*window.innerWidth,2*window.innerHeight);
-    refreshCanvas();
+//    refreshCanvas();
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
