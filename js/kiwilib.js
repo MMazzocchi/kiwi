@@ -17,6 +17,7 @@ var ty=0;
 var rx;
 var ry;
 var orientation = orienting() ? window.orientation : 0;
+var maxDimen;
 
 var svgList = {
     'butterfly':{
@@ -402,7 +403,7 @@ function resize() {
     var ctx = canvas.getContext('2d');
 
     ctx.fillStyle="#000000";
-    ctx.fillRect(-window.innerWidth,-window.innerHeight,2*window.innerWidth,2*window.innerHeight);
+    ctx.fillRect(-maxDimen,-maxDimen,2*maxDimen,2*maxDimen);
 //    refreshCanvas();
 }
 
@@ -413,6 +414,8 @@ $().ready( function() {
     document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
+
+    maxDimen = window.innerLength > window.innerWidth ? window.innerLength : window.innerWidth;
 
     window.addEventListener( 'resize', resize );
     window.addEventListener( 'orientationchange', resize );
