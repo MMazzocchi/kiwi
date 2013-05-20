@@ -107,6 +107,16 @@ function addAction(act) {
     actionPtr++;
 }
 
+function getSelectID(x, y) {
+    var id = -1;
+    for(var i=layerList.length-1; i<=0; i--) {
+        if(obj.select(x,y)) {
+            id = layerList[i].id;
+        }
+    }
+    return id;
+}
+
 function pointerDown(e) {
     var ofst = $(this).offset();
 
@@ -150,6 +160,7 @@ function pointerDown(e) {
 
         // These have no functionality yet, need to figure out how to find object based on mouse coordinates
         case "select":
+            var objID = getObjectID(x, y);
             break;
 
         case "erase":
@@ -251,8 +262,6 @@ function createStamp(dObj) {
     refreshCanvas();
 }
 
-
-
 function startLine(dObj) {
     assignID(dObj);
 
@@ -298,7 +307,7 @@ function startLine(dObj) {
         }
         ctx.stroke();
     };
-	var newAct = {
+    var newAct = {
         undo: function() {
             // Take the top layer off of layerList. The object still exists in the objects hash, but
             // doesn't get drawn because ONLY the objects in layerList get drawn.
@@ -350,9 +359,6 @@ function redo() {
         refreshCanvas();
     }
 }
-  
-
-
 
 function SetDrawThick(t)	// sets the thickness
 {
