@@ -398,6 +398,14 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
     refreshCanvas();
 }
 
+function resize() {
+    var ctx = canvas.getContext('2d');
+
+    ctx.fillStyle="#FFFFFF";
+    ctx.fillRect(-window.innerWidth,-window.innerHeight,window.innerWidth,window.innerHeight);
+    refreshCanvas();
+}
+
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
 
@@ -406,7 +414,7 @@ $().ready( function() {
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
-    window.addEventListener( 'resize', function(e) { e.preventDefault(); refreshCanvas(); }, false );
+    window.addEventListener( 'resize', resize );
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
