@@ -398,20 +398,6 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
     refreshCanvas();
 }
 
-function resize() {
-    var maxDimen = window.innerHeight > window.innerWidth ? window.innerHeight : window.innerWidth;
-
-    var ctx = canvas.getContext('2d');
-
-    ctx.canvas.width  = maxDimen;
-    ctx.canvas.height = maxDimen;
-
-    ctx.fillStyle="#000000";
-    ctx.clearRect(0,0,maxDimen,maxDimen);
-
-    setTimeout(refreshCanvas, 1000);
-}
-
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
 
@@ -420,8 +406,8 @@ $().ready( function() {
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
-    window.addEventListener( 'resize', resize );
-    window.addEventListener( 'orientationchange', resize );
+    window.addEventListener( 'resize', refreshCanvas );
+    window.addEventListener( 'orientationchange', refreshCanvas );
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
