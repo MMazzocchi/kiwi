@@ -407,7 +407,7 @@ function resize() {
     ctx.canvas.height = maxDimen;
 
     ctx.fillStyle="#000000";
-    ctx.fillRect(0,0,maxDimen,maxDimen);
+    ctx.clearRect(0,0,maxDimen,maxDimen);
 
     setTimeout(refreshCanvas, 1000);
 }
