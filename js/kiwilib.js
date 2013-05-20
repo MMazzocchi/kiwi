@@ -17,16 +17,16 @@ var ty=0;
 var rx;
 var ry;
 var orientation = orienting() ? window.orientation : 0;
-var maxDimen;
 
 var svgList = {
     'butterfly':{
         svg:null, 
-        cx:209, cy:164, 
+        cx:205, cy:143, 
         bounds:[0,0,410,286], 
         url:'svg/butterfly.svg' },
 	'mickey':{
 		svg:null, 
+		cx:156, cy:145,
 		bounds:[0,0,313,290],
 		url:'svg/mickey.svg' },
     'bnl':{
@@ -162,7 +162,11 @@ function pointerDown(e) {
         case "stamp":
 			var dObj = {
 				svg: svgList[ curStamp ].url,
-				rotation: 0.70,
+				cx: svgList[ curStamp ].cx,
+				cy: svgList[ curStamp ].cy,
+				scale: 0.5, 
+				bound: svgList[ curStamp ].bounds,
+				rotation: Math.random()*2*Math.PI, //eventually user specified
 				pts: [x, y],
 			};	
             createStamp(dObj);
@@ -217,21 +221,16 @@ function createStamp(dObj) {
 
     dObj.draw = function(ctx) {
         // Begin a 'path'. A path tells the canvas where to draw or fill.
-        
+        var scale = this.scale;
+		var bound = [this.bound[2],this.bound[3]];
 		
 		ctx.save();
 			ctx.beginPath();
-			ctx.fillStyle="#000000";
 			ctx.translate(this.pts[0],this.pts[1]);
+			ctx.scale(scale,scale);
 			ctx.rotate(this.rotation);
-			ctx.drawSvg(this.svg, 0, 0, 0, 0);
-//			ctx.fillRect(0,0,20,20);
-//			ctx.stroke();
+			ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
 		ctx.restore();
-		//console.log(this.svg);
-		//ctx.drawSvg(this.svg, this.x, this.y, 197, 154);
-		//console.log(this.x +" "+ this.y);
-
        
     };
 
@@ -400,14 +399,6 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
     refreshCanvas();
 }
 
-function resize() {
-    var ctx = canvas.getContext('2d');
-
-    ctx.fillStyle="#000000";
-    ctx.fillRect(-maxDimen,-maxDimen,2*maxDimen,2*maxDimen);
-//    refreshCanvas();
-}
-
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
 
@@ -416,10 +407,8 @@ $().ready( function() {
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
-    maxDimen = window.innerLength > window.innerWidth ? window.innerLength : window.innerWidth;
-
-    window.addEventListener( 'resize', resize );
-    window.addEventListener( 'orientationchange', resize );
+    window.addEventListener( 'resize', refreshCanvas );
+    window.addEventListener( 'orientationchange', refreshCanvas );
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
