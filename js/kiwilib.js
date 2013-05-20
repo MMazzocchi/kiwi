@@ -17,7 +17,6 @@ var ty=0;
 var rx;
 var ry;
 var orientation = orienting() ? window.orientation : 0;
-var maxDimen;
 
 var svgList = {
     'butterfly':{
@@ -400,6 +399,8 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 }
 
 function resize() {
+    var maxDimen = window.innerLength < window.innerWidth ? window.innerLength : window.innerWidth;
+
     var ctx = canvas.getContext('2d');
 
     ctx.fillStyle="#000000";
@@ -414,8 +415,6 @@ $().ready( function() {
     document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
-
-    maxDimen = window.innerLength < window.innerWidth ? window.innerLength : window.innerWidth;
 
     window.addEventListener( 'resize', resize );
     window.addEventListener( 'orientationchange', resize );
