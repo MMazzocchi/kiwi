@@ -15,10 +15,13 @@
 <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script> 
 <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
 
-
+<!-- Sliders -->
 <script type="text/javascript">
-function updateSlider(slideAmount) {
+function updateThick(slideAmount) {
 	thickness = slideAmount;
+}
+function updateOpac(slideAmount) {
+	alpha = slideAmount/100;
 }
 </script>
 
@@ -42,10 +45,17 @@ function updateSlider(slideAmount) {
                         </ul>
 					</li>
                 </ul>
-				<div id="opacitySlider">
-					 Opacity<input id="slide" type="range"
-					 min="6" max="80" step="2" value="10"
-					 onchange="updateSlider(this.value)" />
+				<div class="sliders">
+					<div id="opacitySlider">
+						 Opacity<input id="slide" type="range"
+						 min="1" max="100" step="2" value="100"
+						 onchange="updateOpac(this.value)" />
+					</div>
+					<div id="thicknessSlider">
+						 Thickness<input id="slide" type="range"
+						 min="6" max="80" step="2" value="10"
+						 onchange="updateThick(this.value)" />
+					</div>
 				</div>
                 <ul class="nav">
 					<li><a class="icon" id="hand"><img src="img/hand-tool.png" alt="Hand" title="Hand" /><span>Hand</span></a></li>
