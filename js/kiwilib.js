@@ -399,7 +399,7 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 }
 
 function resize() {
-    var maxDimen = window.innerLength < window.innerWidth ? window.innerLength : window.innerWidth;
+    var maxDimen = window.innerLength > window.innerWidth ? window.innerLength : window.innerWidth;
 
     var ctx = canvas.getContext('2d');
 
