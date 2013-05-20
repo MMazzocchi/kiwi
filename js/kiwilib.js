@@ -193,7 +193,7 @@ function pointerMove(e) {
     }
 
     var x = e.pageX - ofst.left;
-    var y = e.pageY - ofst.top;
+    (var y = e.pageY - ofst.top;
 
     if(orienting()) {
         switch(orientation) {
@@ -308,6 +308,12 @@ function startLine(dObj) {
         }
         ctx.stroke();
     };
+    dObj.select = function() {
+        for(var i=0; i<this.pts.length; i++) {
+            if(
+        }
+    }
+
     var newAct = {
         undo: function() {
             // Take the top layer off of layerList. The object still exists in the objects hash, but
