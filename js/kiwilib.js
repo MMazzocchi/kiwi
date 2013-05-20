@@ -230,6 +230,7 @@ function createStamp(dObj) {
 			ctx.scale(scale,scale);
 			ctx.rotate(this.rotation);
 			ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
+			ctx.globalAlpha = this.opacity;
 		ctx.restore();
        
     };
