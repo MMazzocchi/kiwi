@@ -407,9 +407,9 @@ function resize() {
     ctx.canvas.height = maxDimen;
 
     ctx.fillStyle="#000000";
-    ctx.fillRect(-maxDimen,-maxDimen,2*maxDimen,2*maxDimen);
+    ctx.fillRect(0,0,maxDimen,maxDimen);
 
-//    refreshCanvas();
+    refreshCanvas();
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
