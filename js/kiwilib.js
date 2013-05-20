@@ -404,7 +404,7 @@ function resize() {
     var ctx = canvas.getContext('2d');
 
     ctx.fillStyle="#000000";
-    ctx.fillRect(-maxDimen,-maxDimen,2*maxDimen,2*maxDimen);
+    ctx.fillRect(0,0,2*maxDimen,2*maxDimen);
 //    refreshCanvas();
 }
 
