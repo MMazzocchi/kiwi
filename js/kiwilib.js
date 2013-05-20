@@ -415,7 +415,7 @@ $().ready( function() {
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
-    maxDimen = window.innerLength > window.innerWidth ? window.innerLength : window.innerWidth;
+    maxDimen = window.innerLength < window.innerWidth ? window.innerLength : window.innerWidth;
 
     window.addEventListener( 'resize', resize );
     window.addEventListener( 'orientationchange', resize );
