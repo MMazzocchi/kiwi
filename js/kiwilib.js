@@ -322,7 +322,7 @@ function startLine(dObj) {
     dObj.select = function(x,y) {
         for(var i=0; i<this.pts.length-1; i++) {
             var dist = distance([x,y],this.pts[i]) + distance([x,y],this.pts[i+1]);
-            var maxDist = distance(this.pts[i], this.pts[i+1])+(this.width/2);
+            var maxDist = distance(this.pts[i], this.pts[i+1])+(this.width/1);
 
             console.log("Is "+dist+" less than "+maxDist+"?");
             if(dist < maxDist) {
