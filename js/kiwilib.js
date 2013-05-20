@@ -33,7 +33,12 @@ var svgList = {
         svg:null,
         cx:197, cy:154,
         bounds:[0,0,378,302],
-        url:'svg/BnL.svg' }
+        url:'svg/BnL.svg' },
+	'troll':{ 
+		svg:null, 
+		cx:301, cy:226,
+		bounds:[0,0,603,453],
+		url:'svg/troll_face.svg' }
 		
 };
 
@@ -164,7 +169,7 @@ function pointerDown(e) {
 				svg: svgList[ curStamp ].url,
 				cx: svgList[ curStamp ].cx,
 				cy: svgList[ curStamp ].cy,
-				scale: 0.5, 
+				scale: Math.random()*0.5 + 0.25, 
 				bound: svgList[ curStamp ].bounds,
 				rotation: Math.random()*2*Math.PI, //eventually user specified
 				pts: [x, y],
