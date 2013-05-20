@@ -16,6 +16,12 @@
 <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
 
 
+<script type="text/javascript">
+function updateSlider(slideAmount) {
+	thickness = slideAmount;
+}
+</script>
+
 </head>
 <body>
 <div class="navbar navbar-fixed-top">
@@ -36,17 +42,11 @@
                         </ul>
 					</li>
                 </ul>
-				<form class="navbar-form pull-left form-inline">
-					<input id="color" type="color" class="input-mini" />
-					<div class="input-prepend">
-						<span class="add-on">Opacity</span>
-						<input id="opacity" type="range" class="input-mini" value="100" min="1" max="100" />
-                    </div>
-					<div class="input-prepend">
-						<span class="add-on">Thickness</span>
-						<input id="thickness" type="range" class="input-mini" value="50" min="1" max="100" />
-                    </div>
-                </form>
+				<div id="opacitySlider">
+					 Opacity<input id="slide" type="range"
+					 min="6" max="80" step="2" value="10"
+					 onchange="updateSlider(this.value)" />
+				</div>
                 <ul class="nav">
 					<li><a class="icon" id="hand"><img src="img/hand-tool.png" alt="Hand" title="Hand" /><span>Hand</span></a></li>
 					<li><a class="icon" id="brush"><img src="img/paintbrush.png" alt="Brush" title="Brush" /><span>Brush</span></a></li>
