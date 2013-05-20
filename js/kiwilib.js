@@ -403,7 +403,7 @@ function resize() {
 
     ctx.fillStyle="#FFFFFF";
     ctx.fillRect(-window.innerWidth,-window.innerHeight,2*window.innerWidth,2*window.innerHeight);
-//    refreshCanvas();
+    refreshCanvas();
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
@@ -415,7 +415,7 @@ $().ready( function() {
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
     window.addEventListener( 'resize', resize );
-    window.addEventListener( 'orientationchange', refreshCanvas );
+    window.addEventListener( 'orientationchange', resize );
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
