@@ -415,7 +415,7 @@ $().ready( function() {
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
     window.addEventListener( 'resize', resize );
-    window.addEventListener( 'orientationchange', rezise );
+    window.addEventListener( 'orientationchange', refreshCanvas );
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
