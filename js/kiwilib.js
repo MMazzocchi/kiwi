@@ -107,11 +107,15 @@ function addAction(act) {
     actionPtr++;
 }
 
-function getSelectID(x, y) {
+function getObjectID(x, y) {
     var id = -1;
-    for(var i=layerList.length-1; i<=0; i--) {
-        if(obj.select(x,y)) {
-            id = layerList[i].id;
+    for(var i=layerList.length-1; i>=0; i--) {
+        console.log("i: "+i);
+        console.log("layerList[i]: "+layerList[i]);
+        console.log("objectList[layerList[i]]: "+objectList[layerList[i]]);
+        if(objectList[layerList[i]].select(x,y)) {
+            id = objectList[layerList[i]].id;
+            break;
         }
     }
     return id;
@@ -161,6 +165,7 @@ function pointerDown(e) {
         // These have no functionality yet, need to figure out how to find object based on mouse coordinates
         case "select":
             var objID = getObjectID(x, y);
+            console.log(objID);
             break;
 
         case "erase":
@@ -193,7 +198,7 @@ function pointerMove(e) {
     }
 
     var x = e.pageX - ofst.left;
-    (var y = e.pageY - ofst.top;
+    var y = e.pageY - ofst.top;
 
     if(orienting()) {
         switch(orientation) {
@@ -262,6 +267,11 @@ function createStamp(dObj) {
     refreshCanvas();
 }
 
+function distance(p1, p2) {
+    return Math.sqrt(((p1[0]-p2[0])*(p1[0]-p2[0]))+
+                     ((p1[1]-p2[1])*(p1[1]-p2[1])));
+}
+
 function startLine(dObj) {
     assignID(dObj);
 
@@ -308,11 +318,18 @@ function startLine(dObj) {
         }
         ctx.stroke();
     };
-    dObj.select = function() {
-        for(var i=0; i<this.pts.length; i++) {
-            if(
+    dObj.select = function(x,y) {
+        for(var i=0; i<this.pts.length-1; i++) {
+            var dist = distance([x,y],this.pts[i]) + distance([x,y],this.pts[i+1]);
+            var maxDist = distance(this.pts[i], this.pts[i+1])+(this.width/2);
+
+            console.log("Is "+dist+" less than "+maxDist+"?");
+            if(dist < maxDist) {
+                return true;
+            }
         }
-    }
+        return false;
+    };
 
     var newAct = {
         undo: function() {
