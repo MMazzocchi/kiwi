@@ -401,9 +401,9 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 function resize() {
     var ctx = canvas.getContext('2d');
 
-    ctx.fillStyle="#000000";
-    ctx.fillRect(-window.innerWidth,-window.innerHeight,window.innerWidth,window.innerHeight);
-    refreshCanvas();
+    ctx.fillStyle="#FFFFFF";
+    ctx.fillRect(-window.innerWidth,-window.innerHeight,2*window.innerWidth,2*window.innerHeight);
+//    refreshCanvas();
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
