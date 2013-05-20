@@ -403,8 +403,12 @@ function resize() {
 
     var ctx = canvas.getContext('2d');
 
+    ctx.canvas.width  = maxDimen;
+    ctx.canvas.height = maxDimen;
+
     ctx.fillStyle="#000000";
     ctx.fillRect(-maxDimen,-maxDimen,2*maxDimen,2*maxDimen);
+
 //    refreshCanvas();
 }
 
