@@ -196,19 +196,12 @@ function pointerDown(e) {
         case "draw":
             isDragging = true;
             var dObj = {
-<<<<<<< HEAD
-	        pts: [[x, y]],
-	        width: thickness,
-	        opacity: alpha,
-			color: curColor,
-	        bezier: true
-=======
 				pts: [[x, y]],
 				width: thickness,
 				opacity: alpha,
+				color: curColor,
 				bezier: true,
 				type: brushMode
->>>>>>> 204a08cfceda5ce77787384efd5c7321964e799a
             };
             startLine(dObj);
         break;	
@@ -402,13 +395,10 @@ function startLine(dObj) {
         ctx.lineWidth = this.width;
         ctx.globalAlpha = this.opacity;
         if(this.pts.length == 1) {
-<<<<<<< HEAD
-=======
             ctx.fillStyle = '#000000';
 			if(this.type == 'spray') {
 			    ctx.fillStyle = this.pattern;
 			}
->>>>>>> 204a08cfceda5ce77787384efd5c7321964e799a
             ctx.lineWidth = 0;
             ctx.arc(this.pts[0][0], this.pts[0][1], this.width/2, 0, 2*Math.PI);
             ctx.fill();
