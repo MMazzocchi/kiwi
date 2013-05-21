@@ -288,12 +288,12 @@ function createStamp(dObj) {
         var bound = [this.bound[2],this.bound[3]];
 
         ctx.save();
-		ctx.globalAlpha = this.opacity;
-        ctx.beginPath();
-        ctx.translate(this.pts[0],this.pts[1]);
-        ctx.scale(scale,scale);
-        ctx.rotate(this.rotation);
-        ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
+			ctx.globalAlpha = this.opacity;
+			ctx.beginPath();
+			ctx.translate(this.pts[0],this.pts[1]);
+			ctx.scale(scale,scale);
+			ctx.rotate(this.rotation);
+			ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
         ctx.restore();
     };
     dObj.select = function(x,y) {
@@ -327,33 +327,51 @@ function distance(p1, p2) {
                      ((p1[1]-p2[1])*(p1[1]-p2[1])));
 }
 
-function startLine(dObj) {
-    assignID(dObj);
+function createPencilTex(dObj){
 	
-	if(dObj.type == 'spray'){
-		var patW = 32;
-		var texcanvas = document.createElement('canvas');
-		texcanvas.width = patW;
-		texcanvas.height = patW;
-		var dc = texcanvas.getContext('2d');
-		dc.globalAlpha = .33;
-		dc.fillStyle = "#000000";
-		var nbrDots = patW*patW;
+	var patW = dObj.width;
+	var texcanvas = document.createElement('canvas');
+	texcanvas.width = patW;
+	texcanvas.height = patW;
+	var dc = texcanvas.getContext('2d');
+	dc.globalAlpha = .33;
+	dc.fillStyle = "#000000";
+	var nbrDots = patW*patW;
+	if(dObj.type == 'graphite'){
 		for (var i = 0; i < nbrDots; ++i) {
 			var px = Math.floor(Math.random()*patW);     	
 			var py = Math.floor(Math.random()*patW);
 			dc.fillRect(px,py,1,1);
 		}
-		dc.globalAlpha = 1;
 		dObj.pattern =  dc.createPattern(texcanvas, "repeat");
-		console.log("spray");
+	}
+	else{
+		var w = dObj.width;
+		var grd=dc.createRadialGradient(w/2.0,w/2.0,6,w/2.0,w/2.0,w/2.0);
+		grd.addColorStop(0,"blue");
+		grd.addColorStop(1,"white");
+		console.log(dObj.type);
+		dc.strokeStyle = grd;
+		dc.fillRect(0,0,w,w);
+		dObj.pattern =  dc.createPattern(texcanvas, "repeat");
+		//dObj.pattern =  grd;
+	}
+	dc.globalAlpha = 1;
+
+}
+
+function startLine(dObj) {
+    assignID(dObj);
+	// create brush pattern
+	if(dObj.type == 'graphite' || dObj.type == 'spray'){
+		createPencilTex(dObj);
 	}
 
     dObj.draw = function(ctx) {
         ctx.beginPath();
         ctx.moveTo(this.pts[0][0], this.pts[0][1]);
 		ctx.save();
-		if(this.type == 'spray'){
+		if(this.type == 'graphite' || this.type == 'spray'){
 			ctx.strokeStyle = this.pattern;
 		}
 		
@@ -361,7 +379,7 @@ function startLine(dObj) {
 		
         if(this.pts.length == 1) {
             ctx.fillStyle = '#000000';
-			if(this.type == 'spray') {
+			if(this.type == 'graphite' || this.type == 'spray') {
 			    ctx.fillStyle = this.pattern;
 			}
             ctx.lineWidth = 0;
@@ -514,7 +532,6 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
         case 'spraycan':
             curTool = 'draw';
             brushMode = 'spray';
-
             break;
         case 'select':
             curTool = 'select';
