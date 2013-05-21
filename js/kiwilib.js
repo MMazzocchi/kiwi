@@ -13,7 +13,11 @@ var curColor = "#000000";
 var isDragging = false;
 var curStamp = '';
 
-var selectedID = -1;
+var selectedId = -1;
+var xOld;
+var yOld;
+var xFirst;
+var yFirst;
 
 var tx=0;
 var ty=0;
@@ -34,12 +38,48 @@ var svgList = {
         svg:null,
         cx:197, cy:154,
         bounds:[0,0,378,302],
-        url:'svg/BnL.svg' }
+        url:'svg/BnL.svg' },
+	'troll':{ 
+		svg:null, 
+		cx:301, cy:226,
+		bounds:[0,0,603,453],
+		url:'svg/troll_face.svg' }
 		
 };
 
 function orienting() {
     return (typeof window.orientation != "undefined");
+}
+
+function transformCoordinates(e) {
+    var ofst = $('#drawing_canvas').offset()
+
+    if('touches' in e) {
+        e = e.touches[0];
+    }
+
+    var x = e.pageX - ofst.left;
+    var y = e.pageY - ofst.top;
+
+    if(orienting()) {
+        switch(orientation) {
+            case 90:
+                var t=x;
+                x=-y-tx;
+                y=t;
+                break;
+            case -90:
+                var t=-x-ty;
+                x=y;
+                y=t;
+                break;
+            case 180:
+                x=-x-tx;
+                y=-y-ty;
+                break;
+        }
+    }
+    return [x,y];
 }
 
 // Refresh the canvas; draw everything
@@ -149,49 +189,39 @@ function eraseObject(id) {
 }
 
 function pointerDown(e) {
-    var ofst = $(this).offset();
-
-    if('touches' in e) {
-        e = e.touches[0];
-    }
-
-    var x = e.pageX - ofst.left;
-    var y = e.pageY - ofst.top;
-
-    if(orienting()) {
-        switch(orientation) {
-            case 90:
-                var t=x;
-                x=-y-tx;
-                y=t;
-                break;
-            case -90:
-                var t=-x-ty;
-                x=y;
-                y=t;
-                break;
-            case 180:
-                x=-x-tx;
-                y=-y-ty;
-                break;
-        }
-    }
+    var c = transformCoordinates(e);
+    var x = c[0]; var y = c[1];
 
     switch(curTool) {			
         case "draw":
             isDragging = true;
             var dObj = {
+<<<<<<< HEAD
 	        pts: [[x, y]],
 	        width: thickness,
 	        opacity: alpha,
 			color: curColor,
 	        bezier: true
+=======
+				pts: [[x, y]],
+				width: thickness,
+				opacity: alpha,
+				bezier: true,
+				type: brushMode
+>>>>>>> 204a08cfceda5ce77787384efd5c7321964e799a
             };
             startLine(dObj);
         break;	
 
         case "select":
-            selectedID = getObjectID(x, y);
+            selectedId = getObjectID(x, y);
+            if(selectedId != -1) {
+                isDragging = true;
+                xOld = x;
+                yOld = y;
+                xFirst = x;
+                yFirst = y;
+            }
             break;
 
         case "erase":
@@ -206,49 +236,39 @@ function pointerDown(e) {
             break;
 
         case "stamp":
-            var dObj = {
-                svg: svgList[ curStamp ].url,
-                cx: svgList[ curStamp ].cx,
-                cy: svgList[ curStamp ].cy,
-                opacity: alpha,
-                scale: 0.5, 
-                bound: svgList[ curStamp ].bounds,
-                rotation: Math.random()*2*Math.PI, //eventually user specified
-                pts: [x, y],
-            };	
+
+			var dObj = {
+				url: svgList[ curStamp ].url,
+				cx: svgList[ curStamp ].cx,
+				cy: svgList[ curStamp ].cy,
+				scale: Math.random()*0.5 + 0.25, 
+				bound: svgList[ curStamp ].bounds,
+				rotation: Math.random()*2*Math.PI, //eventually user specified
+				pts: [x, y],
+			};	
+			$.get(dObj.url, function(xmlData) {
+				console.log("Got svg: " + dObj.url + " for " + curStamp);
+				dObj.svg = xmlData;
+				console.log(dObj.svg);
+				});
+
             createStamp(dObj);
             break;
     }
 }
 
+function translate(id, x, y) {
+    var dx = x-xOld;
+    var dy = y-yOld;
+    objectList[id].move(dx,dy);
+    xOld = x;
+    yOld = y;
+    refreshCanvas();
+}
+
 function pointerMove(e) {
-    var ofst = $(this).offset();
-
-    if('touches' in e) {
-        e = e.touches[0];
-    }
-
-    var x = e.pageX - ofst.left;
-    var y = e.pageY - ofst.top;
-
-    if(orienting()) {
-        switch(orientation) {
-            case 90:
-                var t=x;
-                x=-y-tx;
-                y=t;
-                break;
-            case -90:
-                var t=-x-ty;
-                x=y;
-                y=t;
-                break;
-            case 180:
-                x=-x-tx;
-                y=-y-ty;
-                break;
-        }
-    }
+    var c = transformCoordinates(e);
+    var x = c[0]; var y = c[1];
 
     if (isDragging){
         switch(curTool) {
@@ -256,16 +276,40 @@ function pointerMove(e) {
                 continueLine(x,y);
                 break;
             case "erase":
-            var id = getObjectID(x,y);
-            if(id != -1) {
-                eraseObject(id);
-            }
-            break;
+                var id = getObjectID(x,y);
+                if(id != -1) {
+                    eraseObject(id);
+                }
+                break;
+            case "select":
+                translate(selectedId, x, y);
+                break;
         }
     }
 }
 
 function pointerEnd(e) {
+    var c = transformCoordinates(e);
+    var x = c[0]; var y = c[1];
+
+    if(isDragging && (curTool == 'select')) {
+        //These seem like pointless variables, but if the're not defined, the  undo function will use global values
+        var id = selectedId;
+        var dx = x-xFirst;
+        var dy = y-yFirst;
+
+        var newAct = {
+            undo: function() {
+                objectList[id].move(-dx, -dy);
+            },
+            redo: function() {
+                objectList[id].move(dx, dy);
+            }
+        };
+
+        addAction(newAct);
+        refreshCanvas();
+    }
     isDragging = false;
 }
 
@@ -274,6 +318,7 @@ function createStamp(dObj) {
 
     dObj.draw = function(ctx) {
         var scale = this.scale;
+
         var bound = [this.bound[2],this.bound[3]];
 
         ctx.save();
@@ -282,7 +327,7 @@ function createStamp(dObj) {
         ctx.translate(this.pts[0],this.pts[1]);
         ctx.scale(scale,scale);
         ctx.rotate(this.rotation);
-        ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
+        ctx.drawSvg(this.url, -this.cx, -this.cy, 0, 0);
         ctx.restore();
     };
     dObj.select = function(x,y) {
@@ -294,7 +339,11 @@ function createStamp(dObj) {
         this.draw(ctx);
         var imageData = ctx.getImageData(x, y, 1, 1);
         return (imageData.data[3] > 0 || imageData.data[0] > 0);
-    }
+    };
+    dObj.move = function(dx,dy) {
+        this.pts[0]+=dx;
+        this.pts[1]+=dy;
+    };
 
     var newAct = {
         undo: function() {
@@ -317,10 +366,34 @@ function distance(p1, p2) {
 
 function startLine(dObj) {
     assignID(dObj);
+	
+	if(dObj.type == 'spray'){
+		var patW = 32;
+		var texcanvas = document.createElement('canvas');
+		texcanvas.width = patW;
+		texcanvas.height = patW;
+		var dc = texcanvas.getContext('2d');
+		dc.globalAlpha = .33;
+		dc.fillStyle = "#000000";
+		var nbrDots = patW*patW;
+		for (var i = 0; i < nbrDots; ++i) {
+			var px = Math.floor(Math.random()*patW);     	
+			var py = Math.floor(Math.random()*patW);
+			dc.fillRect(px,py,1,1);
+		}
+		dc.globalAlpha = 1;
+		dObj.pattern =  dc.createPattern(texcanvas, "repeat");
+		console.log("spray");
+	}
 
     dObj.draw = function(ctx) {
         ctx.beginPath();
         ctx.moveTo(this.pts[0][0], this.pts[0][1]);
+		ctx.save();
+		if(this.type == 'spray'){
+			ctx.strokeStyle = this.pattern;
+		}
+		
         var last = this.pts[0];
 		ctx.fillStyle = this.color;
 		ctx.strokeStyle = this.color;
@@ -329,6 +402,13 @@ function startLine(dObj) {
         ctx.lineWidth = this.width;
         ctx.globalAlpha = this.opacity;
         if(this.pts.length == 1) {
+<<<<<<< HEAD
+=======
+            ctx.fillStyle = '#000000';
+			if(this.type == 'spray') {
+			    ctx.fillStyle = this.pattern;
+			}
+>>>>>>> 204a08cfceda5ce77787384efd5c7321964e799a
             ctx.lineWidth = 0;
             ctx.arc(this.pts[0][0], this.pts[0][1], this.width/2, 0, 2*Math.PI);
             ctx.fill();
@@ -355,6 +435,7 @@ function startLine(dObj) {
             };
         ctx.stroke();
         }
+		ctx.restore();
     };
     dObj.select = function(x,y) {
 
@@ -469,7 +550,8 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
             break;
         case 'spraycan':
             curTool = 'draw';
-            brushMode = 'round';
+            brushMode = 'spray';
+
             break;
         case 'select':
             curTool = 'select';
