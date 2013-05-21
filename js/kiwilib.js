@@ -534,9 +534,11 @@ function redo() {
 
 function updateThick(slideAmount) {		// gets thickness from slider and sets the global thickness
 	thickness = slideAmount;
+        myCP.Refresh();
 }
 function updateOpac(slideAmount) {		// gets opacity from slider and sets the global opacity
 	alpha = slideAmount/100;
+        myCP.Refresh();
 }
 
 function updateTint(slideAmount) {		// gets tint from slider and sets the light setting in the color picker
@@ -580,15 +582,17 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
-//////////////////////////////////
-	myCP = new ColorPicker();
-	myCP.setHSL(0,90,50);
-///////////////////////////////////
+
+    //Ceate Color picker
+    myCP = new ColorPicker();
+    myCP.setHSL(0,90,50);
+
     // Prevent default actions for touch events
     document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
+    //Refresh on orientation changes
     window.addEventListener( 'resize', refreshCanvas );
     window.addEventListener( 'orientationchange', refreshCanvas );
 
@@ -636,18 +640,18 @@ $().ready( function() {
         SelectTool('erase');
     });
 	
-	$('#butterfly').click( function() {
-		SelectTool('stamp');
-		curStamp = 'butterfly'
-	});
-	$('#mickey_button').click( function() {
-		SelectTool('stamp');
-		curStamp = 'mickey'
-	});
-	$('#bnl').click( function() {
-		SelectTool('stamp');
-		curStamp = 'bnl'
-	});
+    $('#butterfly').click( function() {
+         SelectTool('stamp');
+         curStamp = 'butterfly'
+    });
+    $('#mickey_button').click( function() {
+        SelectTool('stamp');
+        curStamp = 'mickey'
+    });
+    $('#bnl').click( function() {
+        SelectTool('stamp');
+        curStamp = 'bnl'
+    });
     $('#stamp').click( function() {
         SelectTool('stamp');
     });
@@ -660,40 +664,46 @@ $().ready( function() {
         actionPtr = 0;
     });
 	
-	$( '#tintSlider' ).slider({
-			orientation: "horizontal",
-			range: "min",
-			min: 0,
-			max: 100,
-			value: myCP.curL,
-			slide: function( event, ui ) {
-				updateTint( ui.value );
-			},
-			change: function( event, ui ) {
-				updateTint( ui.value );
-			}
-	});
-	
-	$( "#opacitySlider" ).slider({
-      orientation: "horizontal",
-      range: "min",
-      min: 0,
-      max: 100,
-      value: 100,
-      change: function( event, ui ) {
-        updateOpac( ui.value );
-      }
+    $( '#tintSlider' ).slider({
+        orientation: "horizontal",
+        range: "min",
+        min: 0,
+        max: 100,
+        value: myCP.curL,
+        slide: function( event, ui ) {
+            updateTint( ui.value );
+        },
+        change: function( event, ui ) {
+            updateTint( ui.value );
+        }
     });
 	
-	$( "#thicknessSlider" ).slider({
-      orientation: "horizontal",
-      range: "min",
-      min: 4,
-      max: 80,
-      value: 10,
-      change: function( event, ui ) {
-        updateThick( ui.value );
-      }
+    $( "#opacitySlider" ).slider({
+        orientation: "horizontal",
+        range: "min",
+        min: 0,
+        max: 100,
+        value: 100,
+        slide: function( event, ui ) {
+            updateOpac( ui.value );
+        },
+        change: function( event, ui ) {
+            updateOpac( ui.value );
+        }
+    });
+	
+    $( "#thicknessSlider" ).slider({
+        orientation: "horizontal",
+        range: "min",
+        min: 4,
+        max: 80,
+        value: 10,
+        slide: function( event, ui ) {
+            updateThick( ui.value );
+        },
+        change: function( event, ui ) {
+            updateThick( ui.value );
+        }
     });
 	
     $(document).keypress(function(e) {
