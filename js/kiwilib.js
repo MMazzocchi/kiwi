@@ -253,6 +253,12 @@ function pointerMove(e) {
             case "draw":
                 continueLine(x,y);
                 break;
+            case "erase":
+            var id = getObjectID(x,y);
+            if(id != -1) {
+                eraseObject(id);
+            }
+            break;
         }
     }
 }
