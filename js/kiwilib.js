@@ -239,14 +239,13 @@ function createStamp(dObj) {
         // Begin a 'path'. A path tells the canvas where to draw or fill.
         var scale = this.scale;
 		var bound = [this.bound[2],this.bound[3]];
-		
+		ctx.globalAlpha = this.opacity;
 		ctx.save();
 			ctx.beginPath();
 			ctx.translate(this.pts[0],this.pts[1]);
 			ctx.scale(scale,scale);
 			ctx.rotate(this.rotation);
 			ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
-			ctx.globalAlpha = this.opacity;
 		ctx.restore();
        
     };
@@ -509,8 +508,7 @@ $().ready( function() {
     $('#stamp').click( function() {
         SelectTool('stamp');
     });
-    //////////////////////////////////////////////////////////////////////////////////////
-	
+	//////////////////////////////////////////////////////////////////////////////////////
     $('#clear').click( function() {
         objectList = {};
         layerList = [];
