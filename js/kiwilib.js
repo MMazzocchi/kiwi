@@ -283,8 +283,23 @@ function pointerEnd(e) {
     var c = transformCoordinates(e);
     var x = c[0]; var y = c[1];
 
-    if(isDragging) {
-        
+    if(isDragging && (curTool == 'select')) {
+        //These seem like pointless variables, but if the're not defined, the  undo function will use global values
+        var id = selectedId;
+        var dx = x-xFirst;
+        var dy = y-yFirst;
+
+        var newAct = {
+            undo: function() {
+                objectList[id].move(-dx, -dy);
+            },
+            redo: function() {
+                objectList[id].move(dx, dy);
+            }
+        };
+
+        addAction(newAct);
+        refreshCanvas();
     }
     isDragging = false;
 }
