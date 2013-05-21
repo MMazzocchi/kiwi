@@ -85,6 +85,10 @@ function transformCoordinates(e) {
 // Refresh the canvas; draw everything
 function refreshCanvas() {
 
+    if(curTool != 'select') {
+        selectedId = -1;
+    }
+
     var ctx = canvas.getContext('2d');
 
     ctx.canvas.width  = window.innerWidth;
@@ -128,9 +132,16 @@ function refreshCanvas() {
         // Get the object for this layer
         var dObj = objectList[id];
 
-        // Draw the object
-        dObj.draw(ctx);
+        if((!isDragging) || (id != selectedId)) {
+            // Draw the object
+            dObj.draw(ctx);
+        }
     });
+
+    // Draw the selected layer on top of the rest
+    if(isDragging && selectedId != -1) {
+        objectList[selectedId].draw(ctx);
+    }
 }
 
 // Assign a new ID to this object
