@@ -204,16 +204,16 @@ function pointerDown(e) {
             break;
 
         case "stamp":
-			var dObj = {
-				svg: svgList[ curStamp ].url,
-				cx: svgList[ curStamp ].cx,
-				cy: svgList[ curStamp ].cy,
-				opacity: alpha,
-				scale: 0.5, 
-				bound: svgList[ curStamp ].bounds,
-				rotation: Math.random()*2*Math.PI, //eventually user specified
-				pts: [x, y],
-			};	
+            var dObj = {
+                svg: svgList[ curStamp ].url,
+                cx: svgList[ curStamp ].cx,
+                cy: svgList[ curStamp ].cy,
+                opacity: alpha,
+                scale: 0.5, 
+                bound: svgList[ curStamp ].bounds,
+                rotation: Math.random()*2*Math.PI, //eventually user specified
+                pts: [x, y],
+            };	
             createStamp(dObj);
             break;
     }
@@ -323,11 +323,9 @@ function startLine(dObj) {
 		
         if(this.pts.length == 1) {
             ctx.fillStyle = '#000000';
-            ctx.lineTo(this.pts[0][0], this.pts[0][1]);
-                        ctx.lineJoin = 'round';
-                        ctx.lineCap = 'round';
-                        ctx.lineWidth = this.width;
-                        ctx.globalAlpha = this.opacity;
+            ctx.lineWidth = 0;
+            ctx.arc(this.pts[0][0], this.pts[0][1], this.width/2, 0, 2*Math.PI);
+            ctx.fill();
         } else if(!this.bezier) {
 
             // Draw the line without beziers
@@ -338,6 +336,7 @@ function startLine(dObj) {
                         ctx.lineWidth = this.width;
                         ctx.globalAlpha = this.opacity;
             };
+            ctx.stroke();
         } else {
 
             // Draw the line with beziers
@@ -354,10 +353,10 @@ function startLine(dObj) {
 	        ctx.lineJoin = 'round';
 	        ctx.lineCap = 'round';
 	        ctx.lineWidth = this.width;
-			ctx.globalAlpha = this.opacity;
+		ctx.globalAlpha = this.opacity;
             };
-        }
         ctx.stroke();
+        }
     };
     dObj.select = function(x,y) {
 
