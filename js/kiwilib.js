@@ -145,10 +145,11 @@ function pointerDown(e) {
         case "draw":
             isDragging = true;
             var dObj = {
-	        pts: [[x, y]],
-	        width: thickness,
-	        opacity: alpha,
-	        bezier: true
+				pts: [[x, y]],
+				width: thickness,
+				opacity: alpha,
+				bezier: true,
+				type: brushMode
             };
             startLine(dObj);
         break;	
@@ -165,8 +166,9 @@ function pointerDown(e) {
             break;
 
         case "stamp":
+
 			var dObj = {
-				svg: svgList[ curStamp ].url,
+				url: svgList[ curStamp ].url,
 				cx: svgList[ curStamp ].cx,
 				cy: svgList[ curStamp ].cy,
 				scale: Math.random()*0.5 + 0.25, 
@@ -174,6 +176,11 @@ function pointerDown(e) {
 				rotation: Math.random()*2*Math.PI, //eventually user specified
 				pts: [x, y],
 			};	
+			$.get(dObj.url, function(xmlData) {
+				console.log("Got svg: " + dObj.url + " for " + curStamp);
+				dObj.svg = xmlData;
+				console.log(dObj.svg);
+				});
             createStamp(dObj);
             break;
     }
@@ -234,11 +241,11 @@ function createStamp(dObj) {
 			ctx.translate(this.pts[0],this.pts[1]);
 			ctx.scale(scale,scale);
 			ctx.rotate(this.rotation);
-			ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
+			ctx.drawSvg(this.svg, -this.cx, -this.cy);
 		ctx.restore();
        
     };
-
+	refreshCanvas();
     var newAct = {
         undo: function() {
             // Take the top layer off of layerList. The object still exists in the objects hash, but
@@ -260,10 +267,34 @@ function createStamp(dObj) {
 
 function startLine(dObj) {
     assignID(dObj);
+	
+	if(dObj.type == 'spray'){
+		var patW = 32;
+		var texcanvas = document.createElement('canvas');
+		texcanvas.width = patW;
+		texcanvas.height = patW;
+		var dc = texcanvas.getContext('2d');
+		dc.globalAlpha = .33;
+		dc.fillStyle = "#000000";
+		var nbrDots = patW*patW;
+		for (var i = 0; i < nbrDots; ++i) {
+			var px = Math.floor(Math.random()*patW);     	
+			var py = Math.floor(Math.random()*patW);
+			dc.fillRect(px,py,1,1);
+		}
+		dc.globalAlpha = 1;
+		dObj.pattern =  dc.createPattern(texcanvas, "repeat");
+		console.log("spray");
+	}
 
     dObj.draw = function(ctx) {
         ctx.beginPath();
         ctx.moveTo(this.pts[0][0], this.pts[0][1]);
+		ctx.save();
+		if(this.type == 'spray'){
+			ctx.strokeStyle = this.pattern;
+		}
+		
         var last = this.pts[0];
 		
         if(this.pts.length == 1) {
@@ -303,6 +334,7 @@ function startLine(dObj) {
             };
         }
         ctx.stroke();
+		ctx.restore();
     };
 	var newAct = {
         undo: function() {
@@ -383,7 +415,7 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
             break;
         case 'spraycan':
             curTool = 'draw';
-            brushMode = 'round';
+            brushMode = 'spray';
             SetDrawThick(50);
             SetDrawAlpha(0.10);
             break;
