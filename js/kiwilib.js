@@ -403,23 +403,21 @@ function redo() {
     }
 }
 
-function updateThick(slideAmount) {
+function updateThick(slideAmount) {		// gets thickness from slider and sets the global thickness
 	thickness = slideAmount;
 }
-function updateOpac(slideAmount) {
+function updateOpac(slideAmount) {		// gets opacity from slider and sets the global opacity
 	alpha = slideAmount/100;
 }
 
 function SetDrawThick(t)	// sets the thickness
 {
     thickness = t;
-//  $( "#linethickSlider" ).slider( "value", gVars.curDrawThick);
 }
 
 function SetDrawAlpha(t)	// sets the opacity
 {
     alpha = t;
-//  $( "#alphaSlider" ).slider( "value", gVars.curDrawAlpha*100);
 }
 
 function SelectTool(toolName) // selects proper tool based off of what user has clicked
@@ -428,27 +426,20 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
         case 'draw':
             curTool = 'draw';
             brushMode = 'simple';
-            SetDrawThick(thickness > 8? 8 : thickness);
-            SetDrawAlpha(1);
             break;
         case 'spraycan':
             curTool = 'draw';
             brushMode = 'round';
-            SetDrawThick(50);
-            SetDrawAlpha(0.10);
             break;
         case 'select':
             curTool = 'select';
-            SetDrawAlpha(1);
             break;
         case 'pencil':
             curTool = 'draw';
             brushMode = 'graphite';
-            SetDrawAlpha(1);
             break;
         default:
             curTool = toolName;
-            SetDrawAlpha(1);
             break;
     }
     refreshCanvas();
@@ -483,9 +474,6 @@ $().ready( function() {
     // Bind the redo function to the redo button.
     $('#redo').click( redo );
 	
-	
-    /////////////////////////////////////////////////////////////////////////////////////
-    // ADDED BUTTONS
     //.attr etc is to address a firefox bug that caches the disabled state of the redo button
     // http://stackoverflow.com/questions/2719044/jquery-ui-button-gets-disabled-on-refresh
     $('#undo_button').attr('disabled', true);
@@ -527,7 +515,7 @@ $().ready( function() {
     $('#stamp').click( function() {
         SelectTool('stamp');
     });
-	//////////////////////////////////////////////////////////////////////////////////////
+
     $('#clear').click( function() {
         objectList = {};
         layerList = [];
