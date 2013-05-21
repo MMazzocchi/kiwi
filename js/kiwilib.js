@@ -247,6 +247,17 @@ function createStamp(dObj) {
         ctx.globalAlpha = this.opacity;
         ctx.restore();
     };
+    dObj.select = function(x,y) {
+        //"Scratch canvas" method
+        var scanvas = document.createElement('canvas');
+        scanvas.width = window.innerWidth;
+        scanvas.height = window.innerHeight;
+        var ctx = scanvas.getContext('2d');
+        this.draw(ctx);
+        var imageData = ctx.getImageData(x, y, 1, 1);
+        return (imageData.data[3] > 0 || imageData.data[0] > 0);
+    }
+
 
     var newAct = {
         undo: function() {
