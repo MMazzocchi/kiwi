@@ -14,8 +14,6 @@ var curStamp = '';
 
 var tx=0;
 var ty=0;
-var rx;
-var ry;
 var orientation = orienting() ? window.orientation : 0;
 
 var svgList = {
@@ -320,16 +318,37 @@ function startLine(dObj) {
         ctx.stroke();
     };
     dObj.select = function(x,y) {
-        for(var i=0; i<this.pts.length-1; i++) {
-            var dist = distance([x,y],this.pts[i]) + distance([x,y],this.pts[i+1]);
-            var maxDist = distance(this.pts[i], this.pts[i+1])+(this.width/1);
 
-            console.log("Is "+dist+" less than "+maxDist+"?");
-            if(dist < maxDist) {
-                return true;
+       for(var i=0; i<this.pts.length-1; i++) {
+
+           //Check to see if we're within the left end cap of this segment
+           if(distance([x,y],this.pts[i]) < (this.width/2)) {
+               return true;
+           } else {
+
+                //Create the first vector between pts[0] and pts[1].
+                var v1 = [this.pts[i][0]-this.pts[i+1][0],
+                          this.pts[i][1]-this.pts[i+1][1]];
+                //Create the second vector between pts[0] and (x,y).
+                var v2 = [this.pts[i][0]-x,
+                          this.pts[i][1]-y];
+                //Calculate the z-magnitude of the resulting cross product
+                //(The x and y magnitudes will always be zero)
+                var z = Math.abs(v1[0]*v2[1]-v2[0]*v1[1]);
+
+                //Now take the dot product
+                var d = (v1[0]*v2[0]) + (v1[1]+v2[1]);
+
+                var dist = distance(this.pts[i], this.pts[i+1]);
+
+                //Now MATH
+                if(((z/dist) < (this.width/2))  && (d >= 0) && (d <= (dist*dist))) {
+                    return true;
+                }
             }
         }
-        return false;
+        //Finally, check the right end cap of the entire line
+        return (distance([x,y],this.pts[this.pts.length-1]) < (this.width/2));
     };
 
     var newAct = {
