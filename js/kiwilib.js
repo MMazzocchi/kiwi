@@ -9,10 +9,15 @@ var curTool = "draw";   // This is the current tool selected by the user
 var brushMode = 'simple';
 var thickness = 10;     // Thickness of the line to be drawn
 var alpha = 1;          // Opacity of the object to be drawn
+var curColor = "#000000";
 var isDragging = false;
 var curStamp = '';
 
-var selectedID = -1;
+var selectedId = -1;
+var xOld;
+var yOld;
+var xFirst;
+var yFirst;
 
 var tx=0;
 var ty=0;
@@ -44,6 +49,37 @@ var svgList = {
 
 function orienting() {
     return (typeof window.orientation != "undefined");
+}
+
+function transformCoordinates(e) {
+    var ofst = $('#drawing_canvas').offset()
+
+    if('touches' in e) {
+        e = e.touches[0];
+    }
+
+    var x = e.pageX - ofst.left;
+    var y = e.pageY - ofst.top;
+
+    if(orienting()) {
+        switch(orientation) {
+            case 90:
+                var t=x;
+                x=-y-tx;
+                y=t;
+                break;
+            case -90:
+                var t=-x-ty;
+                x=y;
+                y=t;
+                break;
+            case 180:
+                x=-x-tx;
+                y=-y-ty;
+                break;
+        }
+    }
+    return [x,y];
 }
 
 // Refresh the canvas; draw everything
@@ -121,7 +157,6 @@ function getObjectID(x, y) {
             break;
         }
     }
-    console.log("Selected "+id);
     return id;
 }
 
@@ -149,37 +184,11 @@ function eraseObject(id) {
     };
 
     addAction(newAct);
-    refreshCanvas();
 }
 
 function pointerDown(e) {
-    var ofst = $(this).offset();
-
-    if('touches' in e) {
-        e = e.touches[0];
-    }
-
-    var x = e.pageX - ofst.left;
-    var y = e.pageY - ofst.top;
-
-    if(orienting()) {
-        switch(orientation) {
-            case 90:
-                var t=x;
-                x=-y-tx;
-                y=t;
-                break;
-            case -90:
-                var t=-x-ty;
-                x=y;
-                y=t;
-                break;
-            case 180:
-                x=-x-tx;
-                y=-y-ty;
-                break;
-        }
-    }
+    var c = transformCoordinates(e);
+    var x = c[0]; var y = c[1];
 
     switch(curTool) {			
         case "draw":
@@ -188,6 +197,7 @@ function pointerDown(e) {
 				pts: [[x, y]],
 				width: thickness,
 				opacity: alpha,
+				color: curColor,
 				bezier: true,
 				type: brushMode
             };
@@ -195,7 +205,14 @@ function pointerDown(e) {
         break;	
 
         case "select":
-            selectedID = getObjectID(x, y);
+            selectedId = getObjectID(x, y);
+            if(selectedId != -1) {
+                isDragging = true;
+                xOld = x;
+                yOld = y;
+                xFirst = x;
+                yFirst = y;
+            }
             break;
 
         case "erase":
@@ -215,6 +232,7 @@ function pointerDown(e) {
 				url: svgList[ curStamp ].url,
 				cx: svgList[ curStamp ].cx,
 				cy: svgList[ curStamp ].cy,
+				opacity: alpha,
 				scale: Math.random()*0.5 + 0.25, 
 				bound: svgList[ curStamp ].bounds,
 				rotation: Math.random()*2*Math.PI, //eventually user specified
@@ -231,34 +249,17 @@ function pointerDown(e) {
     }
 }
 
+function translate(id, x, y) {
+    var dx = x-xOld;
+    var dy = y-yOld;
+    objectList[id].move(dx,dy);
+    xOld = x;
+    yOld = y;
+}
+
 function pointerMove(e) {
-    var ofst = $(this).offset();
-
-    if('touches' in e) {
-        e = e.touches[0];
-    }
-
-    var x = e.pageX - ofst.left;
-    var y = e.pageY - ofst.top;
-
-    if(orienting()) {
-        switch(orientation) {
-            case 90:
-                var t=x;
-                x=-y-tx;
-                y=t;
-                break;
-            case -90:
-                var t=-x-ty;
-                x=y;
-                y=t;
-                break;
-            case 180:
-                x=-x-tx;
-                y=-y-ty;
-                break;
-        }
-    }
+    var c = transformCoordinates(e);
+    var x = c[0]; var y = c[1];
 
     if (isDragging){
         switch(curTool) {
@@ -266,16 +267,40 @@ function pointerMove(e) {
                 continueLine(x,y);
                 break;
             case "erase":
-            var id = getObjectID(x,y);
-            if(id != -1) {
-                eraseObject(id);
-            }
-            break;
+                var id = getObjectID(x,y);
+                if(id != -1) {
+                    eraseObject(id);
+                }
+                break;
+            case "select":
+                translate(selectedId, x, y);
+                break;
         }
     }
 }
 
 function pointerEnd(e) {
+    var c = transformCoordinates(e);
+    var x = c[0]; var y = c[1];
+
+    if(isDragging && (curTool == 'select')) {
+        //These seem like pointless variables, but if the're not defined, the  undo function will use global values
+        var id = selectedId;
+        var dx = x-xFirst;
+        var dy = y-yFirst;
+
+        var newAct = {
+            undo: function() {
+                objectList[id].move(-dx, -dy);
+            },
+            redo: function() {
+                objectList[id].move(dx, dy);
+            }
+        };
+
+        addAction(newAct);
+    }
+
     isDragging = false;
 }
 
@@ -305,8 +330,11 @@ function createStamp(dObj) {
         this.draw(ctx);
         var imageData = ctx.getImageData(x, y, 1, 1);
         return (imageData.data[3] > 0 || imageData.data[0] > 0);
-    }
-
+    };
+    dObj.move = function(dx,dy) {
+        this.pts[0]+=dx;
+        this.pts[1]+=dy;
+    };
 
     var newAct = {
         undo: function() {
@@ -319,7 +347,6 @@ function createStamp(dObj) {
 
     // Add the new action and redraw.
     addAction(newAct);
-    refreshCanvas();
 }
 
 function distance(p1, p2) {
@@ -335,7 +362,7 @@ function createPencilTex(dObj){
 	texcanvas.height = patW;
 	var dc = texcanvas.getContext('2d');
 	dc.globalAlpha = .33;
-	dc.fillStyle = "#000000";
+	dc.fillStyle = dObj.color;
 	var nbrDots = patW*patW;
 	if(dObj.type == 'graphite'){
 		for (var i = 0; i < nbrDots; ++i) {
@@ -371,14 +398,20 @@ function startLine(dObj) {
         ctx.beginPath();
         ctx.moveTo(this.pts[0][0], this.pts[0][1]);
 		ctx.save();
+
+		ctx.strokeStyle = this.color;
 		if(this.type == 'graphite' || this.type == 'spray'){
 			ctx.strokeStyle = this.pattern;
 		}
 		
         var last = this.pts[0];
-		
+		ctx.fillStyle = this.color;
+		ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = this.width;
+        ctx.globalAlpha = this.opacity;
         if(this.pts.length == 1) {
-            ctx.fillStyle = '#000000';
+            ctx.fillStyle = this.color;
 			if(this.type == 'graphite' || this.type == 'spray') {
 			    ctx.fillStyle = this.pattern;
 			}
@@ -390,10 +423,6 @@ function startLine(dObj) {
             // Draw the line without beziers
             for(var i=1; i<this.pts.length; i++) {
                 ctx.lineTo(this.pts[i][0], this.pts[i][1]);
-                        ctx.lineJoin = 'round';
-                        ctx.lineCap = 'round';
-                        ctx.lineWidth = this.width;
-                        ctx.globalAlpha = this.opacity;
             };
             ctx.stroke();
         } else {
@@ -409,10 +438,6 @@ function startLine(dObj) {
                         this.pts[i+2][0], this.pts[i+2][1],
                         this.pts[i+3][0], this.pts[i+3][1]);
                 }
-	        ctx.lineJoin = 'round';
-	        ctx.lineCap = 'round';
-	        ctx.lineWidth = this.width;
-		ctx.globalAlpha = this.opacity;
             };
         ctx.stroke();
         }
@@ -451,6 +476,12 @@ function startLine(dObj) {
         //Finally, check the right end cap of the entire line
         return (distance([x,y],this.pts[this.pts.length-1]) < (this.width/2));
     };
+    dObj.move = function(dx,dy) {
+        for(var i=0; i<this.pts.length; i++) {
+            this.pts[i][0]+=dx;
+            this.pts[i][1]+=dy;
+        }
+    };
 
     var newAct = {
         undo: function() {
@@ -466,14 +497,12 @@ function startLine(dObj) {
 
     // Add the new action and redraw.
     addAction(newAct);
-    refreshCanvas();
 }
 
 
 function continueLine(x,y) {
     var dObj = objectList[layerList[layerList.length-1]];
     dObj.pts.push([x, y]);
-    refreshCanvas();
 }
 
 // Undos an action.
@@ -491,7 +520,6 @@ function undo() {
 
         // Take actionPtr down one (since we just undid an action) and redraw.
         actionPtr--;
-        refreshCanvas();
     }
 }
 
@@ -501,7 +529,6 @@ function redo() {
         var next = actionList[actionPtr];
         next.redo();
         actionPtr++;
-        refreshCanvas();
     }
 }
 
@@ -510,6 +537,11 @@ function updateThick(slideAmount) {		// gets thickness from slider and sets the 
 }
 function updateOpac(slideAmount) {		// gets opacity from slider and sets the global opacity
 	alpha = slideAmount/100;
+}
+
+function updateTint(slideAmount) {		// gets tint from slider and sets the light setting in the color picker
+	myCP.curL = slideAmount;
+    myCP.updateColor();
 }
 
 function SetDrawThick(t)	// sets the thickness
@@ -544,12 +576,14 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
             curTool = toolName;
             break;
     }
-    refreshCanvas();
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
-
+//////////////////////////////////
+	myCP = new ColorPicker();
+	myCP.setHSL(0,90,50);
+///////////////////////////////////
     // Prevent default actions for touch events
     document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
@@ -564,7 +598,7 @@ $().ready( function() {
     // Bind an action.
     $('#drawing_canvas').mousedown( pointerDown );
     $('#drawing_canvas').mousemove( pointerMove );
-    $(document).mouseup( pointerEnd );
+    $('#drawing_canvas').mouseup( pointerEnd );
 
     canvas.addEventListener('touchmove', pointerMove );
     canvas.addEventListener('touchstart', pointerDown );
@@ -624,7 +658,42 @@ $().ready( function() {
         actionList = [];
         idPtr = 0;
         actionPtr = 0;
-        refreshCanvas();
+    });
+	
+	$( '#tintSlider' ).slider({
+			orientation: "horizontal",
+			range: "min",
+			min: 0,
+			max: 100,
+			value: myCP.curL,
+			slide: function( event, ui ) {
+				updateTint( ui.value );
+			},
+			change: function( event, ui ) {
+				updateTint( ui.value );
+			}
+	});
+	
+	$( "#opacitySlider" ).slider({
+      orientation: "horizontal",
+      range: "min",
+      min: 0,
+      max: 100,
+      value: 100,
+      change: function( event, ui ) {
+        updateOpac( ui.value );
+      }
+    });
+	
+	$( "#thicknessSlider" ).slider({
+      orientation: "horizontal",
+      range: "min",
+      min: 4,
+      max: 80,
+      value: 10,
+      change: function( event, ui ) {
+        updateThick( ui.value );
+      }
     });
 	
     $(document).keypress(function(e) {
@@ -644,5 +713,5 @@ $().ready( function() {
     });
 	
     // Redraw.
-    refreshCanvas();
+    setInterval(refreshCanvas, 30);
 });

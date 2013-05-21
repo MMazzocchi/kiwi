@@ -10,6 +10,7 @@
 <script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
 <script type="text/javascript" src="js/kiwilib.js"></script>
 <script type="text/javascript" src="js/raphael-min.js"></script>
+<script type="text/javascript" src="js/color_picker.js"></script>
 
 <!-- SVG conversion library -->
 <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script> 
@@ -24,33 +25,6 @@
 	  height: .3em;
   }
 </style>
-<script>
-  $(function() {
-    $( "#thicknessSlider" ).slider({
-      orientation: "horizontal",
-      range: "min",
-      min: 4,
-      max: 80,
-      value: 10,
-      change: function( event, ui ) {
-        updateThick( ui.value );
-      }
-    });
-  });
-  $(function() {
-    $( "#opacitySlider" ).slider({
-      orientation: "horizontal",
-      range: "min",
-      min: 0,
-      max: 100,
-      value: 100,
-      change: function( event, ui ) {
-        updateOpac( ui.value );
-      }
-    });
-  });
-</script>
-
 </head>
 <body>
 <div class="navbar navbar-fixed-top">
@@ -93,6 +67,11 @@
                             <li><a class="icon" id="butterfly"><img src="img/butterfly_icon.png" /><span>Butterfly</span></a></li>
                         </ul>
 					</li>
+					<li class="cp_canvas"><canvas id="colorpicker_canvas"></canvas></li>
+					<li>
+					  <label for="tintSlider">Tint:</label>
+					  <li id="tintSlider"style="width: 100px;"></li>
+					</li>
 				</ul>
 			</div>
 		</div>
@@ -100,6 +79,7 @@
 </div>
 <div id="canvaswrapp">
 	<canvas id="drawing_canvas"></canvas>
+
 </div>
 <script type="text/javascript" src="js/bootstrap.min.js"></script>
 </body>
