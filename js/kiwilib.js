@@ -12,7 +12,9 @@ var alpha = 1;          // Opacity of the object to be drawn
 var isDragging = false;
 var curStamp = '';
 
-var selectedID = -1;
+var selectedId = -1;
+var xOld;
+var yOld;
 
 var tx=0;
 var ty=0;
@@ -195,7 +197,12 @@ function pointerDown(e) {
         break;	
 
         case "select":
-            selectedID = getObjectID(x, y);
+            selectedId = getObjectID(x, y);
+            if(selectedId != -1) {
+                isDragging = true;
+                xOld = x;
+                yOld = y;
+            }
             break;
 
         case "erase":
@@ -229,6 +236,15 @@ function pointerDown(e) {
             createStamp(dObj);
             break;
     }
+}
+
+function translate(id, x, y) {
+    var dx = x-xOld;
+    var dy = y-yOld;
+    objectList[id].move(dx,dy);
+    xOld = x;
+    yOld = y;
+    refreshCanvas();
 }
 
 function pointerMove(e) {
@@ -266,11 +282,14 @@ function pointerMove(e) {
                 continueLine(x,y);
                 break;
             case "erase":
-            var id = getObjectID(x,y);
-            if(id != -1) {
-                eraseObject(id);
-            }
-            break;
+                var id = getObjectID(x,y);
+                if(id != -1) {
+                    eraseObject(id);
+                }
+                break;
+            case "select":
+                translate(selectedId, x, y);
+                break;
         }
     }
 }
@@ -293,7 +312,7 @@ function createStamp(dObj) {
         ctx.translate(this.pts[0],this.pts[1]);
         ctx.scale(scale,scale);
         ctx.rotate(this.rotation);
-        ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
+        ctx.drawSvg(this.url, -this.cx, -this.cy, 0, 0);
         ctx.restore();
     };
     dObj.select = function(x,y) {
@@ -305,8 +324,11 @@ function createStamp(dObj) {
         this.draw(ctx);
         var imageData = ctx.getImageData(x, y, 1, 1);
         return (imageData.data[3] > 0 || imageData.data[0] > 0);
-    }
-
+    };
+    dObj.move = function(dx,dy) {
+        this.pts[0]+=dx;
+        this.pts[1]+=dy;
+    };
 
     var newAct = {
         undo: function() {
