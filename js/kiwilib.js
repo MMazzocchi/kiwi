@@ -261,6 +261,8 @@ function pointerMove(e) {
     var c = transformCoordinates(e);
     var x = c[0]; var y = c[1];
 
+    console.log("isDragging: "+isDragging);
+
     if (isDragging){
         switch(curTool) {
             case "draw":
@@ -280,6 +282,7 @@ function pointerMove(e) {
 }
 
 function pointerEnd(e) {
+    console.log("PointerEnd called.");
     var c = transformCoordinates(e);
     var x = c[0]; var y = c[1];
 
@@ -299,9 +302,11 @@ function pointerEnd(e) {
         };
 
         addAction(newAct);
-        refreshCanvas();
+       // refreshCanvas();
     }
+
     isDragging = false;
+    console.log("Pointer up. Dragging: "+isDragging+" Current tool: "+curTool);
 }
 
 function createStamp(dObj) {
@@ -575,7 +580,7 @@ $().ready( function() {
     // Bind an action.
     $('#drawing_canvas').mousedown( pointerDown );
     $('#drawing_canvas').mousemove( pointerMove );
-    $(document).mouseup( pointerEnd );
+    $('#drawing_canvas').mouseup( pointerEnd );
 
     canvas.addEventListener('touchmove', pointerMove );
     canvas.addEventListener('touchstart', pointerDown );
