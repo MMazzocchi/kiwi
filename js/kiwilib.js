@@ -465,6 +465,12 @@ function startLine(dObj) {
         //Finally, check the right end cap of the entire line
         return (distance([x,y],this.pts[this.pts.length-1]) < (this.width/2));
     };
+    dObj.move = function(dx,dy) {
+        for(var i=0; i<this.pts.length; i++) {
+            this.pts[i][0]+=dx;
+            this.pts[i][1]+=dy;
+        }
+    };
 
     var newAct = {
         undo: function() {
