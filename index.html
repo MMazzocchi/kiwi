@@ -16,13 +16,39 @@
 <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
 
 <!-- Sliders -->
-<script type="text/javascript">
-function updateThick(slideAmount) {
-	thickness = slideAmount;
-}
-function updateOpac(slideAmount) {
-	alpha = slideAmount/100;
-}
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<style type="text/css" media="screen">
+  .ui-slider .ui-slider-handle {
+	  width: .1em;
+	  height: .3em;
+  }
+</style>
+<script>
+  $(function() {
+    $( "#thicknessSlider" ).slider({
+      orientation: "horizontal",
+      range: "min",
+      min: 4,
+      max: 80,
+      value: 10,
+      change: function( event, ui ) {
+        updateThick( ui.value );
+      }
+    });
+  });
+  $(function() {
+    $( "#opacitySlider" ).slider({
+      orientation: "horizontal",
+      range: "min",
+      min: 0,
+      max: 100,
+      value: 100,
+      change: function( event, ui ) {
+        updateOpac( ui.value );
+      }
+    });
+  });
 </script>
 
 </head>
@@ -45,19 +71,15 @@ function updateOpac(slideAmount) {
                         </ul>
 					</li>
                 </ul>
-				<div class="sliders">
-					<div id="opacitySlider">
-						 Opacity<input id="slide" type="range"
-						 min="1" max="100" step="2" value="100"
-						 onchange="updateOpac(this.value)" />
-					</div>
-					<div id="thicknessSlider">
-						 Thickness<input id="slide" type="range"
-						 min="6" max="80" step="2" value="10"
-						 onchange="updateThick(this.value)" />
-					</div>
-				</div>
                 <ul class="nav">
+					<li>
+					  <label for="thicknessSlider">Thickness:</label>
+					  <li id="thicknessSlider"style="width: 100px;"></li>
+					</li>
+					<li>
+					  <label for="opacitySlider">Opacity:</label>
+					  <li id="opacitySlider"style="width: 100px;"></li>
+					</li>
 					<li><a class="icon" id="hand"><img src="img/hand-tool.png" alt="Hand" title="Hand" /><span>Hand</span></a></li>
 					<li><a class="icon" id="brush"><img src="img/paintbrush.png" alt="Brush" title="Brush" /><span>Brush</span></a></li>
                     <li><a class="icon" id="pencil"><img src="img/pencil.png" alt="Pencil" title="Pencil" /><span>Pencil</span></a></li>

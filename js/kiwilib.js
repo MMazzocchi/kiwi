@@ -12,10 +12,10 @@ var alpha = 1;          // Opacity of the object to be drawn
 var isDragging = false;
 var curStamp = '';
 
+var selectedID = -1;
+
 var tx=0;
 var ty=0;
-var rx;
-var ry;
 var orientation = orienting() ? window.orientation : 0;
 
 var svgList = {
@@ -112,6 +112,46 @@ function addAction(act) {
     actionPtr++;
 }
 
+//Return the id of the topmost object at coordinates x,y
+function getObjectID(x, y) {
+    var id = -1;
+    for(var i=layerList.length-1; i>=0; i--) {
+        if(objectList[layerList[i]].select(x,y)) {
+            id = objectList[layerList[i]].id;
+            break;
+        }
+    }
+    console.log("Selected "+id);
+    return id;
+}
+
+//Erase object with given id
+function eraseObject(id) {
+
+    //Find the layer that needs to be erased
+    var layerId = -1;
+    for(var i=0; i<layerList.length; i++) {
+        if(layerList[i] == id) {
+            layerId = i;
+            break;
+        }
+    }
+    //Take out the layer
+    layerList.splice(layerId, 1);
+    //Add an action to the action stack
+    var newAct = {
+        undo: function() {
+            layerList.splice(layerId, 0, id);
+        },
+        redo: function() {
+            layerList.splice(layerId,1);
+        }
+    };
+
+    addAction(newAct);
+    refreshCanvas();
+}
+
 function pointerDown(e) {
     var ofst = $(this).offset();
 
@@ -154,12 +194,16 @@ function pointerDown(e) {
             startLine(dObj);
         break;	
 
-        // These have no functionality yet, need to figure out how to find object based on mouse coordinates
         case "select":
+            selectedID = getObjectID(x, y);
             break;
 
         case "erase":
-            isDragging = true;		
+            isDragging = true;
+            var id = getObjectID(x,y);
+            if(id != -1) {
+                eraseObject(id);
+            }
             break;
 
         case "fill":
@@ -181,6 +225,7 @@ function pointerDown(e) {
 				dObj.svg = xmlData;
 				console.log(dObj.svg);
 				});
+
             createStamp(dObj);
             break;
     }
@@ -220,6 +265,12 @@ function pointerMove(e) {
             case "draw":
                 continueLine(x,y);
                 break;
+            case "erase":
+            var id = getObjectID(x,y);
+            if(id != -1) {
+                eraseObject(id);
+            }
+            break;
         }
     }
 }
@@ -232,28 +283,36 @@ function createStamp(dObj) {
     assignID(dObj);
 
     dObj.draw = function(ctx) {
-        // Begin a 'path'. A path tells the canvas where to draw or fill.
         var scale = this.scale;
-		var bound = [this.bound[2],this.bound[3]];
-		
-		ctx.save();
-			ctx.beginPath();
-			ctx.translate(this.pts[0],this.pts[1]);
-			ctx.scale(scale,scale);
-			ctx.rotate(this.rotation);
-			ctx.drawSvg(this.svg, -this.cx, -this.cy);
-		ctx.restore();
-       
+
+        var bound = [this.bound[2],this.bound[3]];
+
+        ctx.save();
+		ctx.globalAlpha = this.opacity;
+        ctx.beginPath();
+        ctx.translate(this.pts[0],this.pts[1]);
+        ctx.scale(scale,scale);
+        ctx.rotate(this.rotation);
+        ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
+        ctx.restore();
     };
-	refreshCanvas();
+    dObj.select = function(x,y) {
+        //"Scratch canvas" method
+        var scanvas = document.createElement('canvas');
+        scanvas.width = window.innerWidth;
+        scanvas.height = window.innerHeight;
+        var ctx = scanvas.getContext('2d');
+        this.draw(ctx);
+        var imageData = ctx.getImageData(x, y, 1, 1);
+        return (imageData.data[3] > 0 || imageData.data[0] > 0);
+    }
+
+
     var newAct = {
         undo: function() {
-            // Take the top layer off of layerList. The object still exists in the objects hash, but
-            // doesn't get drawn because ONLY the objects in layerList get drawn.
             layerList.splice(layerList.length-1,1);
         },
         redo: function() {
-            // Put this object back in layerList.
             layerList[layerList.length] = dObj.id;
         }
     };
@@ -263,7 +322,10 @@ function createStamp(dObj) {
     refreshCanvas();
 }
 
-
+function distance(p1, p2) {
+    return Math.sqrt(((p1[0]-p2[0])*(p1[0]-p2[0]))+
+                     ((p1[1]-p2[1])*(p1[1]-p2[1])));
+}
 
 function startLine(dObj) {
     assignID(dObj);
@@ -299,11 +361,12 @@ function startLine(dObj) {
 		
         if(this.pts.length == 1) {
             ctx.fillStyle = '#000000';
-            ctx.lineTo(this.pts[0][0], this.pts[0][1]);
-                        ctx.lineJoin = 'round';
-                        ctx.lineCap = 'round';
-                        ctx.lineWidth = this.width;
-                        ctx.globalAlpha = this.opacity;
+			if(this.type == 'spray') {
+			    ctx.fillStyle = this.pattern;
+			}
+            ctx.lineWidth = 0;
+            ctx.arc(this.pts[0][0], this.pts[0][1], this.width/2, 0, 2*Math.PI);
+            ctx.fill();
         } else if(!this.bezier) {
 
             // Draw the line without beziers
@@ -314,6 +377,7 @@ function startLine(dObj) {
                         ctx.lineWidth = this.width;
                         ctx.globalAlpha = this.opacity;
             };
+            ctx.stroke();
         } else {
 
             // Draw the line with beziers
@@ -330,13 +394,47 @@ function startLine(dObj) {
 	        ctx.lineJoin = 'round';
 	        ctx.lineCap = 'round';
 	        ctx.lineWidth = this.width;
-			ctx.globalAlpha = this.opacity;
+		ctx.globalAlpha = this.opacity;
             };
-        }
         ctx.stroke();
+        }
 		ctx.restore();
     };
-	var newAct = {
+    dObj.select = function(x,y) {
+
+       for(var i=0; i<this.pts.length-1; i++) {
+
+           //Check to see if we're within the left end cap of this segment
+           if(distance([x,y],this.pts[i]) < (this.width/2)) {
+               return true;
+           } else {
+
+                //Create the first vector between pts[0] and pts[1].
+                var v1 = [this.pts[i][0]-this.pts[i+1][0],
+                          this.pts[i][1]-this.pts[i+1][1]];
+                //Create the second vector between pts[0] and (x,y).
+                var v2 = [this.pts[i][0]-x,
+                          this.pts[i][1]-y];
+                //Calculate the z-magnitude of the resulting cross product
+                //(The x and y magnitudes will always be zero)
+                var z = Math.abs(v1[0]*v2[1]-v2[0]*v1[1]);
+
+                //Now take the dot product
+                var d = (v1[0]*v2[0]) + (v1[1]+v2[1]);
+
+                var dist = distance(this.pts[i], this.pts[i+1]);
+
+                //Now MATH
+                if(((z/dist) < (this.width/2))  && (d >= 0) && (d <= (dist*dist))) {
+                    return true;
+                }
+            }
+        }
+        //Finally, check the right end cap of the entire line
+        return (distance([x,y],this.pts[this.pts.length-1]) < (this.width/2));
+    };
+
+    var newAct = {
         undo: function() {
             // Take the top layer off of layerList. The object still exists in the objects hash, but
             // doesn't get drawn because ONLY the objects in layerList get drawn.
@@ -388,20 +486,22 @@ function redo() {
         refreshCanvas();
     }
 }
-  
 
-
+function updateThick(slideAmount) {		// gets thickness from slider and sets the global thickness
+	thickness = slideAmount;
+}
+function updateOpac(slideAmount) {		// gets opacity from slider and sets the global opacity
+	alpha = slideAmount/100;
+}
 
 function SetDrawThick(t)	// sets the thickness
 {
     thickness = t;
-//  $( "#linethickSlider" ).slider( "value", gVars.curDrawThick);
 }
 
 function SetDrawAlpha(t)	// sets the opacity
 {
     alpha = t;
-//  $( "#alphaSlider" ).slider( "value", gVars.curDrawAlpha*100);
 }
 
 function SelectTool(toolName) // selects proper tool based off of what user has clicked
@@ -410,27 +510,21 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
         case 'draw':
             curTool = 'draw';
             brushMode = 'simple';
-            SetDrawThick(thickness > 8? 8 : thickness);
-            SetDrawAlpha(1);
             break;
         case 'spraycan':
             curTool = 'draw';
             brushMode = 'spray';
-            SetDrawThick(50);
-            SetDrawAlpha(0.10);
+
             break;
         case 'select':
             curTool = 'select';
-            SetDrawAlpha(1);
             break;
         case 'pencil':
             curTool = 'draw';
             brushMode = 'graphite';
-            SetDrawAlpha(1);
             break;
         default:
             curTool = toolName;
-            SetDrawAlpha(1);
             break;
     }
     refreshCanvas();
@@ -465,9 +559,6 @@ $().ready( function() {
     // Bind the redo function to the redo button.
     $('#redo').click( redo );
 	
-	
-    /////////////////////////////////////////////////////////////////////////////////////
-    // ADDED BUTTONS
     //.attr etc is to address a firefox bug that caches the disabled state of the redo button
     // http://stackoverflow.com/questions/2719044/jquery-ui-button-gets-disabled-on-refresh
     $('#undo_button').attr('disabled', true);
@@ -509,8 +600,7 @@ $().ready( function() {
     $('#stamp').click( function() {
         SelectTool('stamp');
     });
-    //////////////////////////////////////////////////////////////////////////////////////
-	
+
     $('#clear').click( function() {
         objectList = {};
         layerList = [];
