@@ -208,6 +208,7 @@ function pointerDown(e) {
 				svg: svgList[ curStamp ].url,
 				cx: svgList[ curStamp ].cx,
 				cy: svgList[ curStamp ].cy,
+				opacity: alpha,
 				scale: 0.5, 
 				bound: svgList[ curStamp ].bounds,
 				rotation: Math.random()*2*Math.PI, //eventually user specified
@@ -268,12 +269,12 @@ function createStamp(dObj) {
         var bound = [this.bound[2],this.bound[3]];
 
         ctx.save();
+		ctx.globalAlpha = this.opacity;
         ctx.beginPath();
         ctx.translate(this.pts[0],this.pts[1]);
         ctx.scale(scale,scale);
         ctx.rotate(this.rotation);
         ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
-        ctx.globalAlpha = this.opacity;
         ctx.restore();
     };
     dObj.select = function(x,y) {
