@@ -9,6 +9,7 @@ var curTool = "draw";   // This is the current tool selected by the user
 var brushMode = 'simple';
 var thickness = 10;     // Thickness of the line to be drawn
 var alpha = 1;          // Opacity of the object to be drawn
+var curColor = "#000000";
 var isDragging = false;
 var curStamp = '';
 
@@ -198,6 +199,7 @@ function pointerDown(e) {
 				pts: [[x, y]],
 				width: thickness,
 				opacity: alpha,
+				color: curColor,
 				bezier: true,
 				type: brushMode
             };
@@ -386,14 +388,19 @@ function startLine(dObj) {
         ctx.beginPath();
         ctx.moveTo(this.pts[0][0], this.pts[0][1]);
 		ctx.save();
+		ctx.strokeStyle = this.color;
 		if(this.type == 'spray'){
 			ctx.strokeStyle = this.pattern;
 		}
 		
         var last = this.pts[0];
-		
+		ctx.fillStyle = this.color;
+		ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.lineWidth = this.width;
+        ctx.globalAlpha = this.opacity;
         if(this.pts.length == 1) {
-            ctx.fillStyle = '#000000';
+            ctx.fillStyle = this.color;
 			if(this.type == 'spray') {
 			    ctx.fillStyle = this.pattern;
 			}
@@ -405,10 +412,6 @@ function startLine(dObj) {
             // Draw the line without beziers
             for(var i=1; i<this.pts.length; i++) {
                 ctx.lineTo(this.pts[i][0], this.pts[i][1]);
-                        ctx.lineJoin = 'round';
-                        ctx.lineCap = 'round';
-                        ctx.lineWidth = this.width;
-                        ctx.globalAlpha = this.opacity;
             };
             ctx.stroke();
         } else {
@@ -424,10 +427,6 @@ function startLine(dObj) {
                         this.pts[i+2][0], this.pts[i+2][1],
                         this.pts[i+3][0], this.pts[i+3][1]);
                 }
-	        ctx.lineJoin = 'round';
-	        ctx.lineCap = 'round';
-	        ctx.lineWidth = this.width;
-		ctx.globalAlpha = this.opacity;
             };
         ctx.stroke();
         }
@@ -565,7 +564,10 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
-
+//////////////////////////////////
+	myCP = new ColorPicker();
+	myCP.setHSL(0,90,50);
+///////////////////////////////////
     // Prevent default actions for touch events
     document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
