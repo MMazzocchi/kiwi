@@ -15,6 +15,8 @@ var curStamp = '';
 var selectedId = -1;
 var xOld;
 var yOld;
+var xFirst;
+var yFirst;
 
 var tx=0;
 var ty=0;
@@ -46,6 +48,37 @@ var svgList = {
 
 function orienting() {
     return (typeof window.orientation != "undefined");
+}
+
+function transformCoordinates(e) {
+    var ofst = $('#drawing_canvas').offset()
+
+    if('touches' in e) {
+        e = e.touches[0];
+    }
+
+    var x = e.pageX - ofst.left;
+    var y = e.pageY - ofst.top;
+
+    if(orienting()) {
+        switch(orientation) {
+            case 90:
+                var t=x;
+                x=-y-tx;
+                y=t;
+                break;
+            case -90:
+                var t=-x-ty;
+                x=y;
+                y=t;
+                break;
+            case 180:
+                x=-x-tx;
+                y=-y-ty;
+                break;
+        }
+    }
+    return [x,y];
 }
 
 // Refresh the canvas; draw everything
@@ -155,33 +188,8 @@ function eraseObject(id) {
 }
 
 function pointerDown(e) {
-    var ofst = $(this).offset();
-
-    if('touches' in e) {
-        e = e.touches[0];
-    }
-
-    var x = e.pageX - ofst.left;
-    var y = e.pageY - ofst.top;
-
-    if(orienting()) {
-        switch(orientation) {
-            case 90:
-                var t=x;
-                x=-y-tx;
-                y=t;
-                break;
-            case -90:
-                var t=-x-ty;
-                x=y;
-                y=t;
-                break;
-            case 180:
-                x=-x-tx;
-                y=-y-ty;
-                break;
-        }
-    }
+    var c = transformCoordinates(e);
+    var x = c[0]; var y = c[1];
 
     switch(curTool) {			
         case "draw":
@@ -202,6 +210,8 @@ function pointerDown(e) {
                 isDragging = true;
                 xOld = x;
                 yOld = y;
+                xFirst = x;
+                yFirst = y;
             }
             break;
 
@@ -248,33 +258,8 @@ function translate(id, x, y) {
 }
 
 function pointerMove(e) {
-    var ofst = $(this).offset();
-
-    if('touches' in e) {
-        e = e.touches[0];
-    }
-
-    var x = e.pageX - ofst.left;
-    var y = e.pageY - ofst.top;
-
-    if(orienting()) {
-        switch(orientation) {
-            case 90:
-                var t=x;
-                x=-y-tx;
-                y=t;
-                break;
-            case -90:
-                var t=-x-ty;
-                x=y;
-                y=t;
-                break;
-            case 180:
-                x=-x-tx;
-                y=-y-ty;
-                break;
-        }
-    }
+    var c = transformCoordinates(e);
+    var x = c[0]; var y = c[1];
 
     if (isDragging){
         switch(curTool) {
@@ -295,6 +280,12 @@ function pointerMove(e) {
 }
 
 function pointerEnd(e) {
+    var c = transformCoordinates(e);
+    var x = c[0]; var y = c[1];
+
+    if(isDragging) {
+        
+    }
     isDragging = false;
 }
 
