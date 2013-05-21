@@ -527,6 +527,11 @@ function updateOpac(slideAmount) {		// gets opacity from slider and sets the glo
 	alpha = slideAmount/100;
 }
 
+function updateTint(slideAmount) {		// gets tint from slider and sets the light setting in the color picker
+	myCP.curL = slideAmount;
+    myCP.updateColor();
+}
+
 function SetDrawThick(t)	// sets the thickness
 {
     thickness = t;
@@ -644,6 +649,42 @@ $().ready( function() {
         idPtr = 0;
         actionPtr = 0;
         refreshCanvas();
+    });
+	
+	$( '#tintSlider' ).slider({
+			orientation: "horizontal",
+			range: "min",
+			min: 0,
+			max: 100,
+			value: myCP.curL,
+			slide: function( event, ui ) {
+				updateTint( ui.value );
+			},
+			change: function( event, ui ) {
+				updateTint( ui.value );
+			}
+	});
+	
+	$( "#opacitySlider" ).slider({
+      orientation: "horizontal",
+      range: "min",
+      min: 0,
+      max: 100,
+      value: 100,
+      change: function( event, ui ) {
+        updateOpac( ui.value );
+      }
+    });
+	
+	$( "#thicknessSlider" ).slider({
+      orientation: "horizontal",
+      range: "min",
+      min: 4,
+      max: 80,
+      value: 10,
+      change: function( event, ui ) {
+        updateThick( ui.value );
+      }
     });
 	
     $(document).keypress(function(e) {
