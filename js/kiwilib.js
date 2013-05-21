@@ -185,7 +185,6 @@ function eraseObject(id) {
     };
 
     addAction(newAct);
-    refreshCanvas();
 }
 
 function pointerDown(e) {
@@ -257,7 +256,6 @@ function translate(id, x, y) {
     objectList[id].move(dx,dy);
     xOld = x;
     yOld = y;
-    refreshCanvas();
 }
 
 function pointerMove(e) {
@@ -305,7 +303,6 @@ function pointerEnd(e) {
         };
 
         addAction(newAct);
-       // refreshCanvas();
     }
 
     isDragging = false;
@@ -326,7 +323,7 @@ function createStamp(dObj) {
         ctx.translate(this.pts[0],this.pts[1]);
         ctx.scale(scale,scale);
         ctx.rotate(this.rotation);
-        ctx.drawSvg(this.url, -this.cx, -this.cy, 0, 0);
+        ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
         ctx.restore();
     };
     dObj.select = function(x,y) {
@@ -355,7 +352,6 @@ function createStamp(dObj) {
 
     // Add the new action and redraw.
     addAction(newAct);
-    refreshCanvas();
 }
 
 function distance(p1, p2) {
@@ -487,14 +483,12 @@ function startLine(dObj) {
 
     // Add the new action and redraw.
     addAction(newAct);
-    refreshCanvas();
 }
 
 
 function continueLine(x,y) {
     var dObj = objectList[layerList[layerList.length-1]];
     dObj.pts.push([x, y]);
-    refreshCanvas();
 }
 
 // Undos an action.
@@ -512,7 +506,6 @@ function undo() {
 
         // Take actionPtr down one (since we just undid an action) and redraw.
         actionPtr--;
-        refreshCanvas();
     }
 }
 
@@ -522,7 +515,6 @@ function redo() {
         var next = actionList[actionPtr];
         next.redo();
         actionPtr++;
-        refreshCanvas();
     }
 }
 
@@ -566,7 +558,6 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
             curTool = toolName;
             break;
     }
-    refreshCanvas();
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
@@ -649,7 +640,6 @@ $().ready( function() {
         actionList = [];
         idPtr = 0;
         actionPtr = 0;
-        refreshCanvas();
     });
 	
     $(document).keypress(function(e) {
@@ -669,5 +659,5 @@ $().ready( function() {
     });
 	
     // Redraw.
-    refreshCanvas();
+    setInterval(refreshCanvas, 10);
 });
