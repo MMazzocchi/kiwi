@@ -20,7 +20,6 @@ function ColorPicker()
 
   // Init Disc
   var dc = cpdisc.getContext('2d');
-  // dc.clearRect(0,0,CPW,CPH);
   for (var py = 0; py < CPH; ++py) {
     for (var px = 0; px < CPW; ++px) {
       var dx = px - cx;
@@ -38,12 +37,6 @@ function ColorPicker()
         dc.fillRect(px,py,1,1);
       }
     }
-/*    dc.strokeStyle = '#CCC';
-    dc.lineWidth = 2;
-    dc.beginPath();
-    dc.arc(cx, cy, cx, 0, 2 * Math.PI, false);
-    dc.stroke();
-*/
   }
 
 
@@ -52,12 +45,10 @@ function ColorPicker()
   cpldisc.height = CPH;
 
 	var cpcanvas = document.getElementById('colorpicker_canvas');
-	cpcanvas.width = CPW + xm*2;
-	cpcanvas.height = CPH + xm*2;
+	cpcanvas.width = CPW+xm*2;
+	cpcanvas.height = CPH+xm*2;
 
 	var draw = cpcanvas.getContext('2d');
-  // draw.fillStyle = '#FFFFFF';
-  // draw.fillRect(0,0,CPW,CPH);
 
   this.updateColor = function()
   {
@@ -146,7 +137,7 @@ function ColorPicker()
     this.curL = l;
     curColor = getHSLA(h,s,l,alpha);
 
- //   $( "#tintSlider" ).slider( "value", curL);
+//    $( "#tintSlider" ).slider( "value", this.curL);
 
     this.Refresh();
   }
@@ -213,11 +204,12 @@ function ColorPicker()
   }
 
 
-  $('#colorpicker_canvas').mousedown( HandleColorClick );
+	$('#colorpicker_canvas').mousedown( HandleColorClick );
 	$('#colorpicker_canvas').mousemove( HandleColorDrag );
 	$('#colorpicker_canvas').mouseup( HandleColorUp );
-  $('#colorpicker_canvas').bind('touchstart', HandleColorClick );
-  $('#colorpicker_canvas').bind('touchmove', HandleColorDrag );
+	cpcanvas.addEventListener('touchmove', HandleColorDrag );
+	cpcanvas.addEventListener('touchstart', HandleColorClick );
+    cpcanvas.addEventListener('touchend', HandleColorUp );
 }
 
  // Color Utility Functions - currently unused - using rgb(r,g,b) or rgba(r,g,b,a) or hsla(h,s,l,a) instead
