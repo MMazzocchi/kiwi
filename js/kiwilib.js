@@ -12,6 +12,8 @@ var alpha = 1;          // Opacity of the object to be drawn
 var isDragging = false;
 var curStamp = '';
 
+var selectedID = -1;
+
 var tx=0;
 var ty=0;
 var orientation = orienting() ? window.orientation : 0;
@@ -105,18 +107,44 @@ function addAction(act) {
     actionPtr++;
 }
 
+//Return the id of the topmost object at coordinates x,y
 function getObjectID(x, y) {
     var id = -1;
     for(var i=layerList.length-1; i>=0; i--) {
-        console.log("i: "+i);
-        console.log("layerList[i]: "+layerList[i]);
-        console.log("objectList[layerList[i]]: "+objectList[layerList[i]]);
         if(objectList[layerList[i]].select(x,y)) {
             id = objectList[layerList[i]].id;
             break;
         }
     }
+    console.log("Selected "+id);
     return id;
+}
+
+//Erase object with given id
+function eraseObject(id) {
+
+    //Find the layer that needs to be erased
+    var layerId = -1;
+    for(var i=0; i<layerList.length; i++) {
+        if(layerList[i] == id) {
+            layerId = i;
+            break;
+        }
+    }
+    //Take out the layer
+    layerList.splice(layerId, 1);
+    //Add an action to the action stack
+    var newAct = {
+        undo: function() {
+            layerList.splice(layerId, 0, id);
+        },
+        redo: function() {
+            layerList.splice(layerId,1);
+        }
+    };
+
+    addAction(newAct);
+    refreshCanvas();
 }
 
 function pointerDown(e) {
@@ -160,14 +188,16 @@ function pointerDown(e) {
             startLine(dObj);
         break;	
 
-        // These have no functionality yet, need to figure out how to find object based on mouse coordinates
         case "select":
-            var objID = getObjectID(x, y);
-            console.log(objID);
+            selectedID = getObjectID(x, y);
             break;
 
         case "erase":
-            isDragging = true;		
+            isDragging = true;
+            var id = getObjectID(x,y);
+            if(id != -1) {
+                eraseObject(id);
+            }
             break;
 
         case "fill":
@@ -234,28 +264,34 @@ function createStamp(dObj) {
     assignID(dObj);
 
     dObj.draw = function(ctx) {
-        // Begin a 'path'. A path tells the canvas where to draw or fill.
         var scale = this.scale;
-		var bound = [this.bound[2],this.bound[3]];
-		ctx.globalAlpha = this.opacity;
-		ctx.save();
-			ctx.beginPath();
-			ctx.translate(this.pts[0],this.pts[1]);
-			ctx.scale(scale,scale);
-			ctx.rotate(this.rotation);
-			ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
-		ctx.restore();
-       
+        var bound = [this.bound[2],this.bound[3]];
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.translate(this.pts[0],this.pts[1]);
+        ctx.scale(scale,scale);
+        ctx.rotate(this.rotation);
+        ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
+        ctx.globalAlpha = this.opacity;
+        ctx.restore();
     };
+    dObj.select = function(x,y) {
+        //"Scratch canvas" method
+        var scanvas = document.createElement('canvas');
+        scanvas.width = window.innerWidth;
+        scanvas.height = window.innerHeight;
+        var ctx = scanvas.getContext('2d');
+        this.draw(ctx);
+        var imageData = ctx.getImageData(x, y, 1, 1);
+        return (imageData.data[3] > 0 || imageData.data[0] > 0);
+    }
 
     var newAct = {
         undo: function() {
-            // Take the top layer off of layerList. The object still exists in the objects hash, but
-            // doesn't get drawn because ONLY the objects in layerList get drawn.
             layerList.splice(layerList.length-1,1);
         },
         redo: function() {
-            // Put this object back in layerList.
             layerList[layerList.length] = dObj.id;
         }
     };
