@@ -383,19 +383,19 @@ function startLine(dObj) {
         ctx.beginPath();
         ctx.moveTo(this.pts[0][0], this.pts[0][1]);
 		ctx.save();
+		ctx.strokeStyle = this.color;
 		if(this.type == 'spray'){
 			ctx.strokeStyle = this.pattern;
 		}
 		
         var last = this.pts[0];
 		ctx.fillStyle = this.color;
-		ctx.strokeStyle = this.color;
 		ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
         ctx.lineWidth = this.width;
         ctx.globalAlpha = this.opacity;
         if(this.pts.length == 1) {
-            ctx.fillStyle = '#000000';
+            ctx.fillStyle = this.color;
 			if(this.type == 'spray') {
 			    ctx.fillStyle = this.pattern;
 			}
