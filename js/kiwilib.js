@@ -659,5 +659,5 @@ $().ready( function() {
     });
 	
     // Redraw.
-    setInterval(refreshCanvas, 10);
+    setInterval(refreshCanvas, 30);
 });
