@@ -107,18 +107,44 @@ function addAction(act) {
     actionPtr++;
 }
 
+//Return the id of the topmost object at coordinates x,y
 function getObjectID(x, y) {
     var id = -1;
     for(var i=layerList.length-1; i>=0; i--) {
-        console.log("i: "+i);
-        console.log("layerList[i]: "+layerList[i]);
-        console.log("objectList[layerList[i]]: "+objectList[layerList[i]]);
         if(objectList[layerList[i]].select(x,y)) {
             id = objectList[layerList[i]].id;
             break;
         }
     }
+    console.log("Selected "+id);
     return id;
+}
+
+//Erase object with given id
+function eraseObject(id) {
+
+    //Find the layer that needs to be erased
+    var layerId = -1;
+    for(var i=0; i<layerList.length; i++) {
+        if(layerList[i] == id) {
+            layerId = i;
+            break;
+        }
+    }
+    //Take out the layer
+    layerList.splice(layerId, 1);
+    //Add an action to the action stack
+    var newAct = {
+        undo: function() {
+            layerList.splice(layerId, 0, id);
+        },
+        redo: function() {
+            layerList.splice(layerId,1);
+        }
+    };
+
+    addAction(newAct);
+    refreshCanvas();
 }
 
 function pointerDown(e) {
@@ -162,13 +188,16 @@ function pointerDown(e) {
             startLine(dObj);
         break;	
 
-        // These have no functionality yet, need to figure out how to find object based on mouse coordinates
         case "select":
             selectedID = getObjectID(x, y);
             break;
 
         case "erase":
-            isDragging = true;		
+            isDragging = true;
+            var id = getObjectID(x,y);
+            if(id != -1) {
+                eraseObject(id);
+            }
             break;
 
         case "fill":
@@ -257,7 +286,6 @@ function createStamp(dObj) {
         var imageData = ctx.getImageData(x, y, 1, 1);
         return (imageData.data[3] > 0 || imageData.data[0] > 0);
     }
-
 
     var newAct = {
         undo: function() {
