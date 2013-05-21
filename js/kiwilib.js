@@ -234,6 +234,7 @@ function pointerDown(e) {
 				url: svgList[ curStamp ].url,
 				cx: svgList[ curStamp ].cx,
 				cy: svgList[ curStamp ].cy,
+				opacity: alpha,
 				scale: Math.random()*0.5 + 0.25, 
 				bound: svgList[ curStamp ].bounds,
 				rotation: Math.random()*2*Math.PI, //eventually user specified
