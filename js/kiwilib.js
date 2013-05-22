@@ -514,7 +514,7 @@ function createPencilTex(dObj){
 	}
 	else{
 		var w = dObj.width;
-		var grd=dc.createRadialGradient(dObj.pts[0][0],dObj.pts[0][1],w/8.0,dObj.pts[0][0],dObj.pts[0][1],w/2.0);
+		var grd=dc.createRadialGradient(dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/8.0,dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/2.0);
 		grd.addColorStop(0,dObj.color);
 		grd.addColorStop(1, "blue");
 //		dc.arc(w/2.0,w/2.0,w/2.0,0,2*Math.PI);
@@ -526,13 +526,29 @@ function createPencilTex(dObj){
 
 }
 
+function spraycanLine(dObj){	/////////////////testing spraycan
+	var texcanvas = document.createElement('canvas');
+	var dc = texcanvas.getContext('2d');
+	var w = dObj.width;
+	var grd=dc.createRadialGradient(dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/8.0,dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/2.0);
+	grd.addColorStop(0,dObj.color);
+	grd.addColorStop(1, "blue");
+//		dc.arc(w/2.0,w/2.0,w/2.0,0,2*Math.PI);
+//		dc.fillStyle = grd;
+//		dc.fill();
+	dObj.pattern =  grd;
+}
+
 function startLine(dObj) {
     assignID(dObj);
 	// create brush pattern
-	if(dObj.type == 'graphite' || dObj.type == 'spray'){
+	if(dObj.type == 'graphite'){
 		createPencilTex(dObj);
 	}
-
+	if(dObj.type == 'spray'){//////////// testing spraycan
+		spraycanLine(dObj);
+	}
+	
     dObj.draw = function(ctx) {
         ctx.beginPath();
         ctx.moveTo(this.pts[0][0], this.pts[0][1]);
@@ -642,6 +658,9 @@ function startLine(dObj) {
 function continueLine(x,y) {
     var dObj = objectList[layerList[layerList.length-1]];
     dObj.pts.push([x, y]);
+	if (dObj.type == 'spray'){/////////////////////// testing spraycan
+		spraycanLine(dObj);
+	}
 }
 
 // Undos an action.
