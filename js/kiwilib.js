@@ -18,6 +18,7 @@ var xOld;
 var yOld;
 var xFirst;
 var yFirst;
+var dragMode = '';
 
 var tx=0;
 var ty=0;
@@ -211,6 +212,7 @@ function eraseObject(id) {
 //For the object with given id, check whether the rotate or scale icons were clicked
 function iconClicked(id, x, y) {
     
+
 }
 
 function pointerDown(e) {
@@ -221,19 +223,22 @@ function pointerDown(e) {
         case "draw":
             isDragging = true;
             var dObj = {
-				pts: [[x, y]],
-				width: thickness,
-				opacity: alpha,
-				color: curColor,
-				bezier: true,
-				type: brushMode
+                pts: [[x, y]],
+                width: thickness,
+                opacity: alpha,
+                color: curColor,
+                bezier: true,
+                type: brushMode,
+                xScale: 1,
+                yScale: 1,
+                rotation: 0
             };
             startLine(dObj);
         break;	
 
         case "select":
-            if((selectedId != -1) && iconClicked(selectedId)) {
-                var icon = iconClicked(selectedId, x, y);
+            if((selectedId != -1) && iconClicked(selectedId, x, y)) {
+                dragMode = iconClicked(selectedId, x, y);
             } else {
                 selectedId = getObjectID(x, y);
                 if(selectedId != -1) {
@@ -242,6 +247,7 @@ function pointerDown(e) {
                     yOld = y;
                     xFirst = x;
                     yFirst = y;
+                    dragMode = 'translate';
                 }
             }
             break;
@@ -305,7 +311,15 @@ function pointerMove(e) {
                 }
                 break;
             case "select":
-                translate(selectedId, x, y);
+                switch(dragMode) {
+                    case 'translate':
+                        translate(selectedId, x, y);
+                        break;
+                    case 'rotate':
+                        break;
+                    case 'scale':
+                        break;
+                }
                 break;
         }
     }
@@ -468,20 +482,23 @@ function createPencilTex(dObj){
 
 function startLine(dObj) {
     assignID(dObj);
-	// create brush pattern
-	if(dObj.type == 'graphite' || dObj.type == 'spray'){
-		createPencilTex(dObj);
-	}
+    // create brush pattern
+    if(dObj.type == 'graphite' || dObj.type == 'spray'){
+        createPencilTex(dObj);
+    }
 
     dObj.draw = function(ctx) {
-        ctx.beginPath();
-        ctx.moveTo(this.pts[0][0], this.pts[0][1]);
-		ctx.save();
+    ctx.save();
+    ctx.rotate(this.rotation);
+    ctx.scale(this.xScale,this.yScale);
 
-		ctx.strokeStyle = this.color;
-		if(this.type == 'graphite' || this.type == 'spray'){
-			ctx.strokeStyle = this.pattern;
-		}
+    ctx.beginPath();
+    ctx.moveTo(this.pts[0][0], this.pts[0][1]);
+
+	ctx.strokeStyle = this.color;
+	if(this.type == 'graphite' || this.type == 'spray'){
+		ctx.strokeStyle = this.pattern;
+	}
 		
         var last = this.pts[0];
 		ctx.fillStyle = this.color;
