@@ -330,7 +330,11 @@ function pointerEnd(e) {
 
         addAction(newAct);
     }
-
+	if(curTool == 'eyedropper'){
+		var id = ctx.getImageData(x, y, 1, 1);
+        var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
+        myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+	}
     isDragging = false;
 }
 
@@ -456,14 +460,13 @@ function createPencilTex(dObj){
 	}
 	else{
 		var w = dObj.width;
-		var grd=dc.createRadialGradient(w/2.0,w/2.0,6,w/2.0,w/2.0,w/2.0);
-		grd.addColorStop(0,"blue");
-		grd.addColorStop(1,"white");
-		console.log(dObj.type);
-		dc.strokeStyle = grd;
-		dc.fillRect(0,0,w,w);
-		dObj.pattern =  dc.createPattern(texcanvas, "repeat");
-		//dObj.pattern =  grd;
+		var grd=dc.createRadialGradient(dObj.pts[0][0],dObj.pts[0][1],w/8.0,dObj.pts[0][0],dObj.pts[0][1],w/2.0);
+		grd.addColorStop(0,dObj.color);
+		grd.addColorStop(1, "blue");
+//		dc.arc(w/2.0,w/2.0,w/2.0,0,2*Math.PI);
+//		dc.fillStyle = grd;
+//		dc.fill();
+		dObj.pattern =  grd;
 	}
 	dc.globalAlpha = 1;
 
@@ -803,6 +806,28 @@ $().ready( function() {
             }
             return false;
         }
+		
+		switch (key) {
+			case 97: // A=SPRAYCAN
+			  SelectTool('spraycan');
+			  break;
+			case 100: // D=DRAW
+			  SelectTool('draw');
+			  break;
+			case 101: // E=ERASE
+			  SelectTool('erase');
+			  break;
+			case 102: // F=FILL
+			  SelectTool('fill');
+			  break;
+			case 115: // S=SELECT
+			  SelectTool('select');
+			  break;
+			case 103:  // G=eyedropper
+			  SelectTool('eyedropper');
+			  break;
+		}
+		
     });
 
   $('#resize_icon').load(function() {});
