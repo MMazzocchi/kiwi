@@ -92,13 +92,13 @@ function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
+	var heightoffset = $("#toolbar").height();
+	var widthoffset = $("#toolbar").width();
 	if (window.innerWidth < window.innerHeight) { // portrait
-		var heightoffset = $("#toolbar").height();
 		ctx.canvas.width  = window.innerWidth;
 		ctx.canvas.height = window.innerHeight - heightoffset;
 	}
 	else { // landscape
-		var widthoffset = $("#toolbar").width();
 		ctx.canvas.width  = window.innerWidth - widthoffset;
 		ctx.canvas.height = window.innerHeight;
 	}
@@ -223,6 +223,7 @@ function iconClicked(id, x, y) {
 
 function pointerDown(e) {
     var c = transformCoordinates(e);
+	var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
 
     switch(curTool) {			
@@ -291,7 +292,13 @@ function pointerDown(e) {
 
             createStamp(dObj);
             break;
-    }
+		case "dropper":
+			isDragging = true;
+			var id = ctx.getImageData(x, y, 1, 1);
+			var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
+			myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+			break;
+	}
 }
 
 function translate(id, x, y) {
@@ -304,6 +311,7 @@ function translate(id, x, y) {
 
 function pointerMove(e) {
     var c = transformCoordinates(e);
+	var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
 
     if (isDragging){
@@ -320,6 +328,11 @@ function pointerMove(e) {
             case "select":
                 translate(selectedId, x, y);
                 break;
+			case "dropper":
+				var id = ctx.getImageData(x, y, 1, 1);
+				var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
+				myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+				break;
         }
     }
 }
@@ -345,11 +358,6 @@ function pointerEnd(e) {
 
         addAction(newAct);
     }
-	if(curTool == 'eyedropper'){
-		var id = ctx.getImageData(x, y, 1, 1);
-        var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
-        myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
-	}
     isDragging = false;
 }
 
@@ -774,6 +782,10 @@ $().ready( function() {
         SelectTool('erase');
     });
 	
+	$('#dropper').click( function() {
+        SelectTool('dropper');
+    });
+	
     $('#butterfly').click( function() {
          SelectTool('stamp');
          curStamp = 'butterfly'
@@ -872,8 +884,8 @@ $().ready( function() {
 			case 115: // S=SELECT
 			  SelectTool('select');
 			  break;
-			case 103:  // G=eyedropper
-			  SelectTool('eyedropper');
+			case 103:  // G=dropper
+			  SelectTool('dropper');
 			  break;
 		}
 		
