@@ -856,6 +856,7 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
 
+	document.body.style.cursor="url(img/paintbrush.png), default"; // sets the default cursor to the paintbrush
     //Ceate Color picker
     myCP = new ColorPicker();
     myCP.setHSL(0,90,50);
@@ -894,18 +895,22 @@ $().ready( function() {
     $('button').button().attr("autocomplete", "off");
 
     $('#brush').click( function() {
+		document.body.style.cursor="url(img/paintbrush.png), default";
         SelectTool('draw');
     });
 
     $('#spraycan').click( function() {
+		document.body.style.cursor="url(img/spraycan.png), default";
         SelectTool('spraycan');
     });
 
     $('#hand').click( function() {
+		document.body.style.cursor="url(img/hand-tool.png), default";
         SelectTool('select');
     });
 
     $('#pencil').click( function() {
+		document.body.style.cursor="url(img/pencil.png), default";
         SelectTool('pencil');
     });
 	
@@ -914,14 +919,17 @@ $().ready( function() {
     });
 	
     $('#erase').click( function() {
+		document.body.style.cursor="url(img/eraser.png), default";
         SelectTool('erase');
     });
 	
 	$('#dropper').click( function() {
+		document.body.style.cursor="url(img/dropper.png), default";
         SelectTool('dropper');
     });
 	
 	$('#fill').click( function() {
+		document.body.style.cursor="url(img/paintbucket.png), default";
         SelectTool('fill');
     });
 	
@@ -1008,9 +1016,6 @@ $().ready( function() {
         }
 		
 		switch (key) {
-			case 97: // A=SPRAYCAN
-			  SelectTool('spraycan');
-			  break;
 			case 100: // D=DRAW
 			  SelectTool('draw');
 			  break;
