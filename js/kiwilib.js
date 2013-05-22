@@ -86,11 +86,23 @@ function transformCoordinates(e) {
 // Refresh the canvas; draw everything
 function refreshCanvas() {
 
+    if(curTool != 'select') {
+        selectedId = -1;
+    }
+
     var ctx = canvas.getContext('2d');
 
-    ctx.canvas.width  = window.innerWidth;
-    ctx.canvas.height = window.innerHeight;
-	//ctx.save();
+	if (window.innerWidth < window.innerHeight) { // portrait
+		var heightoffset = $("#toolbar").height();
+		ctx.canvas.width  = window.innerWidth;
+		ctx.canvas.height = window.innerHeight - heightoffset;
+	}
+	else { // landscape
+		var widthoffset = $("#toolbar").width();
+		ctx.canvas.width  = window.innerWidth - widthoffset;
+		ctx.canvas.height = window.innerHeight;
+	}
+
     if(orienting()) {
         orientation = window.orientation;
         ctx.rotate(-orientation*Math.PI/180);
@@ -124,18 +136,31 @@ function refreshCanvas() {
     }
 	//ctx.restore();
     // For each id in layerList, call this function:
-    //$.each(layerList, function(i, id) {
+    $.each(layerList, function(i, id) {
         // Get the object for this layer
-		
-		var id = layerList[layerList.length-1];
         var dObj = objectList[id];
-		if(scratch){
-			ctx.putImageData(scratch,0,0);
-		}
-        dObj.draw(ctx);
-		scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
+
+		//if(scratch){
+		//	ctx.putImageData(scratch,0,0);
+		//}
+        //dObj.draw(ctx);
+		//scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
 		
-    //});
+
+
+        if((!isDragging) || (id != selectedId)) {
+            // Draw the object
+            dObj.draw(ctx);
+        }
+    });
+
+    // Draw the selected layer on top of the rest
+    if(selectedId != -1) {
+        if(isDragging) {
+            objectList[selectedId].draw(ctx);
+        }
+        objectList[selectedId].drawIcons(ctx);
+    }
 }
 
 // Assign a new ID to this object
@@ -191,6 +216,11 @@ function eraseObject(id) {
     addAction(newAct);
 }
 
+//For the object with given id, check whether the rotate or scale icons were clicked
+function iconClicked(id, x, y) {
+    
+}
+
 function pointerDown(e) {
     var c = transformCoordinates(e);
     var x = c[0]; var y = c[1];
@@ -210,13 +240,17 @@ function pointerDown(e) {
         break;	
 
         case "select":
-            selectedId = getObjectID(x, y);
-            if(selectedId != -1) {
-                isDragging = true;
-                xOld = x;
-                yOld = y;
-                xFirst = x;
-                yFirst = y;
+            if((selectedId != -1) && iconClicked(selectedId)) {
+                var icon = iconClicked(selectedId, x, y);
+            } else {
+                selectedId = getObjectID(x, y);
+                if(selectedId != -1) {
+                    isDragging = true;
+                    xOld = x;
+                    yOld = y;
+                    xFirst = x;
+                    yFirst = y;
+                }
             }
             break;
 
@@ -243,9 +277,10 @@ function pointerDown(e) {
 				cx: svgList[ curStamp ].cx,
 				cy: svgList[ curStamp ].cy,
 				opacity: alpha,
-				scale: Math.random()*0.5 + 0.25, 
+				xScale: 1, 
+                                yScale: 1,
 				bound: svgList[ curStamp ].bounds,
-				rotation: Math.random()*2*Math.PI, //eventually user specified
+				rotation: 0,
 				pts: [x, y],
 			};	
 			$.get(dObj.url, function(xmlData) {
@@ -310,7 +345,11 @@ function pointerEnd(e) {
 
         addAction(newAct);
     }
-
+	if(curTool == 'eyedropper'){
+		var id = ctx.getImageData(x, y, 1, 1);
+        var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
+        myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+	}
     isDragging = false;
 }
 
@@ -346,14 +385,38 @@ function createFill(dObj){
 
     // Add the new action and redraw.
     addAction(newAct);
+}
 
+function transformPoint(x,y,dx,dy,sx,sy,theta) {
+        var tx = x*sx;
+        var ty = -1*y*sy;
+        var r = distance([0,0],[tx,ty]);
+        var phi=0;
+        if(tx == 0) {
+            phi = ty < 0 ? (Math.PI*3/2) : (Math.PI/2);
+        } else {
+            phi = Math.atan(ty/tx);
+            if(tx < 0) {
+                phi = phi+(Math.PI);
+            } else {
+                if(ty < 0) {
+                    phi+=(Math.PI*3/2)
+                }
+            }
+        }
+        tx = (r*Math.cos(phi-theta));
+        ty = (r*Math.sin(phi-theta));
+        tx = dx+tx;
+        ty = dy-ty;
+        return [tx,ty];
 }
 
 function createStamp(dObj) {
     assignID(dObj);
 
     dObj.draw = function(ctx) {
-        var scale = this.scale;
+        var xScale = this.xScale;
+        var yScale = this.yScale;
 
         var bound = [this.bound[2],this.bound[3]];
 
@@ -361,8 +424,8 @@ function createStamp(dObj) {
 			ctx.globalAlpha = this.opacity;
 			ctx.beginPath();
 			ctx.translate(this.pts[0],this.pts[1]);
-			ctx.scale(scale,scale);
-			ctx.rotate(this.rotation);
+                        ctx.rotate(this.rotation);
+			ctx.scale(xScale,yScale);
 			ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
         ctx.restore();
     };
@@ -380,6 +443,25 @@ function createStamp(dObj) {
         this.pts[0]+=dx;
         this.pts[1]+=dy;
     };
+    dObj.drawIcons = function(ctx) {
+        var leftCorner = transformPoint(
+            -this.bound[2]/2, -this.bound[3]/2,
+            this.pts[0], this.pts[1],
+            this.xScale, this.yScale,
+            this.rotation );
+
+            var scaleIcon = document.getElementById('resize_icon');
+            ctx.drawImage(scaleIcon, leftCorner[0], leftCorner[1]);
+
+        var rightCorner = transformPoint(
+            this.bound[2]/2, -this.bound[3]/2,
+            this.pts[0], this.pts[1],
+            this.xScale, this.yScale,
+            this.rotation );
+
+            var rotateIcon = document.getElementById('rotate_icon');
+            ctx.drawImage(rotateIcon, rightCorner[0], rightCorner[1]);
+    }
 
     var newAct = {
         undo: function() {
@@ -419,14 +501,13 @@ function createPencilTex(dObj){
 	}
 	else{
 		var w = dObj.width;
-		var grd=dc.createRadialGradient(w/2.0,w/2.0,6,w/2.0,w/2.0,w/2.0);
-		grd.addColorStop(0,"blue");
-		grd.addColorStop(1,"white");
-		console.log(dObj.type);
-		dc.strokeStyle = grd;
-		dc.fillRect(0,0,w,w);
-		dObj.pattern =  dc.createPattern(texcanvas, "repeat");
-		//dObj.pattern =  grd;
+		var grd=dc.createRadialGradient(dObj.pts[0][0],dObj.pts[0][1],w/8.0,dObj.pts[0][0],dObj.pts[0][1],w/2.0);
+		grd.addColorStop(0,dObj.color);
+		grd.addColorStop(1, "blue");
+//		dc.arc(w/2.0,w/2.0,w/2.0,0,2*Math.PI);
+//		dc.fillStyle = grd;
+//		dc.fill();
+		dObj.pattern =  grd;
 	}
 	dc.globalAlpha = 1;
 
@@ -579,9 +660,11 @@ function redo() {
 
 function updateThick(slideAmount) {		// gets thickness from slider and sets the global thickness
 	thickness = slideAmount;
+        myCP.Refresh();
 }
 function updateOpac(slideAmount) {		// gets opacity from slider and sets the global opacity
 	alpha = slideAmount/100;
+        myCP.Refresh();
 }
 
 function updateTint(slideAmount) {		// gets tint from slider and sets the light setting in the color picker
@@ -628,15 +711,17 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
-//////////////////////////////////
-	myCP = new ColorPicker();
-	myCP.setHSL(0,90,50);
-///////////////////////////////////
+
+    //Ceate Color picker
+    myCP = new ColorPicker();
+    myCP.setHSL(0,90,50);
+
     // Prevent default actions for touch events
     document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
 
+    //Refresh on orientation changes
     window.addEventListener( 'resize', refreshCanvas );
     window.addEventListener( 'orientationchange', refreshCanvas );
 
@@ -689,18 +774,18 @@ $().ready( function() {
         SelectTool('erase');
     });
 	
-	$('#butterfly').click( function() {
-		SelectTool('stamp');
-		curStamp = 'butterfly'
-	});
-	$('#mickey_button').click( function() {
-		SelectTool('stamp');
-		curStamp = 'mickey'
-	});
-	$('#bnl').click( function() {
-		SelectTool('stamp');
-		curStamp = 'bnl'
-	});
+    $('#butterfly').click( function() {
+         SelectTool('stamp');
+         curStamp = 'butterfly'
+    });
+    $('#mickey_button').click( function() {
+        SelectTool('stamp');
+        curStamp = 'mickey'
+    });
+    $('#bnl').click( function() {
+        SelectTool('stamp');
+        curStamp = 'bnl'
+    });
     $('#stamp').click( function() {
         SelectTool('stamp');
     });
@@ -711,42 +796,49 @@ $().ready( function() {
         actionList = [];
         idPtr = 0;
         actionPtr = 0;
+        selectedId = -1;
     });
 	
-	$( '#tintSlider' ).slider({
-			orientation: "horizontal",
-			range: "min",
-			min: 0,
-			max: 100,
-			value: myCP.curL,
-			slide: function( event, ui ) {
-				updateTint( ui.value );
-			},
-			change: function( event, ui ) {
-				updateTint( ui.value );
-			}
-	});
-	
-	$( "#opacitySlider" ).slider({
-      orientation: "horizontal",
-      range: "min",
-      min: 0,
-      max: 100,
-      value: 100,
-      change: function( event, ui ) {
-        updateOpac( ui.value );
-      }
+    $( '#tintSlider' ).slider({
+        orientation: "horizontal",
+        range: "min",
+        min: 0,
+        max: 100,
+        value: myCP.curL,
+        slide: function( event, ui ) {
+            updateTint( ui.value );
+        },
+        change: function( event, ui ) {
+            updateTint( ui.value );
+        }
     });
 	
-	$( "#thicknessSlider" ).slider({
-      orientation: "horizontal",
-      range: "min",
-      min: 4,
-      max: 80,
-      value: 10,
-      change: function( event, ui ) {
-        updateThick( ui.value );
-      }
+    $( "#opacitySlider" ).slider({
+        orientation: "horizontal",
+        range: "min",
+        min: 0,
+        max: 100,
+        value: 100,
+        slide: function( event, ui ) {
+            updateOpac( ui.value );
+        },
+        change: function( event, ui ) {
+            updateOpac( ui.value );
+        }
+    });
+	
+    $( "#thicknessSlider" ).slider({
+        orientation: "horizontal",
+        range: "min",
+        min: 4,
+        max: 80,
+        value: 10,
+        slide: function( event, ui ) {
+            updateThick( ui.value );
+        },
+        change: function( event, ui ) {
+            updateThick( ui.value );
+        }
     });
 	
     $(document).keypress(function(e) {
@@ -763,8 +855,33 @@ $().ready( function() {
             }
             return false;
         }
+		
+		switch (key) {
+			case 97: // A=SPRAYCAN
+			  SelectTool('spraycan');
+			  break;
+			case 100: // D=DRAW
+			  SelectTool('draw');
+			  break;
+			case 101: // E=ERASE
+			  SelectTool('erase');
+			  break;
+			case 102: // F=FILL
+			  SelectTool('fill');
+			  break;
+			case 115: // S=SELECT
+			  SelectTool('select');
+			  break;
+			case 103:  // G=eyedropper
+			  SelectTool('eyedropper');
+			  break;
+		}
+		
     });
-	
+
+  $('#resize_icon').load(function() {});
+  $('#rotate_icon').load(function() {});
+
     // Redraw.
     setInterval(refreshCanvas, 10);
 });
