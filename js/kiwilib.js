@@ -876,7 +876,7 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
 
-	document.body.style.cursor="url(img/paintbrush.png), default"; // sets the default cursor to the paintbrush
+	document.body.style.cursor="url(img/paintbrush.png) 0 28, default"; // sets the default cursor to the paintbrush
     //Ceate Color picker
     myCP = new ColorPicker();
     myCP.setHSL(0,90,50);
@@ -915,22 +915,22 @@ $().ready( function() {
     $('button').button().attr("autocomplete", "off");
 
     $('#brush').click( function() {
-		document.body.style.cursor="url(img/paintbrush.png), default";
+		document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('draw');
     });
 
     $('#spraycan').click( function() {
-		document.body.style.cursor="url(img/spraycan.png), default";
+		document.body.style.cursor="url(img/spraycan.png)0 5, default";
         SelectTool('spraycan');
     });
 
     $('#hand').click( function() {
-		document.body.style.cursor="url(img/hand-tool.png), default";
+		document.body.style.cursor="url(img/hand-tool.png)14 6, default";
         SelectTool('select');
     });
 
     $('#pencil').click( function() {
-		document.body.style.cursor="url(img/pencil.png), default";
+		document.body.style.cursor="url(img/pencil.png)0 28, default";
         SelectTool('pencil');
     });
 	
@@ -939,12 +939,12 @@ $().ready( function() {
     });
 	
     $('#erase').click( function() {
-		document.body.style.cursor="url(img/eraser.png), default";
+		document.body.style.cursor="url(img/eraser.png)0 28, default";
         SelectTool('erase');
     });
 	
 	$('#dropper').click( function() {
-		document.body.style.cursor="url(img/dropper.png), default";
+		document.body.style.cursor="url(img/dropper.png)0 28, default";
         SelectTool('dropper');
     });
 	
