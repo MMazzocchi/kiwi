@@ -137,8 +137,6 @@ function ColorPicker()
     this.curL = l;
     curColor = getHSLA(h,s,l,alpha);
 
-//    $( "#tintSlider" ).slider( "value", this.curL);
-
     this.Refresh();
   }
   
@@ -163,7 +161,6 @@ function ColorPicker()
       this.curS = Math.round(s);
       curColor = getHSLA( this.curH, this.curS, this.curL, alpha );
 	  myCP.Refresh();
-      console.log("HSL = " + curColor);
     }
   }
 

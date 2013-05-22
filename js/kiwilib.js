@@ -19,6 +19,7 @@ var xOld;
 var yOld;
 var xFirst;
 var yFirst;
+var dragMode = '';
 
 var tx=0;
 var ty=0;
@@ -219,6 +220,7 @@ function eraseObject(id) {
 //For the object with given id, check whether the rotate or scale icons were clicked
 function iconClicked(id, x, y) {
     
+
 }
 
 function pointerDown(e) {
@@ -230,19 +232,24 @@ function pointerDown(e) {
         case "draw":
             isDragging = true;
             var dObj = {
-				pts: [[x, y]],
-				width: thickness,
-				opacity: alpha,
-				color: curColor,
-				bezier: true,
-				type: brushMode
+                pts: [[x, y]],
+                lCorner: [x,y],
+                rCorner: [x,y],
+                width: thickness,
+                opacity: alpha,
+                color: curColor,
+                bezier: true,
+                type: brushMode,
+                xScale: 1,
+                yScale: 1,
+                rotation: 0
             };
             startLine(dObj);
         break;	
 
         case "select":
-            if((selectedId != -1) && iconClicked(selectedId)) {
-                var icon = iconClicked(selectedId, x, y);
+            if((selectedId != -1) && iconClicked(selectedId, x, y)) {
+                dragMode = iconClicked(selectedId, x, y);
             } else {
                 selectedId = getObjectID(x, y);
                 if(selectedId != -1) {
@@ -251,6 +258,7 @@ function pointerDown(e) {
                     yOld = y;
                     xFirst = x;
                     yFirst = y;
+                    dragMode = 'translate';
                 }
             }
             break;
@@ -296,6 +304,7 @@ function pointerDown(e) {
 			var id = ctx.getImageData(x, y, 1, 1);
 			var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
 			myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+			$( "#tintSlider" ).slider( "value", hsl[2]*100);
 			break;
 	}
 }
@@ -334,12 +343,21 @@ function pointerMove(e) {
                 }
                 break;
             case "select":
-                translate(selectedId, x, y);
+                switch(dragMode) {
+                    case 'translate':
+                        translate(selectedId, x, y);
+                        break;
+                    case 'rotate':
+                        break;
+                    case 'scale':
+                        break;
+                }
                 break;
 			case "dropper":
 				var id = ctx.getImageData(x, y, 1, 1);
 				var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
 				myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+				$( "#tintSlider" ).slider( "value", hsl[2]*100);
 				break;
         }
     }
@@ -366,6 +384,9 @@ function pointerEnd(e) {
 
         addAction(newAct);
     }
+	if(curTool == "fill"){ // this is for the fill function
+	
+	}
     isDragging = false;
 }
 
@@ -408,20 +429,9 @@ function transformPoint(x,y,dx,dy,sx,sy,theta) {
         var ty = -1*y*sy;
         var r = distance([0,0],[tx,ty]);
         var phi=0;
-        if(tx == 0) {
-            phi = ty < 0 ? (Math.PI*3/2) : (Math.PI/2);
-        } else {
-            phi = Math.atan(ty/tx);
-            if(tx < 0) {
-                phi = phi+(Math.PI);
-            } else {
-                if(ty < 0) {
-                    phi+=(Math.PI*3/2)
-                }
-            }
-        }
-        tx = (r*Math.cos(phi-theta));
-        ty = (r*Math.sin(phi-theta));
+        phi = Math.atan2(tx,ty);
+        tx = (r*Math.sin(phi-theta));
+        ty = (r*Math.cos(phi-theta));
         tx = dx+tx;
         ty = dy-ty;
         return [tx,ty];
@@ -519,7 +529,7 @@ function createPencilTex(dObj){
 	}
 	else{
 		var w = dObj.width;
-		var grd=dc.createRadialGradient(dObj.pts[0][0],dObj.pts[0][1],w/8.0,dObj.pts[0][0],dObj.pts[0][1],w/2.0);
+		var grd=dc.createRadialGradient(dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/8.0,dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/2.0);
 		grd.addColorStop(0,dObj.color);
 		grd.addColorStop(1, "blue");
 //		dc.arc(w/2.0,w/2.0,w/2.0,0,2*Math.PI);
@@ -531,26 +541,43 @@ function createPencilTex(dObj){
 
 }
 
+function spraycanLine(dObj){	/////////////////testing spraycan
+	var texcanvas = document.createElement('canvas');
+	var dc = texcanvas.getContext('2d');
+	var w = dObj.width;
+	var grd=dc.createRadialGradient(dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/8.0,dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/2.0);
+	grd.addColorStop(0,dObj.color);
+	grd.addColorStop(1, "blue");
+//		dc.arc(w/2.0,w/2.0,w/2.0,0,2*Math.PI);
+//		dc.fillStyle = grd;
+//		dc.fill();
+	dObj.pattern =  grd;
+}
+
 function startLine(dObj) {
     assignID(dObj);
+
 	// create brush pattern
-	if(dObj.type == 'graphite' || dObj.type == 'spray'){
+	if(dObj.type == 'graphite'){
 		createPencilTex(dObj);
 	}
-
+	if(dObj.type == 'spray'){//////////// testing spraycan
+		spraycanLine(dObj);
+	}
+	
     dObj.draw = function(ctx) {
+
         ctx.beginPath();
         ctx.moveTo(this.pts[0][0], this.pts[0][1]);
-		ctx.save();
 
-		ctx.strokeStyle = this.color;
-		if(this.type == 'graphite' || this.type == 'spray'){
-			ctx.strokeStyle = this.pattern;
-		}
+	ctx.strokeStyle = this.color;
+	if(this.type == 'graphite' || this.type == 'spray'){
+	    ctx.strokeStyle = this.pattern;
+	}
 		
         var last = this.pts[0];
-		ctx.fillStyle = this.color;
-		ctx.lineJoin = 'round';
+        ctx.fillStyle = this.color;
+        ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
         ctx.lineWidth = this.width;
         ctx.globalAlpha = this.opacity;
@@ -587,6 +614,25 @@ function startLine(dObj) {
         }
 		ctx.restore();
     };
+    dObj.drawIcons = function(ctx) {
+        var leftCorner = transformPoint(
+            this.lCorner[0], this.lCorner[1],
+            0, 0,
+            this.xScale, this.yScale,
+            this.rotation );
+
+            var scaleIcon = document.getElementById('resize_icon');
+            ctx.drawImage(scaleIcon, leftCorner[0]-64, leftCorner[1]-64);
+
+        var rightCorner = transformPoint(
+            this.rCorner[0], this.lCorner[1],
+            0, 0,
+            this.xScale, this.yScale,
+            this.rotation );
+
+            var rotateIcon = document.getElementById('rotate_icon');
+            ctx.drawImage(rotateIcon, rightCorner[0], rightCorner[1]-64);
+    }
     dObj.select = function(x,y) {
 
        for(var i=0; i<this.pts.length-1; i++) {
@@ -625,6 +671,16 @@ function startLine(dObj) {
             this.pts[i][0]+=dx;
             this.pts[i][1]+=dy;
         }
+        this.lCorner[0]+=dx;
+        this.rCorner[0]+=dx;
+        this.lCorner[1]+=dy;
+        this.rCorner[1]+=dy;
+    };
+    dObj.rotate = function(dr) {
+
+    };
+    dObj.scale = function(dsx, dsy) {
+
     };
 
     var newAct = {
@@ -647,6 +703,21 @@ function startLine(dObj) {
 function continueLine(x,y) {
     var dObj = objectList[layerList[layerList.length-1]];
     dObj.pts.push([x, y]);
+	if (dObj.type == 'spray'){/////////////////////// testing spraycan
+		spraycanLine(dObj);
+	}
+    if(x < dObj.lCorner[0]) {
+        dObj.lCorner[0] = x;
+    }
+    if(x > dObj.rCorner[0]) {
+        dObj.rCorner[0] = x;
+    }
+    if(y < dObj.lCorner[1]) {
+        dObj.lCorner[1] = y;
+    }
+    if(y > dObj.rCorner[1]) {
+        dObj.rCorner[1] = y;
+    }
 }
 
 // Undos an action.
@@ -678,26 +749,16 @@ function redo() {
 
 function updateThick(slideAmount) {		// gets thickness from slider and sets the global thickness
 	thickness = slideAmount;
-        myCP.Refresh();
+    myCP.Refresh();
 }
 function updateOpac(slideAmount) {		// gets opacity from slider and sets the global opacity
 	alpha = slideAmount/100;
-        myCP.Refresh();
+    myCP.Refresh();
 }
 
 function updateTint(slideAmount) {		// gets tint from slider and sets the light setting in the color picker
 	myCP.curL = slideAmount;
     myCP.updateColor();
-}
-
-function SetDrawThick(t)	// sets the thickness
-{
-    thickness = t;
-}
-
-function SetDrawAlpha(t)	// sets the opacity
-{
-    alpha = t;
 }
 
 function SelectTool(toolName) // selects proper tool based off of what user has clicked
@@ -794,6 +855,10 @@ $().ready( function() {
 	
 	$('#dropper').click( function() {
         SelectTool('dropper');
+    });
+	
+	$('#fill').click( function() {
+        SelectTool('fill');
     });
 	
     $('#butterfly').click( function() {
