@@ -92,12 +92,16 @@ function refreshCanvas() {
     var ctx = canvas.getContext('2d');
 
 	if (window.innerWidth < window.innerHeight) { // portrait
+		var heightoffset = $("#toolbar").height();
 		ctx.canvas.width  = window.innerWidth;
-		ctx.canvas.height = window.innerHeight - $("#toolbar").height();
+		ctx.canvas.height = window.innerHeight - heightoffset;
+		document.getElementById('canvaswrapp').setAttribute("style", "margin-top:" + heightoffset + "px");
 	}
 	else { // landscape
-		ctx.canvas.width  = window.innerWidth - $("#toolbar").width();
+		var widthoffset = $("#toolbar").width();
+		ctx.canvas.width  = window.innerWidth - widthoffset;
 		ctx.canvas.height = window.innerHeight;
+		document.getElementById('canvaswrapp').setAttribute("style", "margin-left:" + widthoffset + "px");
 	}
 
     if(orienting()) {
