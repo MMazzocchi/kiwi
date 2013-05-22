@@ -95,13 +95,11 @@ function refreshCanvas() {
 		var heightoffset = $("#toolbar").height();
 		ctx.canvas.width  = window.innerWidth;
 		ctx.canvas.height = window.innerHeight - heightoffset;
-		document.getElementById('canvaswrapp').setAttribute("style", "margin-top:" + heightoffset + "px");
 	}
 	else { // landscape
 		var widthoffset = $("#toolbar").width();
 		ctx.canvas.width  = window.innerWidth - widthoffset;
 		ctx.canvas.height = window.innerHeight;
-		document.getElementById('canvaswrapp').setAttribute("style", "margin-left:" + widthoffset + "px");
 	}
 
     if(orienting()) {
