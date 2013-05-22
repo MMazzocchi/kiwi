@@ -217,12 +217,6 @@ function eraseObject(id) {
     addAction(newAct);
 }
 
-//For the object with given id, check whether the rotate or scale icons were clicked
-function iconClicked(id, x, y) {
-    
-
-}
-
 function pointerDown(e) {
     var c = transformCoordinates(e);
 	var ctx = canvas.getContext('2d');
@@ -249,8 +243,13 @@ function pointerDown(e) {
         break;	
 
         case "select":
-            if((selectedId != -1) && iconClicked(selectedId, x, y)) {
-                dragMode = iconClicked(selectedId, x, y);
+            if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
+                dragMode = objectList[selectedId].iconClicked(x, y);
+                isDragging = true;
+                xOld = x;
+                yOld = y;
+                xFirst = x;
+                yFirst = y;
             } else {
                 selectedId = getObjectID(x, y);
                 if(selectedId != -1) {
@@ -327,6 +326,15 @@ function translate(id, x, y) {
     yOld = y;
 }
 
+function rotate(id, x, y) {
+    var obj = objectList[id];
+    var theta = Math.atan2(y-obj.midY(), x-obj.midX());
+    var pTheta = Math.atan2(yOld-obj.midY(), xOld-obj.midX());
+    obj.rotate(theta-pTheta);
+    xOld = x;
+    yOld = y;
+}
+
 function pointerMove(e) {
     var c = transformCoordinates(e);
     var ctx = canvas.getContext('2d');
@@ -349,6 +357,7 @@ function pointerMove(e) {
                         translate(selectedId, x, y);
                         break;
                     case 'rotate':
+                        rotate(selectedId, x, y);
                         break;
                     case 'scale':
                         break;
@@ -474,22 +483,22 @@ function createStamp(dObj) {
     };
     dObj.drawIcons = function(ctx) {
         var leftCorner = transformPoint(
-            -this.bound[2]/2, -this.bound[3]/2,
+            -(this.bound[2]/2), -(this.bound[3]/2),
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
 
             var scaleIcon = document.getElementById('resize_icon');
-            ctx.drawImage(scaleIcon, leftCorner[0], leftCorner[1]);
+            ctx.drawImage(scaleIcon, leftCorner[0]-32, leftCorner[1]-32);
 
         var rightCorner = transformPoint(
-            this.bound[2]/2, -this.bound[3]/2,
+            (this.bound[2]/2), -(this.bound[3]/2),
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
 
             var rotateIcon = document.getElementById('rotate_icon');
-            ctx.drawImage(rotateIcon, rightCorner[0], rightCorner[1]);
+            ctx.drawImage(rotateIcon, rightCorner[0]-32, rightCorner[1]-32);
     }
     dObj.rotate = function(dr) {
         this.rotation += dr;
@@ -498,6 +507,23 @@ function createStamp(dObj) {
         this.xScale += (dx/(this.bounds[2]/2));
         this.yScale += (dy/(this.bounds[3]/2));
     }
+    dObj.iconClicked = function(x,y) {
+        var leftCorner = transformPoint(
+            -this.bound[2]/2, -this.bound[3]/2,
+            this.pts[0], this.pts[1],
+            this.xScale, this.yScale,
+            -this.rotation );
+        var rightCorner = transformPoint(
+            this.bound[2]/2, -this.bound[3]/2,
+            this.pts[0], this.pts[1],
+            this.xScale, this.yScale,
+            -this.rotation );
+        if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'resize'; }
+        else if(distance([x,y],[rightCorner[0], rightCorner[1]]) < 32) { return 'rotate'; }
+        else { return false; }
+    }
+    dObj.midX = function() { return this.pts[0]; }
+    dObj.midY = function() { return this.pts[1]; }
 
     var newAct = {
         undo: function() {
@@ -624,22 +650,22 @@ function startLine(dObj) {
     };
     dObj.drawIcons = function(ctx) {
         var leftCorner = transformPoint(
-            this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
+            this.lCorner[0]-this.mx-32, this.lCorner[1]-this.my-32,
             this.mx, this.my,
             this.xScale, this.yScale,
             this.rotation );
 
             var scaleIcon = document.getElementById('resize_icon');
-            ctx.drawImage(scaleIcon, leftCorner[0]-64, leftCorner[1]-64);
+            ctx.drawImage(scaleIcon, leftCorner[0]-32, leftCorner[1]-32);
 
         var rightCorner = transformPoint(
-            this.rCorner[0]-this.mx, this.lCorner[1]-this.my,
+            this.rCorner[0]-this.mx+32, this.lCorner[1]-this.my-32,
             this.mx, this.my,
             this.xScale, this.yScale,
             this.rotation );
 
             var rotateIcon = document.getElementById('rotate_icon');
-            ctx.drawImage(rotateIcon, rightCorner[0], rightCorner[1]-64);
+            ctx.drawImage(rotateIcon, rightCorner[0]-32, rightCorner[1]-32);
 
     }
     dObj.select = function(x,y) {
@@ -707,6 +733,23 @@ function startLine(dObj) {
         this.xScale += dsx;
         this.yScale += dsy;
     };
+    dObj.iconClicked = function(x,y) {
+        var leftCorner = transformPoint(
+            this.lCorner[0]-this.mx-32, this.lCorner[1]-this.my-32,
+            this.mx, this.my,
+            this.xScale, this.yScale,
+            this.rotation );
+        var rightCorner = transformPoint(
+            this.rCorner[0]-this.mx+32, this.lCorner[1]-this.my-32,
+            this.mx, this.my,
+            this.xScale, this.yScale,
+            this.rotation );
+        if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'resize'; }
+        else if(distance([x,y],[rightCorner[0], rightCorner[1]]) < 32) { return 'rotate'; }
+        else { return false; }
+    }
+    dObj.midX = function() { return this.mx; }
+    dObj.midY = function() { return this.my; }
 
     var newAct = {
         undo: function() {
@@ -735,7 +778,6 @@ function continueLine(x,y) {
     if(y > dObj.rCorner[1]) { dObj.rCorner[1] = y; }
     dObj.mx = (dObj.lCorner[0]+dObj.rCorner[0])/2;
     dObj.my = (dObj.lCorner[1]+dObj.rCorner[1])/2;
-    console.log("mx: "+dObj.mx+" my: "+dObj.my);
 
 	if (dObj.type == 'spray'){/////////////////////// testing spraycan
 		spraycanLine(dObj);
@@ -870,6 +912,10 @@ $().ready( function() {
     $('#pencil').click( function() {
 		document.body.style.cursor="url(img/pencil.png)0 28, default";
         SelectTool('pencil');
+    });
+	
+	$('#fill').click( function() {
+        SelectTool('fill');
     });
 	
     $('#erase').click( function() {
