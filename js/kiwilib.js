@@ -91,8 +91,14 @@ function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
-    ctx.canvas.width  = window.innerWidth;
-    ctx.canvas.height = window.innerHeight;
+	if (window.innerWidth < window.innerHeight) { // portrait
+		ctx.canvas.width  = window.innerWidth;
+		ctx.canvas.height = window.innerHeight - $("#toolbar").height();
+	}
+	else { // landscape
+		ctx.canvas.width  = window.innerWidth - $("#toolbar").width();
+		ctx.canvas.height = window.innerHeight;
+	}
 
     if(orienting()) {
         orientation = window.orientation;
