@@ -59,6 +59,10 @@ body {
 	position:relative;
 	z-index:1;
 }
+#drawing_canvas {
+	position:relative;
+	z-index:1;	
+}
 
 
 .ui-slider .ui-slider-handle {
