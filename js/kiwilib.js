@@ -477,7 +477,7 @@ function createStamp(dObj) {
             -this.bound[2]/2, -this.bound[3]/2,
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
-            this.rotation );
+            -this.rotation );
 
             var scaleIcon = document.getElementById('resize_icon');
             ctx.drawImage(scaleIcon, leftCorner[0], leftCorner[1]);
@@ -486,10 +486,17 @@ function createStamp(dObj) {
             this.bound[2]/2, -this.bound[3]/2,
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
-            this.rotation );
+            -this.rotation );
 
             var rotateIcon = document.getElementById('rotate_icon');
             ctx.drawImage(rotateIcon, rightCorner[0], rightCorner[1]);
+    }
+    dObj.rotate = function(dr) {
+        this.rotation += dr;
+    }
+    dObj.scale = function(dx, dy) {
+        this.xScale += (dx/(this.bounds[2]/2));
+        this.yScale += (dy/(this.bounds[3]/2));
     }
 
     var newAct = {
@@ -682,13 +689,7 @@ function startLine(dObj) {
         this.rCorner[1]+=dy;
     };
     dObj.rotate = function(dr) {
-        var xMax = this.pts[0][0];
-        var yMax = this.pts[0][1];
-        var xMin = this.pts[0][0];
-        var yMin = this.pts[0][1];
-
         for(var i=0; i<this.pts.length; i++) {
-            var d = distance([this.mx, this.my], this.pts[i]);
             this.pts[i] = transformPoint(this.pts[i][0]-this.mx, this.pts[i][1]-this.my,
                 this.mx, this.my,
                 1, 1,
@@ -697,7 +698,14 @@ function startLine(dObj) {
         this.rotation -= dr;
     };
     dObj.scale = function(dsx, dsy) {
-
+        for(var i=0; i<this.pts.length; i++) {
+            this.pts[i] = transformPoint(this.pts[i][0]-this.mx, this.pts[i][1]-this.my,
+                this.mx, this.my,
+                1, 1,
+                0 );
+        }
+        this.xScale += dsx;
+        this.yScale += dsy;
     };
 
     var newAct = {
