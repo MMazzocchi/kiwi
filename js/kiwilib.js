@@ -149,8 +149,11 @@ function refreshCanvas() {
     });
 
     // Draw the selected layer on top of the rest
-    if(isDragging && selectedId != -1) {
-        objectList[selectedId].draw(ctx);
+    if(selectedId != -1) {
+        if(isDragging) {
+            objectList[selectedId].draw(ctx);
+        }
+        objectList[selectedId].drawIcons(ctx);
     }
 }
 
@@ -207,6 +210,11 @@ function eraseObject(id) {
     addAction(newAct);
 }
 
+//For the object with given id, check whether the rotate or scale icons were clicked
+function iconClicked(id, x, y) {
+    
+}
+
 function pointerDown(e) {
     var c = transformCoordinates(e);
     var x = c[0]; var y = c[1];
@@ -226,13 +234,17 @@ function pointerDown(e) {
         break;	
 
         case "select":
-            selectedId = getObjectID(x, y);
-            if(selectedId != -1) {
-                isDragging = true;
-                xOld = x;
-                yOld = y;
-                xFirst = x;
-                yFirst = y;
+            if((selectedId != -1) && iconClicked(selectedId)) {
+                var icon = iconClicked(selectedId, x, y);
+            } else {
+                selectedId = getObjectID(x, y);
+                if(selectedId != -1) {
+                    isDragging = true;
+                    xOld = x;
+                    yOld = y;
+                    xFirst = x;
+                    yFirst = y;
+                }
             }
             break;
 
@@ -254,7 +266,8 @@ function pointerDown(e) {
 				cx: svgList[ curStamp ].cx,
 				cy: svgList[ curStamp ].cy,
 				opacity: alpha,
-				scale: Math.random()*0.5 + 0.25, 
+				xScale: Math.random()*0.5 + 0.25, 
+                                yScale: Math.random()*0.5 + 0.25,
 				bound: svgList[ curStamp ].bounds,
 				rotation: Math.random()*2*Math.PI, //eventually user specified
 				pts: [x, y],
@@ -321,15 +334,52 @@ function pointerEnd(e) {
 
         addAction(newAct);
     }
-
+	if(curTool == 'eyedropper'){
+		var id = ctx.getImageData(x, y, 1, 1);
+        var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
+        myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+	}
     isDragging = false;
+}
+
+function transformPoint(x,y,dx,dy,sx,sy,theta) {
+        console.log("Original pt was ("+x+","+y+")");
+        var tx = x*sx;
+        var ty = -1*y*sy;
+        console.log("Scaled by "+sx+","+sy+" and flipped vertically: ("+tx+","+ty+")");
+        var r = distance([0,0],[tx,ty]);
+        var phi=0;
+        if(tx == 0) {
+            phi = ty < 0 ? (Math.PI*3/2) : (Math.PI/2);
+        } else {
+            phi = Math.atan(ty/tx);
+            console.log("tx: "+tx);
+            if(tx < 0) {
+                console.log("phi: "+phi);
+                phi = phi+(Math.PI);
+                console.log("phi: "+phi);
+            } else {
+                if(ty < 0) {
+                    phi+=(Math.PI*3/2)
+                }
+            }
+        }
+        console.log("Angle for this pt is "+(phi)/**180/Math.PI)*/+".");
+        tx = (r*Math.cos(phi-theta));
+        ty = (r*Math.sin(phi-theta));
+        console.log("Adding an angle of "+(-theta*180/Math.PI)+" yields ("+tx+","+ty+")");
+        tx = dx+tx;
+        ty = dy-ty;
+        console.log("Flipped again, translated by "+dx+","+dy+" yields ("+tx+","+ty+")");
+        return [tx,ty];
 }
 
 function createStamp(dObj) {
     assignID(dObj);
 
     dObj.draw = function(ctx) {
-        var scale = this.scale;
+        var xScale = this.xScale;
+        var yScale = this.yScale;
 
         var bound = [this.bound[2],this.bound[3]];
 
@@ -337,8 +387,8 @@ function createStamp(dObj) {
 			ctx.globalAlpha = this.opacity;
 			ctx.beginPath();
 			ctx.translate(this.pts[0],this.pts[1]);
-			ctx.scale(scale,scale);
-			ctx.rotate(this.rotation);
+                        ctx.rotate(this.rotation);
+			ctx.scale(xScale,yScale);
 			ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
         ctx.restore();
     };
@@ -356,6 +406,25 @@ function createStamp(dObj) {
         this.pts[0]+=dx;
         this.pts[1]+=dy;
     };
+    dObj.drawIcons = function(ctx) {
+        var leftCorner = transformPoint(
+            -this.bound[2]/2, -this.bound[3]/2,
+            this.pts[0], this.pts[1],
+            this.xScale, this.yScale,
+            this.rotation );
+
+            var scaleIcon = document.getElementById('resize_icon');
+            ctx.drawImage(scaleIcon, leftCorner[0], leftCorner[1]);
+
+        var rightCorner = transformPoint(
+            this.bound[2]/2, -this.bound[3]/2,
+            this.pts[0], this.pts[1],
+            this.xScale, this.yScale,
+            this.rotation );
+
+            var rotateIcon = document.getElementById('rotate_icon');
+            draw.drawImage(rotateIcon, rightCorner[0], rightCorner[1]);
+    }
 
     var newAct = {
         undo: function() {
@@ -395,14 +464,13 @@ function createPencilTex(dObj){
 	}
 	else{
 		var w = dObj.width;
-		var grd=dc.createRadialGradient(w/2.0,w/2.0,6,w/2.0,w/2.0,w/2.0);
-		grd.addColorStop(0,"blue");
-		grd.addColorStop(1,"white");
-		console.log(dObj.type);
-		dc.strokeStyle = grd;
-		dc.fillRect(0,0,w,w);
-		dObj.pattern =  dc.createPattern(texcanvas, "repeat");
-		//dObj.pattern =  grd;
+		var grd=dc.createRadialGradient(dObj.pts[0][0],dObj.pts[0][1],w/8.0,dObj.pts[0][0],dObj.pts[0][1],w/2.0);
+		grd.addColorStop(0,dObj.color);
+		grd.addColorStop(1, "blue");
+//		dc.arc(w/2.0,w/2.0,w/2.0,0,2*Math.PI);
+//		dc.fillStyle = grd;
+//		dc.fill();
+		dObj.pattern =  grd;
 	}
 	dc.globalAlpha = 1;
 
@@ -683,6 +751,7 @@ $().ready( function() {
         actionList = [];
         idPtr = 0;
         actionPtr = 0;
+        selectedId = -1;
     });
 	
     $( '#tintSlider' ).slider({
@@ -741,8 +810,33 @@ $().ready( function() {
             }
             return false;
         }
+		
+		switch (key) {
+			case 97: // A=SPRAYCAN
+			  SelectTool('spraycan');
+			  break;
+			case 100: // D=DRAW
+			  SelectTool('draw');
+			  break;
+			case 101: // E=ERASE
+			  SelectTool('erase');
+			  break;
+			case 102: // F=FILL
+			  SelectTool('fill');
+			  break;
+			case 115: // S=SELECT
+			  SelectTool('select');
+			  break;
+			case 103:  // G=eyedropper
+			  SelectTool('eyedropper');
+			  break;
+		}
+		
     });
-	
+
+  $('#resize_icon').load(function() {});
+  $('#rotate_icon').load(function() {});
+
     // Redraw.
     setInterval(refreshCanvas, 10);
 });
