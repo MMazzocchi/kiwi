@@ -305,6 +305,7 @@ function pointerDown(e) {
 			var id = ctx.getImageData(x, y, 1, 1);
 			var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
 			myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+			$( "#tintSlider" ).slider( "value", hsl[2]*100);
 			break;
 	}
 }
@@ -348,6 +349,7 @@ function pointerMove(e) {
 				var id = ctx.getImageData(x, y, 1, 1);
 				var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
 				myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+				$( "#tintSlider" ).slider( "value", hsl[2]*100);
 				break;
         }
     }
@@ -374,6 +376,9 @@ function pointerEnd(e) {
 
         addAction(newAct);
     }
+	if(curTool == "fill"){ // this is for the fill function
+	
+	}
     isDragging = false;
 }
 
@@ -714,26 +719,16 @@ function redo() {
 
 function updateThick(slideAmount) {		// gets thickness from slider and sets the global thickness
 	thickness = slideAmount;
-        myCP.Refresh();
+    myCP.Refresh();
 }
 function updateOpac(slideAmount) {		// gets opacity from slider and sets the global opacity
 	alpha = slideAmount/100;
-        myCP.Refresh();
+    myCP.Refresh();
 }
 
 function updateTint(slideAmount) {		// gets tint from slider and sets the light setting in the color picker
 	myCP.curL = slideAmount;
     myCP.updateColor();
-}
-
-function SetDrawThick(t)	// sets the thickness
-{
-    thickness = t;
-}
-
-function SetDrawAlpha(t)	// sets the opacity
-{
-    alpha = t;
 }
 
 function SelectTool(toolName) // selects proper tool based off of what user has clicked
@@ -830,6 +825,10 @@ $().ready( function() {
 	
 	$('#dropper').click( function() {
         SelectTool('dropper');
+    });
+	
+	$('#fill').click( function() {
+        SelectTool('fill');
     });
 	
     $('#butterfly').click( function() {
