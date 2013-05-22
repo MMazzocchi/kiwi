@@ -12,6 +12,7 @@ var alpha = 1;          // Opacity of the object to be drawn
 var curColor = "#000000";
 var isDragging = false;
 var curStamp = '';
+var scratch;
 
 var selectedId = -1;
 var xOld;
@@ -92,20 +93,19 @@ function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
+	var heightoffset = $("#toolbar").height();
+	var widthoffset = $("#toolbar").width();
 	if (window.innerWidth < window.innerHeight) { // portrait
-		var heightoffset = $("#toolbar").height();
 		ctx.canvas.width  = window.innerWidth;
 		ctx.canvas.height = window.innerHeight - heightoffset;
 	}
 	else { // landscape
-		var widthoffset = $("#toolbar").width();
 		ctx.canvas.width  = window.innerWidth - widthoffset;
 		ctx.canvas.height = window.innerHeight;
 	}
 
     if(orienting()) {
         orientation = window.orientation;
-
         ctx.rotate(-orientation*Math.PI/180);
 
         ctx.fillStyle="#FFFFFF";
@@ -135,11 +135,19 @@ function refreshCanvas() {
         ctx.fillStyle="#FFFFFF";
         ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
     }
-
+	//ctx.restore();
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
         // Get the object for this layer
         var dObj = objectList[id];
+
+		//if(scratch){
+		//	ctx.putImageData(scratch,0,0);
+		//}
+        //dObj.draw(ctx);
+		//scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
+		
+
 
         if((!isDragging) || (id != selectedId)) {
             // Draw the object
@@ -217,6 +225,7 @@ function iconClicked(id, x, y) {
 
 function pointerDown(e) {
     var c = transformCoordinates(e);
+	var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
 
     switch(curTool) {			
@@ -261,6 +270,11 @@ function pointerDown(e) {
             break;
 
         case "fill":
+			var dObj = {
+				color: curColor,
+				pts: [x, y]
+			}
+			createFill(dObj);
             break;
 
         case "stamp":
@@ -284,7 +298,13 @@ function pointerDown(e) {
 
             createStamp(dObj);
             break;
-    }
+		case "dropper":
+			isDragging = true;
+			var id = ctx.getImageData(x, y, 1, 1);
+			var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
+			myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+			break;
+	}
 }
 
 function translate(id, x, y) {
@@ -297,6 +317,7 @@ function translate(id, x, y) {
 
 function pointerMove(e) {
     var c = transformCoordinates(e);
+	var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
 
     if (isDragging){
@@ -321,6 +342,11 @@ function pointerMove(e) {
                         break;
                 }
                 break;
+			case "dropper":
+				var id = ctx.getImageData(x, y, 1, 1);
+				var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
+				myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+				break;
         }
     }
 }
@@ -346,12 +372,41 @@ function pointerEnd(e) {
 
         addAction(newAct);
     }
-	if(curTool == 'eyedropper'){
-		var id = ctx.getImageData(x, y, 1, 1);
-        var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
-        myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
-	}
     isDragging = false;
+}
+
+function createFill(dObj){
+	assignID(dObj);
+	
+	dObj.draw = function(ctx) {
+        ctx.save();
+			var height = canvas.height;
+			var width = canvas.width;
+			var img = ctx.getImageData(0,0,width,height);
+			var x = dObj.pts[0];
+			var y = dObj.pts[1];
+			var cx = (y*width+x)
+			var fillColor = curColor;
+			
+			console.log(curColor);
+			
+			ctx.putImageData(img,0,0);
+		ctx.restore();
+	};
+
+
+
+    var newAct = {
+        undo: function() {
+            layerList.splice(layerList.length-1,1);
+        },
+        redo: function() {
+            layerList[layerList.length] = dObj.id;
+        }
+    };
+
+    // Add the new action and redraw.
+    addAction(newAct);
 }
 
 function transformPoint(x,y,dx,dy,sx,sy,theta) {
@@ -670,6 +725,9 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
             curTool = 'draw';
             brushMode = 'graphite';
             break;
+		case 'fill':
+            curTool = 'fill';
+            break;
         default:
             curTool = toolName;
             break;
@@ -732,8 +790,17 @@ $().ready( function() {
         SelectTool('pencil');
     });
 	
+	$('#fill').click( function() {
+        SelectTool('fill');
+		console.log(curTool)
+    });
+	
     $('#erase').click( function() {
         SelectTool('erase');
+    });
+	
+	$('#dropper').click( function() {
+        SelectTool('dropper');
     });
 	
     $('#butterfly').click( function() {
@@ -834,8 +901,8 @@ $().ready( function() {
 			case 115: // S=SELECT
 			  SelectTool('select');
 			  break;
-			case 103:  // G=eyedropper
-			  SelectTool('eyedropper');
+			case 103:  // G=dropper
+			  SelectTool('dropper');
 			  break;
 		}
 		
