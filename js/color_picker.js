@@ -137,7 +137,7 @@ function ColorPicker()
     this.curL = l;
     curColor = getHSLA(h,s,l,alpha);
 
-//    $( "#tintSlider" ).slider( "value", this.curL);
+//    $( '#tintSlider' ).slider( "value", this.curL);
 
     this.Refresh();
   }
