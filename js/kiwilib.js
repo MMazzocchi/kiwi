@@ -266,10 +266,10 @@ function pointerDown(e) {
 				cx: svgList[ curStamp ].cx,
 				cy: svgList[ curStamp ].cy,
 				opacity: alpha,
-				xScale: Math.random()*0.5 + 0.25, 
-                                yScale: Math.random()*0.5 + 0.25,
+				xScale: 1, 
+                                yScale: 1,
 				bound: svgList[ curStamp ].bounds,
-				rotation: Math.random()*2*Math.PI, //eventually user specified
+				rotation: 0,
 				pts: [x, y],
 			};	
 			$.get(dObj.url, function(xmlData) {
@@ -343,34 +343,26 @@ function pointerEnd(e) {
 }
 
 function transformPoint(x,y,dx,dy,sx,sy,theta) {
-        console.log("Original pt was ("+x+","+y+")");
         var tx = x*sx;
         var ty = -1*y*sy;
-        console.log("Scaled by "+sx+","+sy+" and flipped vertically: ("+tx+","+ty+")");
         var r = distance([0,0],[tx,ty]);
         var phi=0;
         if(tx == 0) {
             phi = ty < 0 ? (Math.PI*3/2) : (Math.PI/2);
         } else {
             phi = Math.atan(ty/tx);
-            console.log("tx: "+tx);
             if(tx < 0) {
-                console.log("phi: "+phi);
                 phi = phi+(Math.PI);
-                console.log("phi: "+phi);
             } else {
                 if(ty < 0) {
                     phi+=(Math.PI*3/2)
                 }
             }
         }
-        console.log("Angle for this pt is "+(phi)/**180/Math.PI)*/+".");
         tx = (r*Math.cos(phi-theta));
         ty = (r*Math.sin(phi-theta));
-        console.log("Adding an angle of "+(-theta*180/Math.PI)+" yields ("+tx+","+ty+")");
         tx = dx+tx;
         ty = dy-ty;
-        console.log("Flipped again, translated by "+dx+","+dy+" yields ("+tx+","+ty+")");
         return [tx,ty];
 }
 
@@ -423,7 +415,7 @@ function createStamp(dObj) {
             this.rotation );
 
             var rotateIcon = document.getElementById('rotate_icon');
-            draw.drawImage(rotateIcon, rightCorner[0], rightCorner[1]);
+            ctx.drawImage(rotateIcon, rightCorner[0], rightCorner[1]);
     }
 
     var newAct = {
