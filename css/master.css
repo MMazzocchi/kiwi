@@ -27,7 +27,9 @@ body {
 	width:200px;
 	padding-top:12px;
 	text-align:center;
-	display:block;	
+	display:block;
+	position:relative;
+	z-index:99;	
 }
 #toolbar span {
 	display:block;
@@ -54,6 +56,12 @@ body {
 }
 #canvaswrapp {
 	margin:0 auto;	
+	position:relative;
+	z-index:1;
+}
+#drawing_canvas {
+	position:relative;
+	z-index:1;	
 }
 
 
