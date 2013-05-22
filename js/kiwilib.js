@@ -380,19 +380,39 @@ function pointerEnd(e) {
     if(isDragging && (curTool == 'select')) {
         //These seem like pointless variables, but if the're not defined, the  undo function will use global values
         var id = selectedId;
-        var dx = x-xFirst;
-        var dy = y-yFirst;
 
-        var newAct = {
-            undo: function() {
-                objectList[id].move(-dx, -dy);
-            },
-            redo: function() {
-                objectList[id].move(dx, dy);
-            }
-        };
+        switch(dragMode) {
+            case 'translate':
+                var dx = x-xFirst;
+                var dy = y-yFirst;
 
-        addAction(newAct);
+                var newAct = {
+                    undo: function() {
+                        objectList[id].move(-dx, -dy);
+                    },
+                    redo: function() {
+                        objectList[id].move(dx, dy);
+                    }
+                };
+
+                addAction(newAct);
+                break;
+            case 'rotate':
+                var obj = objectList[id];
+                var dTheta  = Math.atan2(y-obj.midY(), x-obj.midX()) - Math.atan2(yFirst-obj.midY(), xFirst-obj.midX());
+
+                var newAct = {
+                    undo: function() {
+                        objectList[id].rotate(-dTheta);
+                    },
+                    redo: function() {
+                        objectList[id].rotate(dTheta);
+                    }
+                };
+
+                addAction(newAct);
+                break;
+        }
     }
 	if(curTool == "fill"){ // this is for the fill function
 	
