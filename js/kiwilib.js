@@ -693,11 +693,9 @@ function startLine(dObj) {
 function continueLine(x,y) {
     var dObj = objectList[layerList[layerList.length-1]];
     dObj.pts.push([x, y]);
-<<<<<<< HEAD
 	if (dObj.type == 'spray'){/////////////////////// testing spraycan
 		spraycanLine(dObj);
 	}
-=======
     if(x < dObj.lCorner[0]) {
         dObj.lCorner[0] = x;
     }
@@ -710,7 +708,6 @@ function continueLine(x,y) {
     if(y > dObj.rCorner[1]) {
         dObj.rCorner[1] = y;
     }
->>>>>>> f0ffc1d40f8caf87dd5fc990d3dae973778b1bb7
 }
 
 // Undos an action.
