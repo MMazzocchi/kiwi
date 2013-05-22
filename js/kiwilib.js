@@ -235,6 +235,7 @@ function pointerDown(e) {
                 pts: [[x, y]],
                 lCorner: [x,y],
                 rCorner: [x,y],
+                mx: x, my: y,
                 width: thickness,
                 opacity: alpha,
                 color: curColor,
@@ -320,7 +321,7 @@ function translate(id, x, y) {
 
 function pointerMove(e) {
     var c = transformCoordinates(e);
-	var ctx = canvas.getContext('2d');
+    var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
 
     if (isDragging){
@@ -589,8 +590,8 @@ function startLine(dObj) {
     };
     dObj.drawIcons = function(ctx) {
         var leftCorner = transformPoint(
-            this.lCorner[0], this.lCorner[1],
-            0, 0,
+            this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
+            this.mx, this.my,
             this.xScale, this.yScale,
             this.rotation );
 
@@ -598,13 +599,14 @@ function startLine(dObj) {
             ctx.drawImage(scaleIcon, leftCorner[0]-64, leftCorner[1]-64);
 
         var rightCorner = transformPoint(
-            this.rCorner[0], this.lCorner[1],
-            0, 0,
+            this.rCorner[0]-this.mx, this.lCorner[1]-this.my,
+            this.mx, this.my,
             this.xScale, this.yScale,
             this.rotation );
 
             var rotateIcon = document.getElementById('rotate_icon');
             ctx.drawImage(rotateIcon, rightCorner[0], rightCorner[1]-64);
+
     }
     dObj.select = function(x,y) {
 
@@ -644,13 +646,28 @@ function startLine(dObj) {
             this.pts[i][0]+=dx;
             this.pts[i][1]+=dy;
         }
+        this.mx+=dx;
+        this.my+=dy;
+
         this.lCorner[0]+=dx;
         this.rCorner[0]+=dx;
         this.lCorner[1]+=dy;
         this.rCorner[1]+=dy;
     };
     dObj.rotate = function(dr) {
+        var xMax = this.pts[0][0];
+        var yMax = this.pts[0][1];
+        var xMin = this.pts[0][0];
+        var yMin = this.pts[0][1];
 
+        for(var i=0; i<this.pts.length; i++) {
+            var d = distance([this.mx, this.my], this.pts[i]);
+            this.pts[i] = transformPoint(this.pts[i][0]-this.mx, this.pts[i][1]-this.my,
+                this.mx, this.my,
+                1, 1,
+                -dr );
+        }
+        this.rotation -= dr;
     };
     dObj.scale = function(dsx, dsy) {
 
@@ -676,18 +693,13 @@ function startLine(dObj) {
 function continueLine(x,y) {
     var dObj = objectList[layerList[layerList.length-1]];
     dObj.pts.push([x, y]);
-    if(x < dObj.lCorner[0]) {
-        dObj.lCorner[0] = x;
-    }
-    if(x > dObj.rCorner[0]) {
-        dObj.rCorner[0] = x;
-    }
-    if(y < dObj.lCorner[1]) {
-        dObj.lCorner[1] = y;
-    }
-    if(y > dObj.rCorner[1]) {
-        dObj.rCorner[1] = y;
-    }
+    if(x < dObj.lCorner[0]) { dObj.lCorner[0] = x; }
+    if(x > dObj.rCorner[0]) { dObj.rCorner[0] = x; }
+    if(y < dObj.lCorner[1]) { dObj.lCorner[1] = y; }
+    if(y > dObj.rCorner[1]) { dObj.rCorner[1] = y; }
+    dObj.mx = (dObj.lCorner[0]+dObj.rCorner[0])/2;
+    dObj.my = (dObj.lCorner[1]+dObj.rCorner[1])/2;
+    console.log("mx: "+dObj.mx+" my: "+dObj.my);
 }
 
 // Undos an action.
