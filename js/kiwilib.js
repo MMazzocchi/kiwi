@@ -281,24 +281,23 @@ function pointerDown(e) {
             break;
 
         case "stamp":
-
 			var dObj = {
 				url: svgList[ curStamp ].url,
 				cx: svgList[ curStamp ].cx,
 				cy: svgList[ curStamp ].cy,
 				opacity: alpha,
 				xScale: 1, 
-                                yScale: 1,
+                yScale: 1,
 				bound: svgList[ curStamp ].bounds,
 				rotation: 0,
 				pts: [x, y],
 			};	
 			$.get(dObj.url, function(xmlData) {
-				console.log("Got svg: " + dObj.url + " for " + curStamp);
+				//console.log("Got svg: " + dObj.url + " for " + curStamp);
 				dObj.svg = xmlData;
 				console.log(dObj.svg);
-				});
-
+			});
+			createBMP(dObj);
             createStamp(dObj);
             break;
 		case "dropper":
@@ -309,6 +308,15 @@ function pointerDown(e) {
 			$( "#tintSlider" ).slider( "value", hsl[2]*100);
 			break;
 	}
+}
+function createBMP(dObj){
+	var scanvas = document.createElement('canvas');
+	scanvas.width = dObj.bound[2]*dObj.xScale;
+	scanvas.height = dObj.bound[3]*dObj.yScale;
+	var sctx = scanvas.getContext('2d');
+	sctx.drawSvg(dObj.url, 0, 0, 0, 0);
+	dObj.scanvas = scanvas;
+	//dObj.bmp = sctx.getImageData(0,0,scanvas.width,scanvas.height);
 }
 
 function translate(id, x, y) {
@@ -443,10 +451,12 @@ function createStamp(dObj) {
 			ctx.globalAlpha = this.opacity;
 			ctx.beginPath();
 			ctx.translate(this.pts[0],this.pts[1]);
-                        ctx.rotate(this.rotation);
+            ctx.rotate(this.rotation);
 			ctx.scale(xScale,yScale);
-			ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
-        ctx.restore();
+			//ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
+			//ctx.putImageData(this.bmp, this.pts[0]-this.cx, this.pts[1]-this.cy);
+			ctx.drawImage(dObj.scanvas,-dObj.cx,-dObj.cy);
+		ctx.restore();
     };
     dObj.select = function(x,y) {
         //"Scratch canvas" method
@@ -520,7 +530,7 @@ function createPencilTex(dObj){
 	}
 	else{
 		var w = dObj.width;
-		var grd=dc.createRadialGradient(dObj.pts[0][0],dObj.pts[0][1],w/8.0,dObj.pts[0][0],dObj.pts[0][1],w/2.0);
+		var grd=dc.createRadialGradient(dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/8.0,dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/2.0);
 		grd.addColorStop(0,dObj.color);
 		grd.addColorStop(1, "blue");
 //		dc.arc(w/2.0,w/2.0,w/2.0,0,2*Math.PI);
@@ -532,13 +542,30 @@ function createPencilTex(dObj){
 
 }
 
+function spraycanLine(dObj){	/////////////////testing spraycan
+	var texcanvas = document.createElement('canvas');
+	var dc = texcanvas.getContext('2d');
+	var w = dObj.width;
+	var grd=dc.createRadialGradient(dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/8.0,dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/2.0);
+	grd.addColorStop(0,dObj.color);
+	grd.addColorStop(1, "blue");
+//		dc.arc(w/2.0,w/2.0,w/2.0,0,2*Math.PI);
+//		dc.fillStyle = grd;
+//		dc.fill();
+	dObj.pattern =  grd;
+}
+
 function startLine(dObj) {
     assignID(dObj);
-    // create brush pattern
-    if(dObj.type == 'graphite' || dObj.type == 'spray'){
-        createPencilTex(dObj);
-    }
 
+	// create brush pattern
+	if(dObj.type == 'graphite'){
+		createPencilTex(dObj);
+	}
+	if(dObj.type == 'spray'){//////////// testing spraycan
+		spraycanLine(dObj);
+	}
+	
     dObj.draw = function(ctx) {
 
         ctx.beginPath();
@@ -693,6 +720,7 @@ function startLine(dObj) {
 function continueLine(x,y) {
     var dObj = objectList[layerList[layerList.length-1]];
     dObj.pts.push([x, y]);
+
     if(x < dObj.lCorner[0]) { dObj.lCorner[0] = x; }
     if(x > dObj.rCorner[0]) { dObj.rCorner[0] = x; }
     if(y < dObj.lCorner[1]) { dObj.lCorner[1] = y; }
@@ -700,6 +728,11 @@ function continueLine(x,y) {
     dObj.mx = (dObj.lCorner[0]+dObj.rCorner[0])/2;
     dObj.my = (dObj.lCorner[1]+dObj.rCorner[1])/2;
     console.log("mx: "+dObj.mx+" my: "+dObj.my);
+
+	if (dObj.type == 'spray'){/////////////////////// testing spraycan
+		spraycanLine(dObj);
+	}
+
 }
 
 // Undos an action.
