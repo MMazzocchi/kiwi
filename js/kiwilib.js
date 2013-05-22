@@ -12,6 +12,7 @@ var alpha = 1;          // Opacity of the object to be drawn
 var curColor = "#000000";
 var isDragging = false;
 var curStamp = '';
+var scratch;
 
 var selectedId = -1;
 var xOld;
@@ -89,10 +90,9 @@ function refreshCanvas() {
 
     ctx.canvas.width  = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
-
+	//ctx.save();
     if(orienting()) {
         orientation = window.orientation;
-
         ctx.rotate(-orientation*Math.PI/180);
 
         ctx.fillStyle="#FFFFFF";
@@ -122,15 +122,20 @@ function refreshCanvas() {
         ctx.fillStyle="#FFFFFF";
         ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
     }
-
+	//ctx.restore();
     // For each id in layerList, call this function:
-    $.each(layerList, function(i, id) {
+    //$.each(layerList, function(i, id) {
         // Get the object for this layer
+		
+		var id = layerList[layerList.length-1];
         var dObj = objectList[id];
-
-        // Draw the object
+		if(scratch){
+			ctx.putImageData(scratch,0,0);
+		}
         dObj.draw(ctx);
-    });
+		scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
+		
+    //});
 }
 
 // Assign a new ID to this object
@@ -224,6 +229,11 @@ function pointerDown(e) {
             break;
 
         case "fill":
+			var dObj = {
+				color: curColor,
+				pts: [x, y]
+			}
+			createFill(dObj);
             break;
 
         case "stamp":
@@ -302,6 +312,41 @@ function pointerEnd(e) {
     }
 
     isDragging = false;
+}
+
+function createFill(dObj){
+	assignID(dObj);
+	
+	dObj.draw = function(ctx) {
+        ctx.save();
+			var height = canvas.height;
+			var width = canvas.width;
+			var img = ctx.getImageData(0,0,width,height);
+			var x = dObj.pts[0];
+			var y = dObj.pts[1];
+			var cx = (y*width+x)
+			var fillColor = curColor;
+			
+			console.log(curColor);
+			
+			ctx.putImageData(img,0,0);
+		ctx.restore();
+	};
+
+
+
+    var newAct = {
+        undo: function() {
+            layerList.splice(layerList.length-1,1);
+        },
+        redo: function() {
+            layerList[layerList.length] = dObj.id;
+        }
+    };
+
+    // Add the new action and redraw.
+    addAction(newAct);
+
 }
 
 function createStamp(dObj) {
@@ -572,6 +617,9 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
             curTool = 'draw';
             brushMode = 'graphite';
             break;
+		case 'fill':
+            curTool = 'fill';
+            break;
         default:
             curTool = toolName;
             break;
@@ -630,6 +678,11 @@ $().ready( function() {
 
     $('#pencil').click( function() {
         SelectTool('pencil');
+    });
+	
+	$('#fill').click( function() {
+        SelectTool('fill');
+		console.log(curTool)
     });
 	
     $('#erase').click( function() {
