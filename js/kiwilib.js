@@ -272,24 +272,23 @@ function pointerDown(e) {
             break;
 
         case "stamp":
-
 			var dObj = {
 				url: svgList[ curStamp ].url,
 				cx: svgList[ curStamp ].cx,
 				cy: svgList[ curStamp ].cy,
 				opacity: alpha,
 				xScale: 1, 
-                                yScale: 1,
+                yScale: 1,
 				bound: svgList[ curStamp ].bounds,
 				rotation: 0,
 				pts: [x, y],
 			};	
 			$.get(dObj.url, function(xmlData) {
-				console.log("Got svg: " + dObj.url + " for " + curStamp);
+				//console.log("Got svg: " + dObj.url + " for " + curStamp);
 				dObj.svg = xmlData;
 				console.log(dObj.svg);
-				});
-
+			});
+			createBMP(dObj);
             createStamp(dObj);
             break;
 		case "dropper":
@@ -299,6 +298,15 @@ function pointerDown(e) {
 			myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
 			break;
 	}
+}
+function createBMP(dObj){
+	var scanvas = document.createElement('canvas');
+	scanvas.width = dObj.bound[2]*dObj.xScale;
+	scanvas.height = dObj.bound[3]*dObj.yScale;
+	var sctx = scanvas.getContext('2d');
+	sctx.drawSvg(dObj.url, 0, 0, 0, 0);
+	dObj.scanvas = scanvas;
+	//dObj.bmp = sctx.getImageData(0,0,scanvas.width,scanvas.height);
 }
 
 function translate(id, x, y) {
@@ -432,10 +440,12 @@ function createStamp(dObj) {
 			ctx.globalAlpha = this.opacity;
 			ctx.beginPath();
 			ctx.translate(this.pts[0],this.pts[1]);
-                        ctx.rotate(this.rotation);
+            ctx.rotate(this.rotation);
 			ctx.scale(xScale,yScale);
-			ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
-        ctx.restore();
+			//ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
+			//ctx.putImageData(this.bmp, this.pts[0]-this.cx, this.pts[1]-this.cy);
+			ctx.drawImage(dObj.scanvas,-dObj.cx,-dObj.cy);
+		ctx.restore();
     };
     dObj.select = function(x,y) {
         //"Scratch canvas" method
