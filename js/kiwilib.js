@@ -233,110 +233,108 @@ function pointerDown(e) {
     var c = transformCoordinates(e);
 	var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
-	switch(e.which) {
-		case 1:
-			switch(curTool) {			
-				case "draw":
-					isDragging = true;
-					var dObj = {
-						pts: [[x, y]],
-						lCorner: [x,y],
-						rCorner: [x,y],
-						mx: x, my: y,
-						width: thickness,
-						opacity: alpha,
-						color: curColor,
-						bezier: true,
-						type: brushMode,
-						xScale: 1,
-						yScale: 1,
-						rotation: 0
-					};
-					startLine(dObj);
+	if (e.which == 3){
+		if (curTool == "zoom"){
+			curZoom = curZoom/1.5;
+		}
+	}
+	else{
+		switch(curTool) {			
+			case "draw":
+				isDragging = true;
+				var dObj = {
+					pts: [[x, y]],
+					lCorner: [x,y],
+					rCorner: [x,y],
+					mx: x, my: y,
+					width: thickness,
+					opacity: alpha,
+					color: curColor,
+					bezier: true,
+					type: brushMode,
+					xScale: 1,
+					yScale: 1,
+					rotation: 0
+				};
+				startLine(dObj);
 				break;	
 
-				case "select":
-					xOld = x;
-					yOld = y;
-					xFirst = x;
-					yFirst = y;
-					if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
-						dragMode = objectList[selectedId].iconClicked(x, y);
+			case "select":
+				xOld = x;
+				yOld = y;
+				xFirst = x;
+				yFirst = y;
+				if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
+					dragMode = objectList[selectedId].iconClicked(x, y);
+					isDragging = true;
+					if(dragMode == 'scale') {
+						xScaleOld = objectList[selectedId].xScale;
+						yScaleOld = objectList[selectedId].yScale;
+						var mx = objectList[selectedId].midX();
+						var my = objectList[selectedId].midY();
+						var pt = transformPoint(x-mx,y-my,
+							mx, my,
+							1, 1,
+							objectList[selectedId].rotation);
+						xOld = pt[0]; yOld = pt[1];
+						xFirst = pt[0]; yFirst = pt[1];
+					}
+				} else {
+					selectedId = getObjectID(x, y);
+					if(selectedId != -1) {
 						isDragging = true;
-						if(dragMode == 'scale') {
-							xScaleOld = objectList[selectedId].xScale;
-							yScaleOld = objectList[selectedId].yScale;
-							var mx = objectList[selectedId].midX();
-							var my = objectList[selectedId].midY();
-							var pt = transformPoint(x-mx,y-my,
-								mx, my,
-								1, 1,
-								objectList[selectedId].rotation);
-							xOld = pt[0]; yOld = pt[1];
-							xFirst = pt[0]; yFirst = pt[1];
-						}
-					} else {
-						selectedId = getObjectID(x, y);
-						if(selectedId != -1) {
-							isDragging = true;
-							dragMode = 'translate';
-						}
+						dragMode = 'translate';
 					}
-					break;
+				}
+				break;
 
-				case "erase":
-					isDragging = true;
-					var id = getObjectID(x,y);
-					if(id != -1) {
-						eraseObject(id);
-					}
-					break;
+			case "erase":
+				isDragging = true;
+				var id = getObjectID(x,y);
+				if(id != -1) {
+					eraseObject(id);
+				}
+				break;
 
-				case "fill":
-					var dObj = {
-						color: curColor,
-						pts: [x, y]
-					}
-					createFill(dObj);
-					break;
+			case "fill":
+				var dObj = {
+					color: curColor,
+					pts: [x, y]
+				}
+				createFill(dObj);
+				break;
 
-				case "stamp":
-					var dObj = {
-						url: svgList[ curStamp ].url,
-						cx: svgList[ curStamp ].cx,
-						cy: svgList[ curStamp ].cy,
-						opacity: alpha,
-						xScale: 1, 
-						yScale: 1,
-						bound: svgList[ curStamp ].bounds,
-						rotation: 0,
-						pts: [x, y],
-					};	
-					$.get(dObj.url, function(xmlData) {
-						//console.log("Got svg: " + dObj.url + " for " + curStamp);
-						dObj.svg = xmlData;
-						console.log(dObj.svg);
-					});
-					createBMP(dObj);
-					createStamp(dObj);
-					break;
-				case "dropper":
-					isDragging = true;
-					var id = ctx.getImageData(x, y, 1, 1);
-					var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
-					myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
-					$( "#tintSlider" ).slider( "value", hsl[2]*100);
-					break;
-				case "zoom":
-					curZoom = curZoom*1.5;
-					break;
-			}
-			break;
-		case 3:
-			if (curTool == "zoom"){
-				curZoom = curZoom/1.5;
-			}
-			break;
+			case "stamp":
+				var dObj = {
+					url: svgList[ curStamp ].url,
+					cx: svgList[ curStamp ].cx,
+					cy: svgList[ curStamp ].cy,
+					opacity: alpha,
+					xScale: 1, 
+					yScale: 1,
+					bound: svgList[ curStamp ].bounds,
+					rotation: 0,
+					pts: [x, y],
+				};	
+				$.get(dObj.url, function(xmlData) {
+					//console.log("Got svg: " + dObj.url + " for " + curStamp);
+					dObj.svg = xmlData;
+					console.log(dObj.svg);
+				});
+				createBMP(dObj);
+				createStamp(dObj);
+				break;
+			case "dropper":
+				isDragging = true;
+				var id = ctx.getImageData(x, y, 1, 1);
+				var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
+				myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+				$( "#tintSlider" ).slider( "value", hsl[2]*100);
+				break;
+			case "zoom":
+				curZoom = curZoom*1.5;
+				break;
+		}
 	}
 }
 function createBMP(dObj){
