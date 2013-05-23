@@ -7,8 +7,8 @@ function createBrush(dObj, brushMode) {
             //Rotate and scale the canvas
             ctx.save();
             ctx.translate(this.mx,this.my);
+            ctx.rotate(this.rotation);
             ctx.scale(this.xScale, this.yScale);
-            ctx.rotate(-this.rotation);
 
             //Begin at the first point
             ctx.beginPath();
