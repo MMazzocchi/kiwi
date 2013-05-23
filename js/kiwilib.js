@@ -33,8 +33,8 @@ var svgList = {
         url:'svg/butterfly.svg' },
 	'mickey':{
 		svg:null, 
-		cx:156, cy:145,
-		bounds:[0,0,313,290],
+		cx:383, cy:495,
+		bounds:[0,0,765,990],
 		url:'svg/mickey.svg' },
     'bnl':{
         svg:null,
@@ -294,7 +294,7 @@ function pointerDown(e) {
 			$.get(dObj.url, function(xmlData) {
 				//console.log("Got svg: " + dObj.url + " for " + curStamp);
 				dObj.svg = xmlData;
-				console.log(dObj.svg);
+				//console.log(dObj.svg);
 			});
 			createBMP(dObj);
             createStamp(dObj);
@@ -315,7 +315,6 @@ function createBMP(dObj){
 	var sctx = scanvas.getContext('2d');
 	sctx.drawSvg(dObj.url, 0, 0, 0, 0);
 	dObj.scanvas = scanvas;
-	//dObj.bmp = sctx.getImageData(0,0,scanvas.width,scanvas.height);
 }
 
 function translate(id, x, y) {
