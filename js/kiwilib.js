@@ -243,21 +243,17 @@ function pointerDown(e) {
         break;	
 
         case "select":
+            xOld = x;
+            yOld = y;
+            xFirst = x;
+            yFirst = y;
             if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
                 dragMode = objectList[selectedId].iconClicked(x, y);
                 isDragging = true;
-                xOld = x;
-                yOld = y;
-                xFirst = x;
-                yFirst = y;
             } else {
                 selectedId = getObjectID(x, y);
                 if(selectedId != -1) {
                     isDragging = true;
-                    xOld = x;
-                    yOld = y;
-                    xFirst = x;
-                    yFirst = y;
                     dragMode = 'translate';
                 }
             }
@@ -335,6 +331,15 @@ function rotate(id, x, y) {
     yOld = y;
 }
 
+function scale(id, x, y) {
+    var dx = x-xOld;
+    var dy = y-yOld;
+    objectList[id].scale(dx,dy);
+    xOld = x;
+    yOld = y;
+
+}
+
 function pointerMove(e) {
     var c = transformCoordinates(e);
     var ctx = canvas.getContext('2d');
@@ -360,6 +365,7 @@ function pointerMove(e) {
                         rotate(selectedId, x, y);
                         break;
                     case 'scale':
+                        scale(selectedId, x, y);
                         break;
                 }
                 break;
@@ -524,8 +530,8 @@ function createStamp(dObj) {
         this.rotation += dr;
     }
     dObj.scale = function(dx, dy) {
-        this.xScale += (dx/(this.bounds[2]/2));
-        this.yScale += (dy/(this.bounds[3]/2));
+        this.xScale -= (dx/(this.bound[2]/2));
+        this.yScale -= (dy/(this.bound[3]/2));
     }
     dObj.iconClicked = function(x,y) {
         var leftCorner = transformPoint(
@@ -538,7 +544,7 @@ function createStamp(dObj) {
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
-        if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'resize'; }
+        if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'scale'; }
         else if(distance([x,y],[rightCorner[0], rightCorner[1]]) < 32) { return 'rotate'; }
         else { return false; }
     }
@@ -622,6 +628,7 @@ function startLine(dObj) {
     dObj.draw = function(ctx) {
         ctx.save();
         ctx.translate(this.mx,this.my);
+        ctx.scale(this.xScale, this.yScale);
         ctx.rotate(-this.rotation);
 
         ctx.beginPath();
