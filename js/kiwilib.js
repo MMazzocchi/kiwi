@@ -143,8 +143,9 @@ function refreshCanvas() {
 			ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
 	//ctx.restore();
-    // For each id in layerList, call this function:
+    // Redraw every object at the current zoom 
 	ctx.scale(curZoom, curZoom);
+	// For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
         // Get the object for this layer
         var dObj = objectList[id];
@@ -948,6 +949,12 @@ function updateTint(slideAmount) {		// gets tint from slider and sets the light 
     myCP.updateColor();
 }
 
+function updateZoom(slideAmount) {		// gets tint from slider and sets the light setting in the color picker
+	curZoom = slideAmount/10.0;
+	
+    refreshCanvas();
+}
+
 function SelectTool(toolName) // selects proper tool based off of what user has clicked
 {
     switch (toolName) {
@@ -1121,6 +1128,20 @@ $().ready( function() {
         }
     });
 	
+	$( "#zoomSlider" ).slider({
+        orientation: "horizontal",
+        range: "min",
+        min: 1,
+        max: 40,
+        value: 10,
+        slide: function( event, ui ) {
+            updateZoom( ui.value );
+        },
+        change: function( event, ui ) {
+            updateZoom( ui.value );
+        }
+    });
+	
     $(document).keypress(function(e) {
         var key = e.which;
 
@@ -1149,12 +1170,16 @@ $().ready( function() {
 			  document.body.style.cursor="url(img/paintbucket.png), default";
 			  SelectTool('fill');
 			  break;
-			case 45: // '-' = Zoom-out
-				curZoom = curZoom*.5;
+/*			case 45: // '-' = Zoom-out
+				if (curZoom > 1){
+					curZoom = curZoom - 1;
+				}
+				SelectTool('zoom');
 				break;
 			case 61: // '=' = Zoom-in
-				curZoom = curZoom*2;
-				break;
+				curZoom = curZoom + 1;
+				SelectTool('zoom');
+				break; */
 			case 115: // S=SELECT
 			  document.body.style.cursor="url(img/hand-tool.png)14 6, default";
 			  SelectTool('select');
