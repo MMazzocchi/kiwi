@@ -85,6 +85,9 @@ function transformCoordinates(e) {
                 break;
         }
     }
+
+    x = x/curZoom;
+    y = y/curZoom;
     return [x,y];
 }
 
