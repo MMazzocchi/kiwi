@@ -20,6 +20,9 @@ var yOld;
 var xFirst;
 var yFirst;
 var dragMode = '';
+var shift = false;
+var xScaleOld;
+var yScaleOld;
 
 var tx=0;
 var ty=0;
@@ -250,6 +253,8 @@ function pointerDown(e) {
             if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
                 dragMode = objectList[selectedId].iconClicked(x, y);
                 isDragging = true;
+                xScaleOld = objectList[selectedId].xScale;
+                yScaleOld = objectList[selectedId].yScale;
             } else {
                 selectedId = getObjectID(x, y);
                 if(selectedId != -1) {
@@ -334,10 +339,31 @@ function rotate(id, x, y) {
 function scale(id, x, y) {
     var dx = x-xOld;
     var dy = y-yOld;
+    console.log(shift);
+    if(shift) {
+        var obj = objectList[id];
+        var ratio = (yFirst-obj.midY())/(xFirst-obj.midX());
+        obj.xScale=xScaleOld;
+        obj.yScale=yScaleOld;
+        if(Math.abs(x-xFirst) > Math.abs(y-yFirst)) {
+            dx = x-xFirst;
+            dy = (x-xFirst)*ratio;
+        } else {
+            dx = (y-yFirst)/ratio;
+            dy = (y-yFirst);
+        }
+    }
     objectList[id].scale(dx,dy);
     xOld = x;
     yOld = y;
 
+}
+
+function resetScale(id, x, y) {
+    var obj = objectList[id];
+    obj.xScale = 0;
+    obj.yScale = 0;
+    obj.scale(x-obj.midX(), y-obj.midY());
 }
 
 function pointerMove(e) {
@@ -365,6 +391,12 @@ function pointerMove(e) {
                         rotate(selectedId, x, y);
                         break;
                     case 'scale':
+                        if(shift == !e.shiftKey) {
+                            shift = !shift;
+                            if(!shift) {
+                                resetScale(selectedId, x, y);
+                            }
+                        }
                         scale(selectedId, x, y);
                         break;
                 }
@@ -422,6 +454,16 @@ function pointerEnd(e) {
                 var obj = objectList[id];
                 var dx = x-xFirst;
                 var dy = y-yFirst;
+                if(shift) {
+                    var ratio = (yFirst-obj.midY())/(xFirst-obj.midX());
+                    if(Math.abs(x-xFirst) > Math.abs(y-yFirst)) {
+                        dx = x-xFirst;
+                        dy = (x-xFirst)*ratio;
+                    } else {
+                        dx = (y-yFirst)/ratio;
+                        dy = (y-yFirst);
+                    }
+                }
 
                 var newAct = {
                     undo: function() {
@@ -780,13 +822,7 @@ function startLine(dObj) {
         this.rotation -= dr;
     };
     dObj.scale = function(dx, dy) {
-/*        for(var i=0; i<this.pts.length; i++) {
-            this.pts[i] = transformPoint(this.pts[i][0]-this.mx, this.pts[i][1]-this.my,
-                this.mx, this.my,
-                1, 1,
-                0 );
-        }
-*/        this.xScale -= (dx/((this.rCorner[0]-this.lCorner[0])/2));
+        this.xScale -= (dx/((this.rCorner[0]-this.lCorner[0])/2));
         this.yScale -= (dy/((this.rCorner[1]-this.lCorner[1])/2));
     };
     dObj.iconClicked = function(x,y) {
