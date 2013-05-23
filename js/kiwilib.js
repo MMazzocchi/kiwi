@@ -12,6 +12,7 @@ var alpha = 1;          // Opacity of the object to be drawn
 var curColor = "#000000";
 var isDragging = false;
 var curStamp = '';
+var curZoom = 1;
 var scratch;
 
 var selectedId = -1;
@@ -20,6 +21,9 @@ var yOld;
 var xFirst;
 var yFirst;
 var dragMode = '';
+var shift = false;
+var xScaleOld;
+var yScaleOld;
 
 var tx=0;
 var ty=0;
@@ -81,6 +85,9 @@ function transformCoordinates(e) {
                 break;
         }
     }
+
+    x = x/curZoom;
+    y = y/curZoom;
     return [x,y];
 }
 
@@ -92,9 +99,9 @@ function refreshCanvas() {
     }
 
     var ctx = canvas.getContext('2d');
-
 	var heightoffset = $("#toolbar").height();
 	var widthoffset = $("#toolbar").width();
+	
 	if (window.innerWidth < window.innerHeight) { // portrait
 		ctx.canvas.width  = window.innerWidth;
 		ctx.canvas.height = window.innerHeight - heightoffset;
@@ -133,10 +140,15 @@ function refreshCanvas() {
         }
     } else {
         ctx.fillStyle="#FFFFFF";
-        ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+		if (window.innerWidth < window.innerHeight) // portrait
+        	ctx.fillRect(0,0,window.innerWidth,window.innerHeight-heightoffset);
+		else // landscape
+			ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
 	//ctx.restore();
-    // For each id in layerList, call this function:
+    // Redraw every object at the current zoom 
+	ctx.scale(curZoom, curZoom);
+	// For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
         // Get the object for this layer
         var dObj = objectList[id];
@@ -250,6 +262,18 @@ function pointerDown(e) {
             if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
                 dragMode = objectList[selectedId].iconClicked(x, y);
                 isDragging = true;
+                if(dragMode == 'scale') {
+                    xScaleOld = objectList[selectedId].xScale;
+                    yScaleOld = objectList[selectedId].yScale;
+                    var mx = objectList[selectedId].midX();
+                    var my = objectList[selectedId].midY();
+                    var pt = transformPoint(x-mx,y-my,
+                        mx, my,
+                        1, 1,
+                        objectList[selectedId].rotation);
+                    xOld = pt[0]; yOld = pt[1];
+                    xFirst = pt[0]; yFirst = pt[1];
+                }
             } else {
                 selectedId = getObjectID(x, y);
                 if(selectedId != -1) {
@@ -333,10 +357,30 @@ function rotate(id, x, y) {
 function scale(id, x, y) {
     var dx = x-xOld;
     var dy = y-yOld;
+    if(shift) {
+        var obj = objectList[id];
+        var ratio = (yFirst-obj.midY())/(xFirst-obj.midX());
+        obj.xScale=xScaleOld;
+        obj.yScale=yScaleOld;
+        if(Math.abs(x-xFirst) < Math.abs(y-yFirst)) {
+            dx = x-xFirst;
+            dy = (x-xFirst)*ratio;
+        } else {
+            dx = (y-yFirst)/ratio;
+            dy = (y-yFirst);
+        }
+    }
     objectList[id].scale(dx,dy);
     xOld = x;
     yOld = y;
 
+}
+
+function resetScale(id, x, y) {
+    var obj = objectList[id];
+    obj.xScale = 0;
+    obj.yScale = 0;
+    obj.scale(x-obj.midX(), y-obj.midY());
 }
 
 function pointerMove(e) {
@@ -367,6 +411,20 @@ function pointerMove(e) {
                         rotate(selectedId, x, y);
                         break;
                     case 'scale':
+                        var mx = objectList[selectedId].midX();
+                        var my = objectList[selectedId].midY();
+                        var pt = transformPoint(x-mx,y-my,
+                            mx, my,
+                            1, 1,
+                            objectList[selectedId].rotation);
+                        x = pt[0]; y = pt[1];
+
+                        if(shift == !e.shiftKey) {
+                            shift = !shift;
+                            if(!shift) {
+                                resetScale(selectedId, x, y);
+                            }
+                        }
                         scale(selectedId, x, y);
                         break;
                 }
@@ -422,8 +480,26 @@ function pointerEnd(e) {
                 break;
             case 'scale':
                 var obj = objectList[id];
+                var mx = obj.midX();
+                var my = obj.midY();
+                var pt = transformPoint(x-mx,y-my,
+                    mx, my,
+                    1, 1,
+                    obj.rotation);
+                x = pt[0]; y = pt[1];
+
                 var dx = x-xFirst;
                 var dy = y-yFirst;
+                if(shift) {
+                    var ratio = (yFirst-obj.midY())/(xFirst-obj.midX());
+                    if(Math.abs(x-xFirst) < Math.abs(y-yFirst)) {
+                        dx = x-xFirst;
+                        dy = (x-xFirst)*ratio;
+                    } else {
+                        dx = (y-yFirst)/ratio;
+                        dy = (y-yFirst);
+                    }
+                }
 
                 var newAct = {
                     undo: function() {
@@ -631,6 +707,7 @@ function startLine(dObj) {
 	if(dObj.type == 'graphite'){
 		createPencilTex(dObj);
 	}
+
 	if(brushMode == 'simple' || brushMode == 'graphite'){
 		dObj.draw = function(ctx) {
 			ctx.save();
@@ -713,7 +790,7 @@ function startLine(dObj) {
             this.lCorner[0]-this.mx-32, this.lCorner[1]-this.my-32,
             this.mx, this.my,
             this.xScale, this.yScale,
-            this.rotation );
+            -this.rotation );
 
             var scaleIcon = document.getElementById('resize_icon');
             ctx.drawImage(scaleIcon, leftCorner[0]-32, leftCorner[1]-32);
@@ -722,7 +799,7 @@ function startLine(dObj) {
             this.rCorner[0]-this.mx+32, this.lCorner[1]-this.my-32,
             this.mx, this.my,
             this.xScale, this.yScale,
-            this.rotation );
+            -this.rotation );
 
             var rotateIcon = document.getElementById('rotate_icon');
             ctx.drawImage(rotateIcon, rightCorner[0]-32, rightCorner[1]-32);
@@ -733,7 +810,7 @@ function startLine(dObj) {
        var pt = transformPoint(x-this.mx, y-this.my,
            this.mx, this.my,
            1, 1,
-           -this.rotation);
+           this.rotation);
        if(this.xScale ==0 || this.yScale==0) {
             return false;
        } else {
@@ -790,29 +867,25 @@ function startLine(dObj) {
         this.rCorner[1]+=dy;
     };
     dObj.rotate = function(dr) {
-        this.rotation -= dr;
+        this.rotation += dr;
     };
     dObj.scale = function(dx, dy) {
-/*        for(var i=0; i<this.pts.length; i++) {
-            this.pts[i] = transformPoint(this.pts[i][0]-this.mx, this.pts[i][1]-this.my,
-                this.mx, this.my,
-                1, 1,
-                0 );
-        }
-*/        this.xScale -= (dx/((this.rCorner[0]-this.lCorner[0])/2));
-        this.yScale -= (dy/((this.rCorner[1]-this.lCorner[1])/2));
+        if((this.rCorner[0] == this.lCorner[0])) { this.xScale -= dx/this.width; }
+        else { this.xScale -= (dx/((this.rCorner[0]-this.lCorner[0])/2)); }
+        if((this.rCorner[1] == this.lCorner[1])) { this.yScale -= dy/this.width; }
+        else { this.yScale -= (dy/((this.rCorner[1]-this.lCorner[1])/2)); }
     };
     dObj.iconClicked = function(x,y) {
         var leftCorner = transformPoint(
             this.lCorner[0]-this.mx-32, this.lCorner[1]-this.my-32,
             this.mx, this.my,
             this.xScale, this.yScale,
-            this.rotation );
+            -this.rotation );
         var rightCorner = transformPoint(
             this.rCorner[0]-this.mx+32, this.lCorner[1]-this.my-32,
             this.mx, this.my,
             this.xScale, this.yScale,
-            this.rotation );
+            -this.rotation );
         if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'scale'; }
         else if(distance([x,y],[rightCorner[0], rightCorner[1]]) < 32) { return 'rotate'; }
         else { return false; }
@@ -891,6 +964,12 @@ function updateTint(slideAmount) {		// gets tint from slider and sets the light 
     myCP.updateColor();
 }
 
+function updateZoom(slideAmount) {		// gets tint from slider and sets the light setting in the color picker
+	curZoom = slideAmount/10.0;
+	
+    refreshCanvas();
+}
+
 function SelectTool(toolName) // selects proper tool based off of what user has clicked
 {
     switch (toolName) {
@@ -920,7 +999,6 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
-
 	document.body.style.cursor="url(img/paintbrush.png) 0 28, default"; // sets the default cursor to the paintbrush
     //Ceate Color picker
     myCP = new ColorPicker();
@@ -937,7 +1015,7 @@ $().ready( function() {
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
-
+	
     // Bind an action.
     $('#drawing_canvas').mousedown( pointerDown );
     $('#drawing_canvas').mousemove( pointerMove );
@@ -1065,6 +1143,20 @@ $().ready( function() {
         }
     });
 	
+	$( "#zoomSlider" ).slider({
+        orientation: "horizontal",
+        range: "min",
+        min: 1,
+        max: 40,
+        value: 10,
+        slide: function( event, ui ) {
+            updateZoom( ui.value );
+        },
+        change: function( event, ui ) {
+            updateZoom( ui.value );
+        }
+    });
+	
     $(document).keypress(function(e) {
         var key = e.which;
 
@@ -1093,6 +1185,16 @@ $().ready( function() {
 			  document.body.style.cursor="url(img/paintbucket.png), default";
 			  SelectTool('fill');
 			  break;
+/*			case 45: // '-' = Zoom-out
+				if (curZoom > 1){
+					curZoom = curZoom - 1;
+				}
+				SelectTool('zoom');
+				break;
+			case 61: // '=' = Zoom-in
+				curZoom = curZoom + 1;
+				SelectTool('zoom');
+				break; */
 			case 115: // S=SELECT
 			  document.body.style.cursor="url(img/hand-tool.png)14 6, default";
 			  SelectTool('select');
