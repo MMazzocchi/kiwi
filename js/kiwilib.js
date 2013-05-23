@@ -1,10 +1,10 @@
 
-var canvas;           	// This will hold our canvas
-var objectList = {};  	// This is a hash that maps an object's id to the object itself
-var layerList = [];   	// This is the list of layers. Each element is an object id.
-var actionList = [];  	// This is the list of actions. Each element is an "event", which gets defined later on.
-var idPtr = 0;        	// This is the next available id.
-var actionPtr = 0;    	// This is the action stack pointer; anything below this is real, and anything above it has been undo'd.
+var canvas;               // This will hold our canvas
+var objectList = {};      // This is a hash that maps an object's id to the object itself
+var layerList = [];       // This is the list of layers. Each element is an object id.
+var actionList = [];      // This is the list of actions. Each element is an "event", which gets defined later on.
+var idPtr = 0;            // This is the next available id.
+var actionPtr = 0;        // This is the action stack pointer; anything below this is real, and anything above it has been undo'd.
 var curTool = "draw";   // This is the current tool selected by the user
 var brushMode = 'simple';
 var thickness = 10;     // Thickness of the line to be drawn
@@ -35,22 +35,22 @@ var svgList = {
         cx:205, cy:143, 
         bounds:[0,0,410,286], 
         url:'svg/butterfly.svg' },
-	'mickey':{
-		svg:null, 
-		cx:383, cy:495,
-		bounds:[0,0,765,990],
-		url:'svg/mickey.svg' },
+    'mickey':{
+        svg:null, 
+        cx:383, cy:495,
+        bounds:[0,0,765,990],
+        url:'svg/mickey.svg' },
     'bnl':{
         svg:null,
         cx:197, cy:154,
         bounds:[0,0,378,302],
         url:'svg/BnL.svg' },
-	'troll':{ 
-		svg:null, 
-		cx:301, cy:226,
-		bounds:[0,0,603,453],
-		url:'svg/troll_face.svg' }
-		
+    'troll':{ 
+        svg:null, 
+        cx:301, cy:226,
+        bounds:[0,0,603,453],
+        url:'svg/troll_face.svg' }
+        
 };
 
 function orienting() {
@@ -99,17 +99,17 @@ function refreshCanvas() {
     }
 
     var ctx = canvas.getContext('2d');
-	var heightoffset = $("#toolbar").height();
-	var widthoffset = $("#toolbar").width();
-	
-	if (window.innerWidth < window.innerHeight) { // portrait
-		ctx.canvas.width  = window.innerWidth;
-		ctx.canvas.height = window.innerHeight - heightoffset;
-	}
-	else { // landscape
-		ctx.canvas.width  = window.innerWidth - widthoffset;
-		ctx.canvas.height = window.innerHeight;
-	}
+    var heightoffset = $("#toolbar").height();
+    var widthoffset = $("#toolbar").width();
+    
+    if (window.innerWidth < window.innerHeight) { // portrait
+        ctx.canvas.width  = window.innerWidth;
+        ctx.canvas.height = window.innerHeight - heightoffset;
+    }
+    else { // landscape
+        ctx.canvas.width  = window.innerWidth - widthoffset;
+        ctx.canvas.height = window.innerHeight;
+    }
 
     if(orienting()) {
         orientation = window.orientation;
@@ -140,25 +140,25 @@ function refreshCanvas() {
         }
     } else {
         ctx.fillStyle="#FFFFFF";
-		if (window.innerWidth < window.innerHeight) // portrait
-        	ctx.fillRect(0,0,window.innerWidth,window.innerHeight-heightoffset);
-		else // landscape
-			ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
+        if (window.innerWidth < window.innerHeight) // portrait
+            ctx.fillRect(0,0,window.innerWidth,window.innerHeight-heightoffset);
+        else // landscape
+            ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
-	//ctx.restore();
+    //ctx.restore();
     // Redraw every object at the current zoom 
-	ctx.scale(curZoom, curZoom);
-	// For each id in layerList, call this function:
+    ctx.scale(curZoom, curZoom);
+    // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
         // Get the object for this layer
         var dObj = objectList[id];
 
-		//if(scratch){
-		//	ctx.putImageData(scratch,0,0);
-		//}
+        //if(scratch){
+        //    ctx.putImageData(scratch,0,0);
+        //}
         //dObj.draw(ctx);
-		//scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
-		
+        //scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
+        
 
 
         if((!isDragging) || (id != selectedId)) {
@@ -231,119 +231,119 @@ function eraseObject(id) {
 
 function pointerDown(e) {
     var c = transformCoordinates(e);
-	var ctx = canvas.getContext('2d');
+    var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
-	if (e.which == 3){
-		if (curTool == "zoom"){
-			curZoom = curZoom/1.5;
-		}
-	}
-	else{
-		switch(curTool) {			
-			case "draw":
-				isDragging = true;
-				var dObj = {
-					pts: [[x, y]],
-					lCorner: [x,y],
-					rCorner: [x,y],
-					mx: x, my: y,
-					width: thickness,
-					opacity: alpha,
-					color: curColor,
-					bezier: true,
-					type: brushMode,
-					xScale: 1,
-					yScale: 1,
-					rotation: 0
-				};
-				startLine(dObj);
-				break;	
+    if (e.which == 3){
+        if (curTool == "zoom"){
+            curZoom = curZoom/1.5;
+        }
+    }
+    else{
+        switch(curTool) {            
+            case "draw":
+                isDragging = true;
+                var dObj = {
+                    pts: [[x, y]],
+                    lCorner: [x,y],
+                    rCorner: [x,y],
+                    mx: x, my: y,
+                    width: thickness,
+                    opacity: alpha,
+                    color: curColor,
+                    bezier: true,
+                    type: brushMode,
+                    xScale: 1,
+                    yScale: 1,
+                    rotation: 0
+                };
+                startLine(dObj);
+                break;    
 
-			case "select":
-				xOld = x;
-				yOld = y;
-				xFirst = x;
-				yFirst = y;
-				if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
-					dragMode = objectList[selectedId].iconClicked(x, y);
-					isDragging = true;
-					if(dragMode == 'scale') {
-						xScaleOld = objectList[selectedId].xScale;
-						yScaleOld = objectList[selectedId].yScale;
-						var mx = objectList[selectedId].midX();
-						var my = objectList[selectedId].midY();
-						var pt = transformPoint(x-mx,y-my,
-							mx, my,
-							1, 1,
-							objectList[selectedId].rotation);
-						xOld = pt[0]; yOld = pt[1];
-						xFirst = pt[0]; yFirst = pt[1];
-					}
-				} else {
-					selectedId = getObjectID(x, y);
-					if(selectedId != -1) {
-						isDragging = true;
-						dragMode = 'translate';
-					}
-				}
-				break;
+            case "select":
+                xOld = x;
+                yOld = y;
+                xFirst = x;
+                yFirst = y;
+                if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
+                    dragMode = objectList[selectedId].iconClicked(x, y);
+                    isDragging = true;
+                    if(dragMode == 'scale') {
+                        xScaleOld = objectList[selectedId].xScale;
+                        yScaleOld = objectList[selectedId].yScale;
+                        var mx = objectList[selectedId].midX();
+                        var my = objectList[selectedId].midY();
+                        var pt = transformPoint(x-mx,y-my,
+                            mx, my,
+                            1, 1,
+                            objectList[selectedId].rotation);
+                        xOld = pt[0]; yOld = pt[1];
+                        xFirst = pt[0]; yFirst = pt[1];
+                    }
+                } else {
+                    selectedId = getObjectID(x, y);
+                    if(selectedId != -1) {
+                        isDragging = true;
+                        dragMode = 'translate';
+                    }
+                }
+                break;
 
-			case "erase":
-				isDragging = true;
-				var id = getObjectID(x,y);
-				if(id != -1) {
-					eraseObject(id);
-				}
-				break;
+            case "erase":
+                isDragging = true;
+                var id = getObjectID(x,y);
+                if(id != -1) {
+                    eraseObject(id);
+                }
+                break;
 
-			case "fill":
-				var dObj = {
-					color: curColor,
-					pts: [x, y]
-				}
-				createFill(dObj);
-				break;
+            case "fill":
+                var dObj = {
+                    color: curColor,
+                    pts: [x, y]
+                }
+                createFill(dObj);
+                break;
 
-			case "stamp":
-				var dObj = {
-					url: svgList[ curStamp ].url,
-					cx: svgList[ curStamp ].cx,
-					cy: svgList[ curStamp ].cy,
-					opacity: alpha,
-					xScale: 1, 
-					yScale: 1,
-					bound: svgList[ curStamp ].bounds,
-					rotation: 0,
-					pts: [x, y],
-				};	
-				$.get(dObj.url, function(xmlData) {
-					//console.log("Got svg: " + dObj.url + " for " + curStamp);
-					dObj.svg = xmlData;
-					console.log(dObj.svg);
-				});
-				createBMP(dObj);
-				createStamp(dObj);
-				break;
-			case "dropper":
-				isDragging = true;
-				var id = ctx.getImageData(x, y, 1, 1);
-				var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
-				myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
-				$( "#tintSlider" ).slider( "value", hsl[2]*100);
-				break;
-			case "zoom":
-				curZoom = curZoom*1.5;
-				break;
-		}
-	}
+            case "stamp":
+                var dObj = {
+                    url: svgList[ curStamp ].url,
+                    cx: svgList[ curStamp ].cx,
+                    cy: svgList[ curStamp ].cy,
+                    opacity: alpha,
+                    xScale: 1, 
+                    yScale: 1,
+                    bound: svgList[ curStamp ].bounds,
+                    rotation: 0,
+                    pts: [x, y],
+                };    
+                $.get(dObj.url, function(xmlData) {
+                    //console.log("Got svg: " + dObj.url + " for " + curStamp);
+                    dObj.svg = xmlData;
+                    console.log(dObj.svg);
+                });
+                createBMP(dObj);
+                createStamp(dObj);
+                break;
+            case "dropper":
+                isDragging = true;
+                var id = ctx.getImageData(x, y, 1, 1);
+                var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
+                myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+                $( "#tintSlider" ).slider( "value", hsl[2]*100);
+                break;
+            case "zoom":
+                curZoom = curZoom*1.5;
+                break;
+        }
+    }
 }
 function createBMP(dObj){
-	var scanvas = document.createElement('canvas');
-	scanvas.width = dObj.bound[2]*dObj.xScale;
-	scanvas.height = dObj.bound[3]*dObj.yScale;
-	var sctx = scanvas.getContext('2d');
-	sctx.drawSvg(dObj.url, 0, 0, 0, 0);
-	dObj.scanvas = scanvas;
+    var scanvas = document.createElement('canvas');
+    scanvas.width = dObj.bound[2]*dObj.xScale;
+    scanvas.height = dObj.bound[3]*dObj.yScale;
+    var sctx = scanvas.getContext('2d');
+    sctx.drawSvg(dObj.url, 0, 0, 0, 0);
+    dObj.scanvas = scanvas;
 }
 
 function translate(id, x, y) {
@@ -402,7 +402,7 @@ function pointerMove(e) {
             case "draw":
                 continueLine(x,y);
                 break;
-			case "spray":
+            case "spray":
                 continueSpray(x,y);
                 break;
             case "erase":
@@ -438,12 +438,12 @@ function pointerMove(e) {
                         break;
                 }
                 break;
-			case "dropper":
-				var id = ctx.getImageData(x, y, 1, 1);
-				var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
-				myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
-				$( "#tintSlider" ).slider( "value", hsl[2]*100);
-				break;
+            case "dropper":
+                var id = ctx.getImageData(x, y, 1, 1);
+                var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
+                myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+                $( "#tintSlider" ).slider( "value", hsl[2]*100);
+                break;
         }
     }
 }
@@ -531,28 +531,28 @@ function pointerEnd(e) {
                 break;
         }
     }
-	
+    
     isDragging = false;
 }
 
 function createFill(dObj){
-	assignID(dObj);
-	
-	dObj.draw = function(ctx) {
+    assignID(dObj);
+    
+    dObj.draw = function(ctx) {
         ctx.save();
-			var height = canvas.height;
-			var width = canvas.width;
-			var img = ctx.getImageData(0,0,width,height);
-			var x = dObj.pts[0];
-			var y = dObj.pts[1];
-			var cx = (y*width+x)
-			var fillColor = curColor;
-			
-			console.log(curColor);
-			
-			ctx.putImageData(img,0,0);
-		ctx.restore();
-	};
+            var height = canvas.height;
+            var width = canvas.width;
+            var img = ctx.getImageData(0,0,width,height);
+            var x = dObj.pts[0];
+            var y = dObj.pts[1];
+            var cx = (y*width+x)
+            var fillColor = curColor;
+            
+            console.log(curColor);
+            
+            ctx.putImageData(img,0,0);
+        ctx.restore();
+    };
 
     var newAct = {
         undo: function() {
@@ -590,15 +590,15 @@ function createStamp(dObj) {
         var bound = [this.bound[2],this.bound[3]];
 
         ctx.save();
-			ctx.globalAlpha = this.opacity;
-			ctx.beginPath();
-			ctx.translate(this.pts[0],this.pts[1]);
+            ctx.globalAlpha = this.opacity;
+            ctx.beginPath();
+            ctx.translate(this.pts[0],this.pts[1]);
             ctx.rotate(this.rotation);
-			ctx.scale(xScale,yScale);
-			//ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
-			//ctx.putImageData(this.bmp, this.pts[0]-this.cx, this.pts[1]-this.cy);
-			ctx.drawImage(dObj.scanvas,-dObj.cx,-dObj.cy);
-		ctx.restore();
+            ctx.scale(xScale,yScale);
+            //ctx.drawSvg(this.svg, -this.cx, -this.cy, 0, 0);
+            //ctx.putImageData(this.bmp, this.pts[0]-this.cx, this.pts[1]-this.cy);
+            ctx.drawImage(dObj.scanvas,-dObj.cx,-dObj.cy);
+        ctx.restore();
     };
     dObj.select = function(x,y) {
         //"Scratch canvas" method
@@ -677,133 +677,133 @@ function distance(p1, p2) {
 }
 
 function createPencilTex(dObj){
-	
-	var patW = dObj.width;
-	var texcanvas = document.createElement('canvas');
-	texcanvas.width = patW;
-	texcanvas.height = patW;
-	var dc = texcanvas.getContext('2d');
-	dc.globalAlpha = .33;
-	dc.fillStyle = dObj.color;
-	var nbrDots = patW*patW;
-	if(dObj.type == 'graphite'){
-		for (var i = 0; i < nbrDots; ++i) {
-			var px = Math.floor(Math.random()*patW);     	
-			var py = Math.floor(Math.random()*patW);
-			dc.fillRect(px,py,1,1);
-		}
-		dObj.pattern =  dc.createPattern(texcanvas, "repeat");
-	}
-	dc.globalAlpha = 1;
+    
+    var patW = dObj.width;
+    var texcanvas = document.createElement('canvas');
+    texcanvas.width = patW;
+    texcanvas.height = patW;
+    var dc = texcanvas.getContext('2d');
+    dc.globalAlpha = .33;
+    dc.fillStyle = dObj.color;
+    var nbrDots = patW*patW;
+    if(dObj.type == 'graphite'){
+        for (var i = 0; i < nbrDots; ++i) {
+            var px = Math.floor(Math.random()*patW);         
+            var py = Math.floor(Math.random()*patW);
+            dc.fillRect(px,py,1,1);
+        }
+        dObj.pattern =  dc.createPattern(texcanvas, "repeat");
+    }
+    dc.globalAlpha = 1;
 
 }
 function createSpraytex(dObj){
-	var scanvas = document.createElement('canvas');
-	scanvas.height = scanvas.width = dObj.width;
-	var ctx = scanvas.getContext('2d');
-	var w = dObj.width;
-	var grd=ctx.createRadialGradient(w/2,w/2,0,w/2,w/2,w/2);
-	grd.addColorStop(0,dObj.color);
-	grd.addColorStop(1, "rgba(255,0,0,0)");
-	//dObj.grd = grd;
-	ctx.fillStyle = grd;
-	var w = dObj.width;
-	ctx.fillRect(0,0,w,w);
-	dObj.scanvas = scanvas;
+    var scanvas = document.createElement('canvas');
+    scanvas.height = scanvas.width = dObj.width;
+    var ctx = scanvas.getContext('2d');
+    var w = dObj.width;
+    var grd=ctx.createRadialGradient(w/2,w/2,0,w/2,w/2,w/2);
+    grd.addColorStop(0,dObj.color);
+    grd.addColorStop(1, "rgba(255,0,0,0)");
+    //dObj.grd = grd;
+    ctx.fillStyle = grd;
+    var w = dObj.width;
+    ctx.fillRect(0,0,w,w);
+    dObj.scanvas = scanvas;
 }
 
 
 function startLine(dObj) {
     assignID(dObj);
-	if(dObj.type == 'spray'){
-		createSpraytex(dObj);
-	}
-	// create brush pattern
-	if(dObj.type == 'graphite'){
-		createPencilTex(dObj);
-	}
+    if(dObj.type == 'spray'){
+        createSpraytex(dObj);
+    }
+    // create brush pattern
+    if(dObj.type == 'graphite'){
+        createPencilTex(dObj);
+    }
 
-	if(brushMode == 'simple' || brushMode == 'graphite'){
-		dObj.draw = function(ctx) {
-			ctx.save();
-			ctx.translate(this.mx,this.my);
-			ctx.scale(this.xScale, this.yScale);
-			ctx.rotate(-this.rotation);
-			ctx.beginPath();
-			ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
-			ctx.strokeStyle = this.color;
-			if(this.type == 'graphite'){
-				ctx.strokeStyle = this.pattern;
-			}
-				
-			ctx.fillStyle = this.color;
-			ctx.lineJoin = 'round';
-			ctx.lineCap = 'round';
-			ctx.lineWidth = this.width;
-			ctx.globalAlpha = this.opacity;
+    if(brushMode == 'simple' || brushMode == 'graphite'){
+        dObj.draw = function(ctx) {
+            ctx.save();
+            ctx.translate(this.mx,this.my);
+            ctx.scale(this.xScale, this.yScale);
+            ctx.rotate(-this.rotation);
+            ctx.beginPath();
+            ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
+            ctx.strokeStyle = this.color;
+            if(this.type == 'graphite'){
+                ctx.strokeStyle = this.pattern;
+            }
+                
+            ctx.fillStyle = this.color;
+            ctx.lineJoin = 'round';
+            ctx.lineCap = 'round';
+            ctx.lineWidth = this.width;
+            ctx.globalAlpha = this.opacity;
 
-			if(this.pts.length == 1) {
-				ctx.fillStyle = this.color;
-				if(this.type == 'graphite') {
-					ctx.fillStyle = this.pattern;
-				}
-				ctx.lineWidth = 0;
-				ctx.arc(this.pts[0][0]-this.mx, this.pts[0][1]-this.my, this.width/2, 0, 2*Math.PI);
-				ctx.fill();
-			} else if(!this.bezier) {
+            if(this.pts.length == 1) {
+                ctx.fillStyle = this.color;
+                if(this.type == 'graphite') {
+                    ctx.fillStyle = this.pattern;
+                }
+                ctx.lineWidth = 0;
+                ctx.arc(this.pts[0][0]-this.mx, this.pts[0][1]-this.my, this.width/2, 0, 2*Math.PI);
+                ctx.fill();
+            } else if(!this.bezier) {
 
-				// Draw the line without beziers
-				for(var i=1; i<this.pts.length; i++) {
+                // Draw the line without beziers
+                for(var i=1; i<this.pts.length; i++) {
 
-					ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
-				};
-				ctx.stroke();
-			} else {
+                    ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
+                };
+                ctx.stroke();
+            } else {
 
-				// Draw the line with beziers
-				for(var i=0; i<this.pts.length; i+=3) {
-					if(this.pts.length <= i+4) {
-						for(var j=i; j<this.pts.length; j++) {
-							ctx.lineTo(this.pts[j][0]-this.mx,this.pts[j][1]-this.my);
-						}
-					} else {
-						ctx.bezierCurveTo(this.pts[i+1][0]-this.mx, this.pts[i+1][1]-this.my,
-							this.pts[i+2][0]-this.mx, this.pts[i+2][1]-this.my,
-							this.pts[i+3][0]-this.mx, this.pts[i+3][1]-this.my);
-					}
-				};
-				ctx.stroke();
-			}
-			ctx.restore();
-		};
-	}
-	else if(brushMode == 'spray'){
-		dObj.draw = function(ctx) {
-		ctx.save();
-			ctx.translate(this.mx,this.my);
-			ctx.scale(this.xScale, this.yScale);
-			ctx.rotate(-this.rotation);
-			ctx.beginPath();
-			ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
-			ctx.lineWidth = this.width;
-			ctx.globalAlpha = this.opacity;
-			var w = dObj.width;
-			
-			for(var i=1; i<this.pts.length; i++) {
-				var d = distance(this.pts[i-1],this.pts[i]);
-				var space =20;
-				var s = Math.ceil(d/space);
-				var v = [this.pts[i-1][0]-this.pts[i][0],this.pts[i-1][1]-this.pts[i][1]];
-				//console.log(d);
-				for(var j=0; j<s; j++){
-					ctx.drawImage(dObj.scanvas,(j*1/s*v[0]+this.pts[i][0])-this.mx-w/2, (j*1/s*v[1]+this.pts[i][1])-this.my-w/2);
-					//ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
-				}
-			};
-			ctx.stroke();
-		ctx.restore();
-		}
-	}
+                // Draw the line with beziers
+                for(var i=0; i<this.pts.length; i+=3) {
+                    if(this.pts.length <= i+4) {
+                        for(var j=i; j<this.pts.length; j++) {
+                            ctx.lineTo(this.pts[j][0]-this.mx,this.pts[j][1]-this.my);
+                        }
+                    } else {
+                        ctx.bezierCurveTo(this.pts[i+1][0]-this.mx, this.pts[i+1][1]-this.my,
+                            this.pts[i+2][0]-this.mx, this.pts[i+2][1]-this.my,
+                            this.pts[i+3][0]-this.mx, this.pts[i+3][1]-this.my);
+                    }
+                };
+                ctx.stroke();
+            }
+            ctx.restore();
+        };
+    }
+    else if(brushMode == 'spray'){
+        dObj.draw = function(ctx) {
+        ctx.save();
+            ctx.translate(this.mx,this.my);
+            ctx.scale(this.xScale, this.yScale);
+            ctx.rotate(-this.rotation);
+            ctx.beginPath();
+            ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
+            ctx.lineWidth = this.width;
+            ctx.globalAlpha = this.opacity;
+            var w = dObj.width;
+            
+            for(var i=1; i<this.pts.length; i++) {
+                var d = distance(this.pts[i-1],this.pts[i]);
+                var space =20;
+                var s = Math.ceil(d/space);
+                var v = [this.pts[i-1][0]-this.pts[i][0],this.pts[i-1][1]-this.pts[i][1]];
+                //console.log(d);
+                for(var j=0; j<s; j++){
+                    ctx.drawImage(dObj.scanvas,(j*1/s*v[0]+this.pts[i][0])-this.mx-w/2, (j*1/s*v[1]+this.pts[i][1])-this.my-w/2);
+                    //ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
+                }
+            };
+            ctx.stroke();
+        ctx.restore();
+        }
+    }
     dObj.drawIcons = function(ctx) {
         var leftCorner = transformPoint(
             this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
@@ -969,17 +969,17 @@ function redo() {
     }
 }
 
-function updateThick(slideAmount) {		// gets thickness from slider and sets the global thickness
-	thickness = slideAmount;
+function updateThick(slideAmount) {        // gets thickness from slider and sets the global thickness
+    thickness = slideAmount;
     myCP.Refresh();
 }
-function updateOpac(slideAmount) {		// gets opacity from slider and sets the global opacity
-	alpha = slideAmount/100;
+function updateOpac(slideAmount) {        // gets opacity from slider and sets the global opacity
+    alpha = slideAmount/100;
     myCP.Refresh();
 }
 
-function updateTint(slideAmount) {		// gets tint from slider and sets the light setting in the color picker
-	myCP.curL = slideAmount;
+function updateTint(slideAmount) {        // gets tint from slider and sets the light setting in the color picker
+    myCP.curL = slideAmount;
     myCP.updateColor();
 }
 
@@ -1001,7 +1001,7 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
             curTool = 'draw';
             brushMode = 'graphite';
             break;
-		case 'fill':
+        case 'fill':
             curTool = 'fill';
             break;
         default:
@@ -1012,7 +1012,7 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
-	document.body.style.cursor="url(img/paintbrush.png) 0 28, default"; // sets the default cursor to the paintbrush
+    document.body.style.cursor="url(img/paintbrush.png) 0 28, default"; // sets the default cursor to the paintbrush
     //Ceate Color picker
     myCP = new ColorPicker();
     myCP.setHSL(0,90,50);
@@ -1028,21 +1028,21 @@ $().ready( function() {
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
-	
+    
 
     // Bind an action.
-	$('#drawing_canvas').contextmenu(function() {	// takes right-clicks
-		if (curTool == 'zoom'){
-			return false;
-		}
-	});
+    $('#drawing_canvas').contextmenu(function() {    // takes right-clicks
+        if (curTool == 'zoom'){
+            return false;
+        }
+    });
 
     $('#drawing_canvas').mousedown( function(event){
-		pointerDown(event);
+        pointerDown(event);
     });
     $('#drawing_canvas').mousemove( pointerMove );
     $('#drawing_canvas').mouseup( pointerEnd );
-	
+    
     canvas.addEventListener('touchmove', pointerMove );
     canvas.addEventListener('touchstart', pointerDown );
     canvas.addEventListener('touchend', pointerEnd );
@@ -1052,7 +1052,7 @@ $().ready( function() {
 
     // Bind the redo function to the redo button.
     $('#redo').click( redo );
-	
+    
     //.attr etc is to address a firefox bug that caches the disabled state of the redo button
     // http://stackoverflow.com/questions/2719044/jquery-ui-button-gets-disabled-on-refresh
     $('#undo_button').attr('disabled', true);
@@ -1060,49 +1060,49 @@ $().ready( function() {
     $('button').button().attr("autocomplete", "off");
 
     $('#brush').click( function() {
-		document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('draw');
     });
 
     $('#spraycan').click( function() {
-		document.body.style.cursor="url(img/spraycan.png)0 5, default";
+        document.body.style.cursor="url(img/spraycan.png)0 5, default";
         SelectTool('spraycan');
     });
 
     $('#hand').click( function() {
-		document.body.style.cursor="url(img/hand-tool.png)14 6, default";
+        document.body.style.cursor="url(img/hand-tool.png)14 6, default";
         SelectTool('select');
     });
 
     $('#pencil').click( function() {
-		document.body.style.cursor="url(img/pencil.png)0 28, default";
+        document.body.style.cursor="url(img/pencil.png)0 28, default";
         SelectTool('pencil');
     });
-	
-	$('#fill').click( function() {
+    
+    $('#fill').click( function() {
         SelectTool('fill');
     });
-	
+    
     $('#erase').click( function() {
-		document.body.style.cursor="url(img/eraser.png)0 28, default";
+        document.body.style.cursor="url(img/eraser.png)0 28, default";
         SelectTool('erase');
     });
-	
-	$('#zoom').click( function() {
-		document.body.style.cursor="url(img/search.png)8 6, default";
+    
+    $('#zoom').click( function() {
+        document.body.style.cursor="url(img/search.png)8 6, default";
         SelectTool('zoom');
     });
-	
-	$('#dropper').click( function() {
-		document.body.style.cursor="url(img/dropper.png)0 28, default";
+    
+    $('#dropper').click( function() {
+        document.body.style.cursor="url(img/dropper.png)0 28, default";
         SelectTool('dropper');
     });
-	
-	$('#fill').click( function() {
-		document.body.style.cursor="url(img/paintbucket.png), default";
+    
+    $('#fill').click( function() {
+        document.body.style.cursor="url(img/paintbucket.png), default";
         SelectTool('fill');
     });
-	
+    
     $('#butterfly').click( function() {
          SelectTool('stamp');
          curStamp = 'butterfly'
@@ -1127,7 +1127,7 @@ $().ready( function() {
         actionPtr = 0;
         selectedId = -1;
     });
-	
+    
     $( '#tintSlider' ).slider({
         orientation: "horizontal",
         range: "min",
@@ -1141,7 +1141,7 @@ $().ready( function() {
             updateTint( ui.value );
         }
     });
-	
+    
     $( "#opacitySlider" ).slider({
         orientation: "horizontal",
         range: "min",
@@ -1155,7 +1155,7 @@ $().ready( function() {
             updateOpac( ui.value );
         }
     });
-	
+    
     $( "#thicknessSlider" ).slider({
         orientation: "horizontal",
         range: "min",
@@ -1169,13 +1169,13 @@ $().ready( function() {
             updateThick( ui.value );
         }
     });
-	
+    
     $(document).keypress(function(e) {
         var key = e.which;
 
         // Ctrl-Z or CMD-Z for Undo   Shift-* for Redo
         if ((e.ctrlKey) && ((key == 122 || key == 90))) {  // CTRL-Z
-            if (key == 122 || key == 90){			// UNDO and REDO
+            if (key == 122 || key == 90){            // UNDO and REDO
                 if (e.shiftKey) {
                     redo();
                 } else {
@@ -1184,30 +1184,30 @@ $().ready( function() {
             }
             return false;
         }
-		
-		switch (key) {
-			case 100: // D=DRAW
-			  document.body.style.cursor="url(img/paintbrush.png)0 28, default";
-			  SelectTool('draw');
-			  break;
-			case 101: // E=ERASE
-			  document.body.style.cursor="url(img/eraser.png)0 28, default";
-			  SelectTool('erase');
-			  break;
-			case 102: // F=FILL
-			  document.body.style.cursor="url(img/paintbucket.png), default";
-			  SelectTool('fill');
-			  break;
-			case 115: // S=SELECT
-			  document.body.style.cursor="url(img/hand-tool.png)14 6, default";
-			  SelectTool('select');
-			  break;
-			case 103:  // G=dropper
-			  document.body.style.cursor="url(img/dropper.png)0 28, default";
-			  SelectTool('dropper');
-			  break;
-		}
-		
+        
+        switch (key) {
+            case 100: // D=DRAW
+              document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+              SelectTool('draw');
+              break;
+            case 101: // E=ERASE
+              document.body.style.cursor="url(img/eraser.png)0 28, default";
+              SelectTool('erase');
+              break;
+            case 102: // F=FILL
+              document.body.style.cursor="url(img/paintbucket.png), default";
+              SelectTool('fill');
+              break;
+            case 115: // S=SELECT
+              document.body.style.cursor="url(img/hand-tool.png)14 6, default";
+              SelectTool('select');
+              break;
+            case 103:  // G=dropper
+              document.body.style.cursor="url(img/dropper.png)0 28, default";
+              SelectTool('dropper');
+              break;
+        }
+        
     });
 
   $('#resize_icon').load(function() {});
