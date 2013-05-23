@@ -714,10 +714,8 @@ function startLine(dObj) {
 			ctx.translate(this.mx,this.my);
 			ctx.scale(this.xScale, this.yScale);
 			ctx.rotate(-this.rotation);
-
 			ctx.beginPath();
 			ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
-
 			ctx.strokeStyle = this.color;
 			if(this.type == 'graphite'){
 				ctx.strokeStyle = this.pattern;
@@ -775,11 +773,17 @@ function startLine(dObj) {
 			ctx.lineWidth = this.width;
 			ctx.globalAlpha = this.opacity;
 			var w = dObj.width;
+			
 			for(var i=1; i<this.pts.length; i++) {
-				//for(var j=0; j<5; j++){
-				ctx.drawImage(dObj.scanvas,this.pts[i][0]-this.mx-w/2, this.pts[i][1]-this.my-w/2);
-				//ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
-				//}
+				var d = distance(this.pts[i-1],this.pts[i]);
+				var space =20;
+				var s = Math.ceil(d/space);
+				var v = [this.pts[i-1][0]-this.pts[i][0],this.pts[i-1][1]-this.pts[i][1]];
+				//console.log(d);
+				for(var j=0; j<s; j++){
+					ctx.drawImage(dObj.scanvas,(j*1/s*v[0]+this.pts[i][0])-this.mx-w/2, (j*1/s*v[1]+this.pts[i][1])-this.my-w/2);
+					//ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
+				}
 			};
 			ctx.stroke();
 		ctx.restore();
