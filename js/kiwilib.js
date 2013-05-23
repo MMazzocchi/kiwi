@@ -37,8 +37,8 @@ var svgList = {
         url:'svg/butterfly.svg' },
 	'mickey':{
 		svg:null, 
-		cx:156, cy:145,
-		bounds:[0,0,313,290],
+		cx:383, cy:495,
+		bounds:[0,0,765,990],
 		url:'svg/mickey.svg' },
     'bnl':{
         svg:null,
@@ -233,6 +233,7 @@ function pointerDown(e) {
     var c = transformCoordinates(e);
 	var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
+<<<<<<< HEAD
 	switch(e.which) {
 		case 1:
 			switch(curTool) {			
@@ -336,6 +337,100 @@ function pointerDown(e) {
 			if (curTool == "zoom"){
 				curZoom = curZoom/1.5;
 			}
+=======
+
+    switch(curTool) {			
+        case "draw":
+            isDragging = true;
+            var dObj = {
+                pts: [[x, y]],
+                lCorner: [x,y],
+                rCorner: [x,y],
+                mx: x, my: y,
+                width: thickness,
+                opacity: alpha,
+                color: curColor,
+                bezier: true,
+                type: brushMode,
+                xScale: 1,
+                yScale: 1,
+                rotation: 0
+            };
+            startLine(dObj);
+        break;	
+
+        case "select":
+            xOld = x;
+            yOld = y;
+            xFirst = x;
+            yFirst = y;
+            if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
+                dragMode = objectList[selectedId].iconClicked(x, y);
+                isDragging = true;
+                if(dragMode == 'scale') {
+                    xScaleOld = objectList[selectedId].xScale;
+                    yScaleOld = objectList[selectedId].yScale;
+                    var mx = objectList[selectedId].midX();
+                    var my = objectList[selectedId].midY();
+                    var pt = transformPoint(x-mx,y-my,
+                        mx, my,
+                        1, 1,
+                        objectList[selectedId].rotation);
+                    xOld = pt[0]; yOld = pt[1];
+                    xFirst = pt[0]; yFirst = pt[1];
+                }
+            } else {
+                selectedId = getObjectID(x, y);
+                if(selectedId != -1) {
+                    isDragging = true;
+                    dragMode = 'translate';
+                }
+            }
+            break;
+
+        case "erase":
+            isDragging = true;
+            var id = getObjectID(x,y);
+            if(id != -1) {
+                eraseObject(id);
+            }
+            break;
+
+		case "fill":
+			var dObj = {
+				color: curColor,
+				pts: [x, y]
+			}
+			createFill(dObj);
+			break;
+
+        case "stamp":
+			var dObj = {
+				url: svgList[ curStamp ].url,
+				cx: svgList[ curStamp ].cx,
+				cy: svgList[ curStamp ].cy,
+				opacity: alpha,
+				xScale: 1, 
+                yScale: 1,
+				bound: svgList[ curStamp ].bounds,
+				rotation: 0,
+				pts: [x, y],
+			};	
+			$.get(dObj.url, function(xmlData) {
+				//console.log("Got svg: " + dObj.url + " for " + curStamp);
+				dObj.svg = xmlData;
+				//console.log(dObj.svg);
+			});
+			createBMP(dObj);
+            createStamp(dObj);
+            break;
+		case "dropper":
+			isDragging = true;
+			var id = ctx.getImageData(x, y, 1, 1);
+			var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
+			myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+			$( "#tintSlider" ).slider( "value", hsl[2]*100);
+>>>>>>> f5a0a59f82ba2bc4d6436c6e899c78e8a0981f2a
 			break;
 	}
 }
@@ -346,7 +441,6 @@ function createBMP(dObj){
 	var sctx = scanvas.getContext('2d');
 	sctx.drawSvg(dObj.url, 0, 0, 0, 0);
 	dObj.scanvas = scanvas;
-	//dObj.bmp = sctx.getImageData(0,0,scanvas.width,scanvas.height);
 }
 
 function translate(id, x, y) {
@@ -404,6 +498,9 @@ function pointerMove(e) {
         switch(curTool) {
             case "draw":
                 continueLine(x,y);
+                break;
+			case "spray":
+                continueSpray(x,y);
                 break;
             case "erase":
                 var id = getObjectID(x,y);
@@ -546,8 +643,6 @@ function createFill(dObj){
 		ctx.restore();
 	};
 
-
-
     var newAct = {
         undo: function() {
             layerList.splice(layerList.length-1,1);
@@ -688,104 +783,118 @@ function createPencilTex(dObj){
 		}
 		dObj.pattern =  dc.createPattern(texcanvas, "repeat");
 	}
-	else{
-		var w = dObj.width;
-		var grd=dc.createRadialGradient(dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/8.0,dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/2.0);
-		grd.addColorStop(0,dObj.color);
-		grd.addColorStop(1, "blue");
-//		dc.arc(w/2.0,w/2.0,w/2.0,0,2*Math.PI);
-//		dc.fillStyle = grd;
-//		dc.fill();
-		dObj.pattern =  grd;
-	}
 	dc.globalAlpha = 1;
 
 }
-
-function spraycanLine(dObj){	/////////////////testing spraycan
-	var texcanvas = document.createElement('canvas');
-	var dc = texcanvas.getContext('2d');
+function createSpraytex(dObj){
+	var scanvas = document.createElement('canvas');
+	scanvas.height = scanvas.width = dObj.width;
+	var ctx = scanvas.getContext('2d');
 	var w = dObj.width;
-	var grd=dc.createRadialGradient(dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/8.0,dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/2.0);
+	var grd=ctx.createRadialGradient(w/2,w/2,0,w/2,w/2,w/2);
 	grd.addColorStop(0,dObj.color);
-	grd.addColorStop(1, "rgba(255,255,255,0)");
-//		dc.arc(w/2.0,w/2.0,w/2.0,0,2*Math.PI);
-//		dc.fillStyle = grd;
-//		dc.fill();
-	dObj.pattern =  grd;
+	grd.addColorStop(1, "rgba(255,0,0,0)");
+	//dObj.grd = grd;
+	ctx.fillStyle = grd;
+	var w = dObj.width;
+	ctx.fillRect(0,0,w,w);
+	dObj.scanvas = scanvas;
 }
+
 
 function startLine(dObj) {
     assignID(dObj);
-
+	if(dObj.type == 'spray'){
+		createSpraytex(dObj);
+	}
 	// create brush pattern
 	if(dObj.type == 'graphite'){
 		createPencilTex(dObj);
 	}
-	if(dObj.type == 'spray'){//////////// testing spraycan
-		spraycanLine(dObj);
+
+	if(brushMode == 'simple' || brushMode == 'graphite'){
+		dObj.draw = function(ctx) {
+			ctx.save();
+			ctx.translate(this.mx,this.my);
+			ctx.scale(this.xScale, this.yScale);
+			ctx.rotate(-this.rotation);
+
+			ctx.beginPath();
+			ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
+
+			ctx.strokeStyle = this.color;
+			if(this.type == 'graphite'){
+				ctx.strokeStyle = this.pattern;
+			}
+				
+			ctx.fillStyle = this.color;
+			ctx.lineJoin = 'round';
+			ctx.lineCap = 'round';
+			ctx.lineWidth = this.width;
+			ctx.globalAlpha = this.opacity;
+
+			if(this.pts.length == 1) {
+				ctx.fillStyle = this.color;
+				if(this.type == 'graphite') {
+					ctx.fillStyle = this.pattern;
+				}
+				ctx.lineWidth = 0;
+				ctx.arc(this.pts[0][0]-this.mx, this.pts[0][1]-this.my, this.width/2, 0, 2*Math.PI);
+				ctx.fill();
+			} else if(!this.bezier) {
+
+				// Draw the line without beziers
+				for(var i=1; i<this.pts.length; i++) {
+
+					ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
+				};
+				ctx.stroke();
+			} else {
+
+				// Draw the line with beziers
+				for(var i=0; i<this.pts.length; i+=3) {
+					if(this.pts.length <= i+4) {
+						for(var j=i; j<this.pts.length; j++) {
+							ctx.lineTo(this.pts[j][0]-this.mx,this.pts[j][1]-this.my);
+						}
+					} else {
+						ctx.bezierCurveTo(this.pts[i+1][0]-this.mx, this.pts[i+1][1]-this.my,
+							this.pts[i+2][0]-this.mx, this.pts[i+2][1]-this.my,
+							this.pts[i+3][0]-this.mx, this.pts[i+3][1]-this.my);
+					}
+				};
+				ctx.stroke();
+			}
+			ctx.restore();
+		};
 	}
-	
-    dObj.draw = function(ctx) {
-        ctx.save();
-        ctx.translate(this.mx,this.my);
-        ctx.scale(this.xScale, this.yScale);
-        ctx.rotate(-this.rotation);
-
-        ctx.beginPath();
-        ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
-
-	ctx.strokeStyle = this.color;
-	if(this.type == 'graphite' || this.type == 'spray'){
-	    ctx.strokeStyle = this.pattern;
+	else if(brushMode == 'spray'){
+		dObj.draw = function(ctx) {
+		ctx.save();
+			ctx.translate(this.mx,this.my);
+			ctx.scale(this.xScale, this.yScale);
+			ctx.rotate(-this.rotation);
+			ctx.beginPath();
+			ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
+			ctx.lineWidth = this.width;
+			ctx.globalAlpha = this.opacity;
+			var w = dObj.width;
+			for(var i=1; i<this.pts.length; i++) {
+				//for(var j=0; j<5; j++){
+				ctx.drawImage(dObj.scanvas,this.pts[i][0]-this.mx-w/2, this.pts[i][1]-this.my-w/2);
+				//ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
+				//}
+			};
+			ctx.stroke();
+		ctx.restore();
+		}
 	}
-		
-        ctx.fillStyle = this.color;
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'round';
-        ctx.lineWidth = this.width;
-        ctx.globalAlpha = this.opacity;
-
-        if(this.pts.length == 1) {
-            ctx.fillStyle = this.color;
-            if(this.type == 'graphite' || this.type == 'spray') {
-                ctx.fillStyle = this.pattern;
-            }
-            ctx.lineWidth = 0;
-            ctx.arc(this.pts[0][0]-this.mx, this.pts[0][1]-this.my, this.width/2, 0, 2*Math.PI);
-            ctx.fill();
-        } else if(!this.bezier) {
-
-            // Draw the line without beziers
-            for(var i=1; i<this.pts.length; i++) {
-
-                ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
-            };
-            ctx.stroke();
-        } else {
-
-            // Draw the line with beziers
-            for(var i=0; i<this.pts.length; i+=3) {
-                if(this.pts.length <= i+4) {
-                    for(var j=i; j<this.pts.length; j++) {
-                        ctx.lineTo(this.pts[j][0]-this.mx,this.pts[j][1]-this.my);
-                    }
-                } else {
-                    ctx.bezierCurveTo(this.pts[i+1][0]-this.mx, this.pts[i+1][1]-this.my,
-                        this.pts[i+2][0]-this.mx, this.pts[i+2][1]-this.my,
-                        this.pts[i+3][0]-this.mx, this.pts[i+3][1]-this.my);
-                }
-            };
-            ctx.stroke();
-        }
-        ctx.restore();
-    };
     dObj.drawIcons = function(ctx) {
         var leftCorner = transformPoint(
             this.lCorner[0]-this.mx-32, this.lCorner[1]-this.my-32,
             this.mx, this.my,
             this.xScale, this.yScale,
-            this.rotation );
+            -this.rotation );
 
             var scaleIcon = document.getElementById('resize_icon');
             ctx.drawImage(scaleIcon, leftCorner[0]-32, leftCorner[1]-32);
@@ -794,7 +903,7 @@ function startLine(dObj) {
             this.rCorner[0]-this.mx+32, this.lCorner[1]-this.my-32,
             this.mx, this.my,
             this.xScale, this.yScale,
-            this.rotation );
+            -this.rotation );
 
             var rotateIcon = document.getElementById('rotate_icon');
             ctx.drawImage(rotateIcon, rightCorner[0]-32, rightCorner[1]-32);
@@ -805,7 +914,7 @@ function startLine(dObj) {
        var pt = transformPoint(x-this.mx, y-this.my,
            this.mx, this.my,
            1, 1,
-           -this.rotation);
+           this.rotation);
        if(this.xScale ==0 || this.yScale==0) {
             return false;
        } else {
@@ -862,23 +971,25 @@ function startLine(dObj) {
         this.rCorner[1]+=dy;
     };
     dObj.rotate = function(dr) {
-        this.rotation -= dr;
+        this.rotation += dr;
     };
     dObj.scale = function(dx, dy) {
-        this.xScale -= (dx/((this.rCorner[0]-this.lCorner[0])/2));
-        this.yScale -= (dy/((this.rCorner[1]-this.lCorner[1])/2));
+        if((this.rCorner[0] == this.lCorner[0])) { this.xScale -= dx/this.width; }
+        else { this.xScale -= (dx/((this.rCorner[0]-this.lCorner[0])/2)); }
+        if((this.rCorner[1] == this.lCorner[1])) { this.yScale -= dy/this.width; }
+        else { this.yScale -= (dy/((this.rCorner[1]-this.lCorner[1])/2)); }
     };
     dObj.iconClicked = function(x,y) {
         var leftCorner = transformPoint(
             this.lCorner[0]-this.mx-32, this.lCorner[1]-this.my-32,
             this.mx, this.my,
             this.xScale, this.yScale,
-            this.rotation );
+            -this.rotation );
         var rightCorner = transformPoint(
             this.rCorner[0]-this.mx+32, this.lCorner[1]-this.my-32,
             this.mx, this.my,
             this.xScale, this.yScale,
-            this.rotation );
+            -this.rotation );
         if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'scale'; }
         else if(distance([x,y],[rightCorner[0], rightCorner[1]]) < 32) { return 'rotate'; }
         else { return false; }
@@ -913,10 +1024,6 @@ function continueLine(x,y) {
     if(y > dObj.rCorner[1]) { dObj.rCorner[1] = y; }
     dObj.mx = (dObj.lCorner[0]+dObj.rCorner[0])/2;
     dObj.my = (dObj.lCorner[1]+dObj.rCorner[1])/2;
-
-	if (dObj.type == 'spray'){/////////////////////// testing spraycan
-		spraycanLine(dObj);
-	}
 
 }
 
