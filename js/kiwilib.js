@@ -258,8 +258,18 @@ function pointerDown(e) {
             if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
                 dragMode = objectList[selectedId].iconClicked(x, y);
                 isDragging = true;
-                xScaleOld = objectList[selectedId].xScale;
-                yScaleOld = objectList[selectedId].yScale;
+                if(dragMode == 'scale') {
+                    xScaleOld = objectList[selectedId].xScale;
+                    yScaleOld = objectList[selectedId].yScale;
+                    var mx = objectList[selectedId].midX();
+                    var my = objectList[selectedId].midY();
+                    var pt = transformPoint(x-mx,y-my,
+                        mx, my,
+                        1, 1,
+                        objectList[selectedId].rotation);
+                    xOld = pt[0]; yOld = pt[1];
+                    xFirst = pt[0]; yFirst = pt[1];
+                }
             } else {
                 selectedId = getObjectID(x, y);
                 if(selectedId != -1) {
@@ -349,7 +359,7 @@ function scale(id, x, y) {
         var ratio = (yFirst-obj.midY())/(xFirst-obj.midX());
         obj.xScale=xScaleOld;
         obj.yScale=yScaleOld;
-        if(Math.abs(x-xFirst) > Math.abs(y-yFirst)) {
+        if(Math.abs(x-xFirst) < Math.abs(y-yFirst)) {
             dx = x-xFirst;
             dy = (x-xFirst)*ratio;
         } else {
@@ -395,6 +405,14 @@ function pointerMove(e) {
                         rotate(selectedId, x, y);
                         break;
                     case 'scale':
+                        var mx = objectList[selectedId].midX();
+                        var my = objectList[selectedId].midY();
+                        var pt = transformPoint(x-mx,y-my,
+                            mx, my,
+                            1, 1,
+                            objectList[selectedId].rotation);
+                        x = pt[0]; y = pt[1];
+
                         if(shift == !e.shiftKey) {
                             shift = !shift;
                             if(!shift) {
@@ -456,11 +474,19 @@ function pointerEnd(e) {
                 break;
             case 'scale':
                 var obj = objectList[id];
+                var mx = obj.midX();
+                var my = obj.midY();
+                var pt = transformPoint(x-mx,y-my,
+                    mx, my,
+                    1, 1,
+                    obj.rotation);
+                x = pt[0]; y = pt[1];
+
                 var dx = x-xFirst;
                 var dy = y-yFirst;
                 if(shift) {
                     var ratio = (yFirst-obj.midY())/(xFirst-obj.midX());
-                    if(Math.abs(x-xFirst) > Math.abs(y-yFirst)) {
+                    if(Math.abs(x-xFirst) < Math.abs(y-yFirst)) {
                         dx = x-xFirst;
                         dy = (x-xFirst)*ratio;
                     } else {
