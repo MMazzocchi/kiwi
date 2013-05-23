@@ -12,6 +12,7 @@ var alpha = 1;          // Opacity of the object to be drawn
 var curColor = "#000000";
 var isDragging = false;
 var curStamp = '';
+var curZoom = 1;
 var scratch;
 
 var selectedId = -1;
@@ -95,9 +96,9 @@ function refreshCanvas() {
     }
 
     var ctx = canvas.getContext('2d');
-
 	var heightoffset = $("#toolbar").height();
 	var widthoffset = $("#toolbar").width();
+	
 	if (window.innerWidth < window.innerHeight) { // portrait
 		ctx.canvas.width  = window.innerWidth;
 		ctx.canvas.height = window.innerHeight - heightoffset;
@@ -115,31 +116,35 @@ function refreshCanvas() {
 
         switch(orientation) {
             case 0:
-                ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+                ctx.fillRect(0,0,window.innerWidth,window.innerHeight-heightoffset);
                 tx=0; ty=0; 
                 break;
             case -90:
                 tx=0; ty=-window.innerWidth;
                 ctx.translate(0,-window.innerWidth);
-                ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+                ctx.fillRect(0,0,window.innerHeight,window.innerWidth-widthoffset);
                 break;
             case 90:
                 tx=-window.innerHeight; ty=0;
                 ctx.translate(-window.innerHeight,0);
-                ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+                ctx.fillRect(0,0,window.innerHeight,window.innerWidth-widthoffset);
                 break;
             case 180:
                 tx=-window.innerWidth; ty=-window.innerHeight;
                 ctx.translate(-window.innerWidth,-window.innerHeight);
-                ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+                ctx.fillRect(0,0,window.innerWidth,window.innerHeight-heightoffset);
                 break;
         }
     } else {
         ctx.fillStyle="#FFFFFF";
-        ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+		if (window.innerWidth < window.innerHeight) // portrait
+        	ctx.fillRect(0,0,window.innerWidth,window.innerHeight-heightoffset);
+		else // landscape
+			ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
 	//ctx.restore();
     // For each id in layerList, call this function:
+	ctx.scale(curZoom, curZoom);
     $.each(layerList, function(i, id) {
         // Get the object for this layer
         var dObj = objectList[id];
@@ -947,7 +952,6 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
-
 	document.body.style.cursor="url(img/paintbrush.png) 0 28, default"; // sets the default cursor to the paintbrush
     //Ceate Color picker
     myCP = new ColorPicker();
@@ -964,7 +968,7 @@ $().ready( function() {
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
-
+	
     // Bind an action.
     $('#drawing_canvas').mousedown( pointerDown );
     $('#drawing_canvas').mousemove( pointerMove );
@@ -1120,6 +1124,12 @@ $().ready( function() {
 			  document.body.style.cursor="url(img/paintbucket.png), default";
 			  SelectTool('fill');
 			  break;
+			case 45: // '-' = Zoom-out
+				curZoom = curZoom*.5;
+				break;
+			case 61: // '=' = Zoom-in
+				curZoom = curZoom*2;
+				break;
 			case 115: // S=SELECT
 			  document.body.style.cursor="url(img/hand-tool.png)14 6, default";
 			  SelectTool('select');
