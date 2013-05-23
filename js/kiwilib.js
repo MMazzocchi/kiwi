@@ -233,99 +233,108 @@ function pointerDown(e) {
     var c = transformCoordinates(e);
 	var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
+	if (e.which == 3){
+		if (curTool == "zoom"){
+			curZoom = curZoom/1.5;
+		}
+	}
+	else{
+		switch(curTool) {			
+			case "draw":
+				isDragging = true;
+				var dObj = {
+					pts: [[x, y]],
+					lCorner: [x,y],
+					rCorner: [x,y],
+					mx: x, my: y,
+					width: thickness,
+					opacity: alpha,
+					color: curColor,
+					bezier: true,
+					type: brushMode,
+					xScale: 1,
+					yScale: 1,
+					rotation: 0
+				};
+				startLine(dObj);
+				break;	
 
-    switch(curTool) {			
-        case "draw":
-            isDragging = true;
-            var dObj = {
-                pts: [[x, y]],
-                lCorner: [x,y],
-                rCorner: [x,y],
-                mx: x, my: y,
-                width: thickness,
-                opacity: alpha,
-                color: curColor,
-                bezier: true,
-                type: brushMode,
-                xScale: 1,
-                yScale: 1,
-                rotation: 0
-            };
-            startLine(dObj);
-        break;	
+			case "select":
+				xOld = x;
+				yOld = y;
+				xFirst = x;
+				yFirst = y;
+				if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
+					dragMode = objectList[selectedId].iconClicked(x, y);
+					isDragging = true;
+					if(dragMode == 'scale') {
+						xScaleOld = objectList[selectedId].xScale;
+						yScaleOld = objectList[selectedId].yScale;
+						var mx = objectList[selectedId].midX();
+						var my = objectList[selectedId].midY();
+						var pt = transformPoint(x-mx,y-my,
+							mx, my,
+							1, 1,
+							objectList[selectedId].rotation);
+						xOld = pt[0]; yOld = pt[1];
+						xFirst = pt[0]; yFirst = pt[1];
+					}
+				} else {
+					selectedId = getObjectID(x, y);
+					if(selectedId != -1) {
+						isDragging = true;
+						dragMode = 'translate';
+					}
+				}
+				break;
 
-        case "select":
-            xOld = x;
-            yOld = y;
-            xFirst = x;
-            yFirst = y;
-            if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
-                dragMode = objectList[selectedId].iconClicked(x, y);
-                isDragging = true;
-                if(dragMode == 'scale') {
-                    xScaleOld = objectList[selectedId].xScale;
-                    yScaleOld = objectList[selectedId].yScale;
-                    var mx = objectList[selectedId].midX();
-                    var my = objectList[selectedId].midY();
-                    var pt = transformPoint(x-mx,y-my,
-                        mx, my,
-                        1, 1,
-                        objectList[selectedId].rotation);
-                    xOld = pt[0]; yOld = pt[1];
-                    xFirst = pt[0]; yFirst = pt[1];
-                }
-            } else {
-                selectedId = getObjectID(x, y);
-                if(selectedId != -1) {
-                    isDragging = true;
-                    dragMode = 'translate';
-                }
-            }
-            break;
+			case "erase":
+				isDragging = true;
+				var id = getObjectID(x,y);
+				if(id != -1) {
+					eraseObject(id);
+				}
+				break;
 
-        case "erase":
-            isDragging = true;
-            var id = getObjectID(x,y);
-            if(id != -1) {
-                eraseObject(id);
-            }
-            break;
+			case "fill":
+				var dObj = {
+					color: curColor,
+					pts: [x, y]
+				}
+				createFill(dObj);
+				break;
 
-		case "fill":
-			var dObj = {
-				color: curColor,
-				pts: [x, y]
-			}
-			createFill(dObj);
-			break;
-
-        case "stamp":
-			var dObj = {
-				url: svgList[ curStamp ].url,
-				cx: svgList[ curStamp ].cx,
-				cy: svgList[ curStamp ].cy,
-				opacity: alpha,
-				xScale: 1, 
-                yScale: 1,
-				bound: svgList[ curStamp ].bounds,
-				rotation: 0,
-				pts: [x, y],
-			};	
-			$.get(dObj.url, function(xmlData) {
-				//console.log("Got svg: " + dObj.url + " for " + curStamp);
-				dObj.svg = xmlData;
-				//console.log(dObj.svg);
-			});
-			createBMP(dObj);
-            createStamp(dObj);
-            break;
-		case "dropper":
-			isDragging = true;
-			var id = ctx.getImageData(x, y, 1, 1);
-			var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
-			myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
-			$( "#tintSlider" ).slider( "value", hsl[2]*100);
-			break;
+			case "stamp":
+				var dObj = {
+					url: svgList[ curStamp ].url,
+					cx: svgList[ curStamp ].cx,
+					cy: svgList[ curStamp ].cy,
+					opacity: alpha,
+					xScale: 1, 
+					yScale: 1,
+					bound: svgList[ curStamp ].bounds,
+					rotation: 0,
+					pts: [x, y],
+				};	
+				$.get(dObj.url, function(xmlData) {
+					//console.log("Got svg: " + dObj.url + " for " + curStamp);
+					dObj.svg = xmlData;
+					console.log(dObj.svg);
+				});
+				createBMP(dObj);
+				createStamp(dObj);
+				break;
+			case "dropper":
+				isDragging = true;
+				var id = ctx.getImageData(x, y, 1, 1);
+				var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
+				myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+				$( "#tintSlider" ).slider( "value", hsl[2]*100);
+				break;
+			case "zoom":
+				curZoom = curZoom*1.5;
+				break;
+		}
 	}
 }
 function createBMP(dObj){
@@ -443,6 +452,14 @@ function pointerEnd(e) {
     var c = transformCoordinates(e);
     var x = c[0]; var y = c[1];
 
+    if(curTool == 'draw') {
+        var obj = objectList[layerList[layerList.length-1]];
+        obj.lCorner[0] -= 32;
+        obj.lCorner[1] -= 32;
+        obj.rCorner[0] += 32;
+        obj.rCorner[1] += 32;
+    }
+
     if(isDragging && (curTool == 'select')) {
         //These seem like pointless variables, but if the're not defined, the  undo function will use global values
         var id = selectedId;
@@ -514,9 +531,7 @@ function pointerEnd(e) {
                 break;
         }
     }
-	if(curTool == "fill"){ // this is for the fill function
 	
-	}
     isDragging = false;
 }
 
@@ -791,7 +806,7 @@ function startLine(dObj) {
 	}
     dObj.drawIcons = function(ctx) {
         var leftCorner = transformPoint(
-            this.lCorner[0]-this.mx-32, this.lCorner[1]-this.my-32,
+            this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
             this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
@@ -800,7 +815,7 @@ function startLine(dObj) {
             ctx.drawImage(scaleIcon, leftCorner[0]-32, leftCorner[1]-32);
 
         var rightCorner = transformPoint(
-            this.rCorner[0]-this.mx+32, this.lCorner[1]-this.my-32,
+            this.rCorner[0]-this.mx, this.lCorner[1]-this.my,
             this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
@@ -881,12 +896,12 @@ function startLine(dObj) {
     };
     dObj.iconClicked = function(x,y) {
         var leftCorner = transformPoint(
-            this.lCorner[0]-this.mx-32, this.lCorner[1]-this.my-32,
+            this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
             this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
         var rightCorner = transformPoint(
-            this.rCorner[0]-this.mx+32, this.lCorner[1]-this.my-32,
+            this.rCorner[0]-this.mx, this.lCorner[1]-this.my,
             this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
@@ -968,12 +983,6 @@ function updateTint(slideAmount) {		// gets tint from slider and sets the light 
     myCP.updateColor();
 }
 
-function updateZoom(slideAmount) {		// gets tint from slider and sets the light setting in the color picker
-	curZoom = slideAmount/10.0;
-	
-    refreshCanvas();
-}
-
 function SelectTool(toolName) // selects proper tool based off of what user has clicked
 {
     switch (toolName) {
@@ -1020,11 +1029,20 @@ $().ready( function() {
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
 	
+
     // Bind an action.
-    $('#drawing_canvas').mousedown( pointerDown );
+	$('#drawing_canvas').contextmenu(function() {	// takes right-clicks
+		if (curTool == 'zoom'){
+			return false;
+		}
+	});
+
+    $('#drawing_canvas').mousedown( function(event){
+		pointerDown(event);
+    });
     $('#drawing_canvas').mousemove( pointerMove );
     $('#drawing_canvas').mouseup( pointerEnd );
-
+	
     canvas.addEventListener('touchmove', pointerMove );
     canvas.addEventListener('touchstart', pointerDown );
     canvas.addEventListener('touchend', pointerEnd );
@@ -1068,6 +1086,11 @@ $().ready( function() {
     $('#erase').click( function() {
 		document.body.style.cursor="url(img/eraser.png)0 28, default";
         SelectTool('erase');
+    });
+	
+	$('#zoom').click( function() {
+		document.body.style.cursor="url(img/search.png)8 6, default";
+        SelectTool('zoom');
     });
 	
 	$('#dropper').click( function() {
@@ -1147,20 +1170,6 @@ $().ready( function() {
         }
     });
 	
-	$( "#zoomSlider" ).slider({
-        orientation: "horizontal",
-        range: "min",
-        min: 1,
-        max: 40,
-        value: 10,
-        slide: function( event, ui ) {
-            updateZoom( ui.value );
-        },
-        change: function( event, ui ) {
-            updateZoom( ui.value );
-        }
-    });
-	
     $(document).keypress(function(e) {
         var key = e.which;
 
@@ -1189,16 +1198,6 @@ $().ready( function() {
 			  document.body.style.cursor="url(img/paintbucket.png), default";
 			  SelectTool('fill');
 			  break;
-/*			case 45: // '-' = Zoom-out
-				if (curZoom > 1){
-					curZoom = curZoom - 1;
-				}
-				SelectTool('zoom');
-				break;
-			case 61: // '=' = Zoom-in
-				curZoom = curZoom + 1;
-				SelectTool('zoom');
-				break; */
 			case 115: // S=SELECT
 			  document.body.style.cursor="url(img/hand-tool.png)14 6, default";
 			  SelectTool('select');
