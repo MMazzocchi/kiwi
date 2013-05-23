@@ -344,7 +344,6 @@ function rotate(id, x, y) {
 function scale(id, x, y) {
     var dx = x-xOld;
     var dy = y-yOld;
-    console.log(shift);
     if(shift) {
         var obj = objectList[id];
         var ratio = (yFirst-obj.midY())/(xFirst-obj.midX());
