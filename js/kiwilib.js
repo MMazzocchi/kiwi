@@ -720,8 +720,9 @@ function startLine(dObj) {
     dObj.draw = function(ctx) {
         ctx.save();
         ctx.translate(this.mx,this.my);
+//        ctx.scale(this.xScale, this.yScale);
+        ctx.rotate(this.rotation);
         ctx.scale(this.xScale, this.yScale);
-        ctx.rotate(-this.rotation);
 
         ctx.beginPath();
         ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
@@ -776,7 +777,7 @@ function startLine(dObj) {
             this.lCorner[0]-this.mx-32, this.lCorner[1]-this.my-32,
             this.mx, this.my,
             this.xScale, this.yScale,
-            this.rotation );
+            -this.rotation );
 
             var scaleIcon = document.getElementById('resize_icon');
             ctx.drawImage(scaleIcon, leftCorner[0]-32, leftCorner[1]-32);
@@ -785,7 +786,7 @@ function startLine(dObj) {
             this.rCorner[0]-this.mx+32, this.lCorner[1]-this.my-32,
             this.mx, this.my,
             this.xScale, this.yScale,
-            this.rotation );
+            -this.rotation );
 
             var rotateIcon = document.getElementById('rotate_icon');
             ctx.drawImage(rotateIcon, rightCorner[0]-32, rightCorner[1]-32);
@@ -796,7 +797,7 @@ function startLine(dObj) {
        var pt = transformPoint(x-this.mx, y-this.my,
            this.mx, this.my,
            1, 1,
-           -this.rotation);
+           this.rotation);
        if(this.xScale ==0 || this.yScale==0) {
             return false;
        } else {
@@ -853,23 +854,25 @@ function startLine(dObj) {
         this.rCorner[1]+=dy;
     };
     dObj.rotate = function(dr) {
-        this.rotation -= dr;
+        this.rotation += dr;
     };
     dObj.scale = function(dx, dy) {
-        this.xScale -= (dx/((this.rCorner[0]-this.lCorner[0])/2));
-        this.yScale -= (dy/((this.rCorner[1]-this.lCorner[1])/2));
+        if((this.rCorner[0] == this.lCorner[0])) { this.xScale -= dx/this.width; }
+        else { this.xScale -= (dx/((this.rCorner[0]-this.lCorner[0])/2)); }
+        if((this.rCorner[1] == this.lCorner[1])) { this.yScale -= dy/this.width; }
+        else { this.yScale -= (dy/((this.rCorner[1]-this.lCorner[1])/2)); }
     };
     dObj.iconClicked = function(x,y) {
         var leftCorner = transformPoint(
             this.lCorner[0]-this.mx-32, this.lCorner[1]-this.my-32,
             this.mx, this.my,
             this.xScale, this.yScale,
-            this.rotation );
+            -this.rotation );
         var rightCorner = transformPoint(
             this.rCorner[0]-this.mx+32, this.lCorner[1]-this.my-32,
             this.mx, this.my,
             this.xScale, this.yScale,
-            this.rotation );
+            -this.rotation );
         if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'scale'; }
         else if(distance([x,y],[rightCorner[0], rightCorner[1]]) < 32) { return 'rotate'; }
         else { return false; }
