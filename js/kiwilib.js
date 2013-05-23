@@ -244,21 +244,17 @@ function pointerDown(e) {
         break;	
 
         case "select":
+            xOld = x;
+            yOld = y;
+            xFirst = x;
+            yFirst = y;
             if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
                 dragMode = objectList[selectedId].iconClicked(x, y);
                 isDragging = true;
-                xOld = x;
-                yOld = y;
-                xFirst = x;
-                yFirst = y;
             } else {
                 selectedId = getObjectID(x, y);
                 if(selectedId != -1) {
                     isDragging = true;
-                    xOld = x;
-                    yOld = y;
-                    xFirst = x;
-                    yFirst = y;
                     dragMode = 'translate';
                 }
             }
@@ -336,6 +332,15 @@ function rotate(id, x, y) {
     yOld = y;
 }
 
+function scale(id, x, y) {
+    var dx = x-xOld;
+    var dy = y-yOld;
+    objectList[id].scale(dx,dy);
+    xOld = x;
+    yOld = y;
+
+}
+
 function pointerMove(e) {
     var c = transformCoordinates(e);
     var ctx = canvas.getContext('2d');
@@ -361,6 +366,7 @@ function pointerMove(e) {
                         rotate(selectedId, x, y);
                         break;
                     case 'scale':
+                        scale(selectedId, x, y);
                         break;
                 }
                 break;
@@ -408,6 +414,22 @@ function pointerEnd(e) {
                     },
                     redo: function() {
                         objectList[id].rotate(dTheta);
+                    }
+                };
+
+                addAction(newAct);
+                break;
+            case 'scale':
+                var obj = objectList[id];
+                var dx = x-xFirst;
+                var dy = y-yFirst;
+
+                var newAct = {
+                    undo: function() {
+                        objectList[id].scale(-dx, -dy);
+                    },
+                    redo: function() {
+                        objectList[id].scale(dx, dy);
                     }
                 };
 
@@ -525,8 +547,8 @@ function createStamp(dObj) {
         this.rotation += dr;
     }
     dObj.scale = function(dx, dy) {
-        this.xScale += (dx/(this.bounds[2]/2));
-        this.yScale += (dy/(this.bounds[3]/2));
+        this.xScale -= (dx/(this.bound[2]/2));
+        this.yScale -= (dy/(this.bound[3]/2));
     }
     dObj.iconClicked = function(x,y) {
         var leftCorner = transformPoint(
@@ -539,7 +561,7 @@ function createStamp(dObj) {
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
-        if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'resize'; }
+        if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'scale'; }
         else if(distance([x,y],[rightCorner[0], rightCorner[1]]) < 32) { return 'rotate'; }
         else { return false; }
     }
@@ -621,34 +643,39 @@ function startLine(dObj) {
 	}
 	
     dObj.draw = function(ctx) {
+        ctx.save();
+        ctx.translate(this.mx,this.my);
+        ctx.scale(this.xScale, this.yScale);
+        ctx.rotate(-this.rotation);
 
         ctx.beginPath();
-        ctx.moveTo(this.pts[0][0], this.pts[0][1]);
+        ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
 
 	ctx.strokeStyle = this.color;
 	if(this.type == 'graphite' || this.type == 'spray'){
 	    ctx.strokeStyle = this.pattern;
 	}
 		
-        var last = this.pts[0];
         ctx.fillStyle = this.color;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
         ctx.lineWidth = this.width;
         ctx.globalAlpha = this.opacity;
+
         if(this.pts.length == 1) {
             ctx.fillStyle = this.color;
-			if(this.type == 'graphite' || this.type == 'spray') {
-			    ctx.fillStyle = this.pattern;
-			}
+            if(this.type == 'graphite' || this.type == 'spray') {
+                ctx.fillStyle = this.pattern;
+            }
             ctx.lineWidth = 0;
-            ctx.arc(this.pts[0][0], this.pts[0][1], this.width/2, 0, 2*Math.PI);
+            ctx.arc(this.pts[0][0]-this.mx, this.pts[0][1]-this.my, this.width/2, 0, 2*Math.PI);
             ctx.fill();
         } else if(!this.bezier) {
 
             // Draw the line without beziers
             for(var i=1; i<this.pts.length; i++) {
-                ctx.lineTo(this.pts[i][0], this.pts[i][1]);
+
+                ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
             };
             ctx.stroke();
         } else {
@@ -657,17 +684,17 @@ function startLine(dObj) {
             for(var i=0; i<this.pts.length; i+=3) {
                 if(this.pts.length <= i+4) {
                     for(var j=i; j<this.pts.length; j++) {
-                        ctx.lineTo(this.pts[j][0],this.pts[j][1]);
+                        ctx.lineTo(this.pts[j][0]-this.mx,this.pts[j][1]-this.my);
                     }
                 } else {
-                    ctx.bezierCurveTo(this.pts[i+1][0], this.pts[i+1][1],
-                        this.pts[i+2][0], this.pts[i+2][1],
-                        this.pts[i+3][0], this.pts[i+3][1]);
+                    ctx.bezierCurveTo(this.pts[i+1][0]-this.mx, this.pts[i+1][1]-this.my,
+                        this.pts[i+2][0]-this.mx, this.pts[i+2][1]-this.my,
+                        this.pts[i+3][0]-this.mx, this.pts[i+3][1]-this.my);
                 }
             };
-        ctx.stroke();
+            ctx.stroke();
         }
-		ctx.restore();
+        ctx.restore();
     };
     dObj.drawIcons = function(ctx) {
         var leftCorner = transformPoint(
@@ -690,6 +717,21 @@ function startLine(dObj) {
 
     }
     dObj.select = function(x,y) {
+
+       var pt = transformPoint(x-this.mx, y-this.my,
+           this.mx, this.my,
+           1, 1,
+           -this.rotation);
+       if(this.xScale ==0 || this.yScale==0) {
+            return false;
+       } else {
+           pt = transformPoint(pt[0]-this.mx, pt[1]-this.my,
+               this.mx, this.my,
+               1/this.xScale, 1/this.yScale,
+               0);
+       }
+       x = pt[0]; y = pt[1];
+
 
        for(var i=0; i<this.pts.length-1; i++) {
 
@@ -736,23 +778,17 @@ function startLine(dObj) {
         this.rCorner[1]+=dy;
     };
     dObj.rotate = function(dr) {
-        for(var i=0; i<this.pts.length; i++) {
-            this.pts[i] = transformPoint(this.pts[i][0]-this.mx, this.pts[i][1]-this.my,
-                this.mx, this.my,
-                1, 1,
-                -dr );
-        }
         this.rotation -= dr;
     };
-    dObj.scale = function(dsx, dsy) {
-        for(var i=0; i<this.pts.length; i++) {
+    dObj.scale = function(dx, dy) {
+/*        for(var i=0; i<this.pts.length; i++) {
             this.pts[i] = transformPoint(this.pts[i][0]-this.mx, this.pts[i][1]-this.my,
                 this.mx, this.my,
                 1, 1,
                 0 );
         }
-        this.xScale += dsx;
-        this.yScale += dsy;
+*/        this.xScale -= (dx/((this.rCorner[0]-this.lCorner[0])/2));
+        this.yScale -= (dy/((this.rCorner[1]-this.lCorner[1])/2));
     };
     dObj.iconClicked = function(x,y) {
         var leftCorner = transformPoint(
@@ -765,7 +801,7 @@ function startLine(dObj) {
             this.mx, this.my,
             this.xScale, this.yScale,
             this.rotation );
-        if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'resize'; }
+        if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'scale'; }
         else if(distance([x,y],[rightCorner[0], rightCorner[1]]) < 32) { return 'rotate'; }
         else { return false; }
     }
