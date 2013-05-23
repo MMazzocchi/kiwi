@@ -113,23 +113,23 @@ function refreshCanvas() {
 
         switch(orientation) {
             case 0:
-                ctx.fillRect(0,0,window.innerWidth,window.innerHeight-heightoffset);
+                ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
                 tx=0; ty=0; 
                 break;
             case -90:
                 tx=0; ty=-window.innerWidth;
                 ctx.translate(0,-window.innerWidth);
-                ctx.fillRect(0,0,window.innerHeight,window.innerWidth-widthoffset);
+                ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
                 break;
             case 90:
                 tx=-window.innerHeight; ty=0;
                 ctx.translate(-window.innerHeight,0);
-                ctx.fillRect(0,0,window.innerHeight,window.innerWidth-widthoffset);
+                ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
                 break;
             case 180:
                 tx=-window.innerWidth; ty=-window.innerHeight;
                 ctx.translate(-window.innerWidth,-window.innerHeight);
-                ctx.fillRect(0,0,window.innerWidth,window.innerHeight-heightoffset);
+                ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
                 break;
         }
     } else {
