@@ -12,6 +12,7 @@ var alpha = 1;          // Opacity of the object to be drawn
 var curColor = "#000000";
 var isDragging = false;
 var curStamp = '';
+var curZoom = 1;
 var scratch;
 
 var selectedId = -1;
@@ -92,7 +93,6 @@ function refreshCanvas() {
     }
 
     var ctx = canvas.getContext('2d');
-
 	var heightoffset = $("#toolbar").height();
 	var widthoffset = $("#toolbar").width();
 	if (window.innerWidth < window.innerHeight) { // portrait
@@ -137,6 +137,7 @@ function refreshCanvas() {
     }
 	//ctx.restore();
     // For each id in layerList, call this function:
+	ctx.scale(curZoom, curZoom);
     $.each(layerList, function(i, id) {
         // Get the object for this layer
         var dObj = objectList[id];
@@ -875,7 +876,6 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
-
 	document.body.style.cursor="url(img/paintbrush.png) 0 28, default"; // sets the default cursor to the paintbrush
     //Ceate Color picker
     myCP = new ColorPicker();
@@ -892,7 +892,7 @@ $().ready( function() {
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
-
+	
     // Bind an action.
     $('#drawing_canvas').mousedown( pointerDown );
     $('#drawing_canvas').mousemove( pointerMove );
@@ -1048,6 +1048,12 @@ $().ready( function() {
 			  document.body.style.cursor="url(img/paintbucket.png), default";
 			  SelectTool('fill');
 			  break;
+			case 45: // '-' = Zoom-out
+				curZoom = curZoom*.5;
+				break;
+			case 61: // '=' = Zoom-in
+				curZoom = curZoom*2;
+				break;
 			case 115: // S=SELECT
 			  document.body.style.cursor="url(img/hand-tool.png)14 6, default";
 			  SelectTool('select');
