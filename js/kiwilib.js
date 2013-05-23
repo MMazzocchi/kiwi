@@ -95,6 +95,7 @@ function refreshCanvas() {
     var ctx = canvas.getContext('2d');
 	var heightoffset = $("#toolbar").height();
 	var widthoffset = $("#toolbar").width();
+	
 	if (window.innerWidth < window.innerHeight) { // portrait
 		ctx.canvas.width  = window.innerWidth;
 		ctx.canvas.height = window.innerHeight - heightoffset;
@@ -133,7 +134,10 @@ function refreshCanvas() {
         }
     } else {
         ctx.fillStyle="#FFFFFF";
-        ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+		if (window.innerWidth < window.innerHeight) // portrait
+        	ctx.fillRect(0,0,window.innerWidth,window.innerHeight-heightoffset);
+		else // landscape
+			ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
 	//ctx.restore();
     // For each id in layerList, call this function:
