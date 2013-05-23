@@ -418,6 +418,22 @@ function pointerEnd(e) {
 
                 addAction(newAct);
                 break;
+            case 'scale':
+                var obj = objectList[id];
+                var dx = x-xFirst;
+                var dy = y-yFirst;
+
+                var newAct = {
+                    undo: function() {
+                        objectList[id].scale(-dx, -dy);
+                    },
+                    redo: function() {
+                        objectList[id].scale(dx, dy);
+                    }
+                };
+
+                addAction(newAct);
+                break;
         }
     }
 	if(curTool == "fill"){ // this is for the fill function
@@ -701,6 +717,21 @@ function startLine(dObj) {
     }
     dObj.select = function(x,y) {
 
+       var pt = transformPoint(x-this.mx, y-this.my,
+           this.mx, this.my,
+           1, 1,
+           -this.rotation);
+       if(this.xScale ==0 || this.yScale==0) {
+            return false;
+       } else {
+           pt = transformPoint(pt[0]-this.mx, pt[1]-this.my,
+               this.mx, this.my,
+               1/this.xScale, 1/this.yScale,
+               0);
+       }
+       x = pt[0]; y = pt[1];
+
+
        for(var i=0; i<this.pts.length-1; i++) {
 
            //Check to see if we're within the left end cap of this segment
@@ -748,15 +779,15 @@ function startLine(dObj) {
     dObj.rotate = function(dr) {
         this.rotation -= dr;
     };
-    dObj.scale = function(dsx, dsy) {
-        for(var i=0; i<this.pts.length; i++) {
+    dObj.scale = function(dx, dy) {
+/*        for(var i=0; i<this.pts.length; i++) {
             this.pts[i] = transformPoint(this.pts[i][0]-this.mx, this.pts[i][1]-this.my,
                 this.mx, this.my,
                 1, 1,
                 0 );
         }
-        this.xScale += dsx;
-        this.yScale += dsy;
+*/        this.xScale -= (dx/((this.rCorner[0]-this.lCorner[0])/2));
+        this.yScale -= (dy/((this.rCorner[1]-this.lCorner[1])/2));
     };
     dObj.iconClicked = function(x,y) {
         var leftCorner = transformPoint(
@@ -769,7 +800,7 @@ function startLine(dObj) {
             this.mx, this.my,
             this.xScale, this.yScale,
             this.rotation );
-        if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'resize'; }
+        if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'scale'; }
         else if(distance([x,y],[rightCorner[0], rightCorner[1]]) < 32) { return 'rotate'; }
         else { return false; }
     }
