@@ -620,34 +620,38 @@ function startLine(dObj) {
 	}
 	
     dObj.draw = function(ctx) {
+        ctx.save();
+        ctx.translate(this.mx,this.my);
+        ctx.rotate(-this.rotation);
 
         ctx.beginPath();
-        ctx.moveTo(this.pts[0][0], this.pts[0][1]);
+        ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
 
 	ctx.strokeStyle = this.color;
 	if(this.type == 'graphite' || this.type == 'spray'){
 	    ctx.strokeStyle = this.pattern;
 	}
 		
-        var last = this.pts[0];
         ctx.fillStyle = this.color;
         ctx.lineJoin = 'round';
         ctx.lineCap = 'round';
         ctx.lineWidth = this.width;
         ctx.globalAlpha = this.opacity;
+
         if(this.pts.length == 1) {
             ctx.fillStyle = this.color;
-			if(this.type == 'graphite' || this.type == 'spray') {
-			    ctx.fillStyle = this.pattern;
-			}
+            if(this.type == 'graphite' || this.type == 'spray') {
+                ctx.fillStyle = this.pattern;
+            }
             ctx.lineWidth = 0;
-            ctx.arc(this.pts[0][0], this.pts[0][1], this.width/2, 0, 2*Math.PI);
+            ctx.arc(this.pts[0][0]-this.mx, this.pts[0][1]-this.my, this.width/2, 0, 2*Math.PI);
             ctx.fill();
         } else if(!this.bezier) {
 
             // Draw the line without beziers
             for(var i=1; i<this.pts.length; i++) {
-                ctx.lineTo(this.pts[i][0], this.pts[i][1]);
+
+                ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
             };
             ctx.stroke();
         } else {
@@ -656,17 +660,17 @@ function startLine(dObj) {
             for(var i=0; i<this.pts.length; i+=3) {
                 if(this.pts.length <= i+4) {
                     for(var j=i; j<this.pts.length; j++) {
-                        ctx.lineTo(this.pts[j][0],this.pts[j][1]);
+                        ctx.lineTo(this.pts[j][0]-this.mx,this.pts[j][1]-this.my);
                     }
                 } else {
-                    ctx.bezierCurveTo(this.pts[i+1][0], this.pts[i+1][1],
-                        this.pts[i+2][0], this.pts[i+2][1],
-                        this.pts[i+3][0], this.pts[i+3][1]);
+                    ctx.bezierCurveTo(this.pts[i+1][0]-this.mx, this.pts[i+1][1]-this.my,
+                        this.pts[i+2][0]-this.mx, this.pts[i+2][1]-this.my,
+                        this.pts[i+3][0]-this.mx, this.pts[i+3][1]-this.my);
                 }
             };
-        ctx.stroke();
+            ctx.stroke();
         }
-		ctx.restore();
+        ctx.restore();
     };
     dObj.drawIcons = function(ctx) {
         var leftCorner = transformPoint(
@@ -735,12 +739,6 @@ function startLine(dObj) {
         this.rCorner[1]+=dy;
     };
     dObj.rotate = function(dr) {
-        for(var i=0; i<this.pts.length; i++) {
-            this.pts[i] = transformPoint(this.pts[i][0]-this.mx, this.pts[i][1]-this.my,
-                this.mx, this.my,
-                1, 1,
-                -dr );
-        }
         this.rotation -= dr;
     };
     dObj.scale = function(dsx, dsy) {
