@@ -452,6 +452,14 @@ function pointerEnd(e) {
     var c = transformCoordinates(e);
     var x = c[0]; var y = c[1];
 
+    if(curTool == 'draw') {
+        var obj = objectList[layerList[layerList.length-1]];
+        obj.lCorner[0] -= 32;
+        obj.lCorner[1] -= 32;
+        obj.rCorner[0] += 32;
+        obj.rCorner[1] += 32;
+    }
+
     if(isDragging && (curTool == 'select')) {
         //These seem like pointless variables, but if the're not defined, the  undo function will use global values
         var id = selectedId;
@@ -794,7 +802,7 @@ function startLine(dObj) {
 	}
     dObj.drawIcons = function(ctx) {
         var leftCorner = transformPoint(
-            this.lCorner[0]-this.mx-32, this.lCorner[1]-this.my-32,
+            this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
             this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
@@ -803,7 +811,7 @@ function startLine(dObj) {
             ctx.drawImage(scaleIcon, leftCorner[0]-32, leftCorner[1]-32);
 
         var rightCorner = transformPoint(
-            this.rCorner[0]-this.mx+32, this.lCorner[1]-this.my-32,
+            this.rCorner[0]-this.mx, this.lCorner[1]-this.my,
             this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
@@ -884,12 +892,12 @@ function startLine(dObj) {
     };
     dObj.iconClicked = function(x,y) {
         var leftCorner = transformPoint(
-            this.lCorner[0]-this.mx-32, this.lCorner[1]-this.my-32,
+            this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
             this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
         var rightCorner = transformPoint(
-            this.rCorner[0]-this.mx+32, this.lCorner[1]-this.my-32,
+            this.rCorner[0]-this.mx, this.lCorner[1]-this.my,
             this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
