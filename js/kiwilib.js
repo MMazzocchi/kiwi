@@ -601,7 +601,7 @@ function spraycanLine(dObj){	/////////////////testing spraycan
 	var w = dObj.width;
 	var grd=dc.createRadialGradient(dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/8.0,dObj.pts[dObj.pts.length-1][0],dObj.pts[dObj.pts.length-1][1],w/2.0);
 	grd.addColorStop(0,dObj.color);
-	grd.addColorStop(1, "blue");
+	grd.addColorStop(1, "rgba(255,255,255,0)");
 //		dc.arc(w/2.0,w/2.0,w/2.0,0,2*Math.PI);
 //		dc.fillStyle = grd;
 //		dc.fill();
@@ -1037,18 +1037,23 @@ $().ready( function() {
 		
 		switch (key) {
 			case 100: // D=DRAW
+			  document.body.style.cursor="url(img/paintbrush.png)0 28, default";
 			  SelectTool('draw');
 			  break;
 			case 101: // E=ERASE
+			  document.body.style.cursor="url(img/eraser.png)0 28, default";
 			  SelectTool('erase');
 			  break;
 			case 102: // F=FILL
+			  document.body.style.cursor="url(img/paintbucket.png), default";
 			  SelectTool('fill');
 			  break;
 			case 115: // S=SELECT
+			  document.body.style.cursor="url(img/hand-tool.png)14 6, default";
 			  SelectTool('select');
 			  break;
 			case 103:  // G=dropper
+			  document.body.style.cursor="url(img/dropper.png)0 28, default";
 			  SelectTool('dropper');
 			  break;
 		}
