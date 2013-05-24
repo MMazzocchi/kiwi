@@ -16,7 +16,6 @@ var curZoom = 1;
 var mousex = 0;
 var mousey = 0;
 var scratch;
-
 var tx=0;
 var ty=0;
 var orientation = orienting() ? window.orientation : 0;
@@ -278,7 +277,6 @@ function pointerDown(e) {
                 $.get(dObj.url, function(xmlData) {
                     //console.log("Got svg: " + dObj.url + " for " + curStamp);
                     dObj.svg = xmlData;
-                    console.log(dObj.svg);
                 });
                 createBMP(dObj);
                 createStamp(dObj);
