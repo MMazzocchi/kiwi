@@ -486,6 +486,7 @@ $().ready( function() {
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
+	toolbar = document.getElementById('toolbar');
     
 
     // Bind an action.
@@ -500,10 +501,18 @@ $().ready( function() {
     });
     $('#drawing_canvas').mousemove( pointerMove );
     $('#drawing_canvas').mouseup( pointerEnd );
+	$('#toolbar').mousedown( function(event){
+        pointerDown(event);
+    });
+    $('#toolbar').mousemove( pointerMove );
+    $('#toolbar').mouseup( pointerEnd );
     
     canvas.addEventListener('touchmove', pointerMove );
     canvas.addEventListener('touchstart', pointerDown );
     canvas.addEventListener('touchend', pointerEnd );
+	toolbar.addEventListener('touchmove', pointerMove );
+    toolbar.addEventListener('touchstart', pointerDown );
+    toolbar.addEventListener('touchend', pointerEnd );
 
     // Bind the undo function to the undo button.
     $('#undo').click( undo );
