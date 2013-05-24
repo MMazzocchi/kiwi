@@ -506,11 +506,10 @@ $().ready( function() {
     canvas.addEventListener('touchstart', pointerDown );
     canvas.addEventListener('touchend', pointerEnd );
 	
-	toolbar.on('tap', tapHandler);
 
     // Bind the undo function to the undo button.
     $('#undo').click( undo );
-	$('#undo').tapHandler( undo );
+	$('#undo').on('tap', undo);
 
     // Bind the redo function to the redo button.
     $('#redo').click( redo );
