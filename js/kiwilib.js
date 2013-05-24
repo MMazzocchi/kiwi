@@ -651,6 +651,10 @@ $().ready( function() {
         }
         
         switch (key) {
+			case 97:  // A = AIRBRUSH
+			  document.body.style.cursor="url(img/spraycan.png)0 5, default";
+			  SelectTool('spraycan');
+              break;
             case 100: // D=DRAW
               document.body.style.cursor="url(img/paintbrush.png)0 28, default";
               SelectTool('draw');
@@ -663,11 +667,15 @@ $().ready( function() {
               document.body.style.cursor="url(img/paintbucket.png), default";
               SelectTool('fill');
               break;
+			case 112: // P=PENCIL
+              document.body.style.cursor="url(img/pencil.png)0 28, default";
+			  SelectTool('pencil');
+              break;
             case 115: // S=SELECT
               document.body.style.cursor="url(img/hand-tool.png)14 6, default";
               SelectTool('select');
               break;
-            case 103:  // G=dropper
+            case 103:  // G=DROPPER
               document.body.style.cursor="url(img/dropper.png)0 28, default";
               SelectTool('dropper');
               break;
