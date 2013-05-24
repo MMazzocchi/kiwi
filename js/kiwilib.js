@@ -16,7 +16,6 @@ var curZoom = 1;
 var mousex = 0;
 var mousey = 0;
 var scratch;
-
 var tx=0;
 var ty=0;
 var orientation = orienting() ? window.orientation : 0;
