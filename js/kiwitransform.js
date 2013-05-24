@@ -126,6 +126,7 @@ function endTransform(id, x, y, dragMode) {
             };
 
             addAction(newAct);
+            break;
 
         case 'scale':
             var obj = objectList[id];
