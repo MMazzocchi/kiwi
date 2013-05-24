@@ -7,12 +7,14 @@ var idPtr = 0;            // This is the next available id.
 var actionPtr = 0;        // This is the action stack pointer; anything below this is real, and anything above it has been undo'd.
 var curTool = "draw";   // This is the current tool selected by the user
 var brushMode = 'simple';
-var thickness = 10;     // Thickness of the line to be drawn
+var thickness = 25;     // Thickness of the line to be drawn
 var alpha = 1;          // Opacity of the object to be drawn
 var curColor = "#000000";
 var isDragging = false;
 var curStamp = '';
 var curZoom = 1;
+var mousex = 0;
+var mousey = 0;
 var scratch;
 
 var tx=0;
@@ -112,8 +114,10 @@ function refreshCanvas() {
             ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
     //ctx.restore();
-    // Redraw every object at the current zoom 
+    // Redraw every object at the current zoom
+	ctx.translate(mousex, mousey);
     ctx.scale(curZoom, curZoom);
+	ctx.translate(-mousex, -mousey);
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
         // Get the object for this layer
@@ -287,6 +291,8 @@ function pointerDown(e) {
                 break;
             case "zoom":
                 curZoom = curZoom*1.5;
+				mousex = e.clientX;
+				mousey = e.clientY;
                 break;
         }
     }
@@ -479,6 +485,7 @@ $().ready( function() {
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
+	toolbar = document.getElementById('toolbar');
     
 
     // Bind an action.
@@ -497,9 +504,11 @@ $().ready( function() {
     canvas.addEventListener('touchmove', pointerMove );
     canvas.addEventListener('touchstart', pointerDown );
     canvas.addEventListener('touchend', pointerEnd );
+	
 
     // Bind the undo function to the undo button.
     $('#undo').click( undo );
+	$('#undo').on('tap', undo);
 
     // Bind the redo function to the redo button.
     $('#redo').click( redo );
@@ -526,6 +535,10 @@ $().ready( function() {
     });
 
     $('#pencil').click( function() {
+        document.body.style.cursor="url(img/pencil.png)0 28, default";
+        SelectTool('pencil');
+    });
+	$('#pencil').on('tap', function() {
         document.body.style.cursor="url(img/pencil.png)0 28, default";
         SelectTool('pencil');
     });
@@ -612,7 +625,7 @@ $().ready( function() {
         range: "min",
         min: 4,
         max: 80,
-        value: 10,
+        value: 25,
         slide: function( event, ui ) {
             updateThick( ui.value );
         },
