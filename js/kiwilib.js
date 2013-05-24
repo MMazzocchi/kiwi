@@ -15,16 +15,6 @@ var curStamp = '';
 var curZoom = 1;
 var scratch;
 
-var selectedId = -1;
-var xOld;
-var yOld;
-var xFirst;
-var yFirst;
-var dragMode = '';
-var shift = false;
-var xScaleOld;
-var yScaleOld;
-
 var tx=0;
 var ty=0;
 var orientation = orienting() ? window.orientation : 0;
@@ -244,16 +234,7 @@ function pointerDown(e) {
                     dragMode = objectList[selectedId].iconClicked(x, y);
                     isDragging = true;
                     if(dragMode == 'scale') {
-                        xScaleOld = objectList[selectedId].xScale;
-                        yScaleOld = objectList[selectedId].yScale;
-                        var mx = objectList[selectedId].midX();
-                        var my = objectList[selectedId].midY();
-                        var pt = transformPoint(x-mx,y-my,
-                            mx, my,
-                            1, 1,
-                            objectList[selectedId].rotation);
-                        xOld = pt[0]; yOld = pt[1];
-                        xFirst = pt[0]; yFirst = pt[1];
+                        beginScale(selectedId, x, y);
                     }
                 } else {
                     selectedId = getObjectID(x, y);
@@ -267,9 +248,7 @@ function pointerDown(e) {
             case "erase":
                 isDragging = true;
                 var id = getObjectID(x,y);
-                if(id != -1) {
-                    eraseObject(id);
-                }
+                if(id != -1) { eraseObject(id); }
                 break;
 
             case "fill":
@@ -314,52 +293,6 @@ function pointerDown(e) {
     }
 }
 
-function translate(id, x, y) {
-    var dx = x-xOld;
-    var dy = y-yOld;
-    objectList[id].move(dx,dy);
-    xOld = x;
-    yOld = y;
-}
-
-function rotate(id, x, y) {
-    var obj = objectList[id];
-    var theta = Math.atan2(y-obj.midY(), x-obj.midX());
-    var pTheta = Math.atan2(yOld-obj.midY(), xOld-obj.midX());
-    obj.rotate(theta-pTheta);
-    xOld = x;
-    yOld = y;
-}
-
-function scale(id, x, y) {
-    var dx = x-xOld;
-    var dy = y-yOld;
-    if(shift) {
-        var obj = objectList[id];
-        var ratio = (yFirst-obj.midY())/(xFirst-obj.midX());
-        obj.xScale=xScaleOld;
-        obj.yScale=yScaleOld;
-        if(Math.abs(x-xFirst) < Math.abs(y-yFirst)) {
-            dx = x-xFirst;
-            dy = (x-xFirst)*ratio;
-        } else {
-            dx = (y-yFirst)/ratio;
-            dy = (y-yFirst);
-        }
-    }
-    objectList[id].scale(dx,dy);
-    xOld = x;
-    yOld = y;
-
-}
-
-function resetScale(id, x, y) {
-    var obj = objectList[id];
-    obj.xScale = 0;
-    obj.yScale = 0;
-    obj.scale(x-obj.midX(), y-obj.midY());
-}
-
 function pointerMove(e) {
     var c = transformCoordinates(e);
     var ctx = canvas.getContext('2d');
@@ -380,31 +313,7 @@ function pointerMove(e) {
                 }
                 break;
             case "select":
-                switch(dragMode) {
-                    case 'translate':
-                        translate(selectedId, x, y);
-                        break;
-                    case 'rotate':
-                        rotate(selectedId, x, y);
-                        break;
-                    case 'scale':
-                        var mx = objectList[selectedId].midX();
-                        var my = objectList[selectedId].midY();
-                        var pt = transformPoint(x-mx,y-my,
-                            mx, my,
-                            1, 1,
-                            objectList[selectedId].rotation);
-                        x = pt[0]; y = pt[1];
-
-                        if(shift == !e.shiftKey) {
-                            shift = !shift;
-                            if(!shift) {
-                                resetScale(selectedId, x, y);
-                            }
-                        }
-                        scale(selectedId, x, y);
-                        break;
-                }
+                applyTransform(selectedId, x, y, dragMode, e);
                 break;
             case "dropper":
                 var id = ctx.getImageData(x, y, 1, 1);
@@ -429,75 +338,7 @@ function pointerEnd(e) {
     }
 
     if(isDragging && (curTool == 'select')) {
-        //These seem like pointless variables, but if the're not defined, the  undo function will use global values
-        var id = selectedId;
-
-        switch(dragMode) {
-            case 'translate':
-                var dx = x-xFirst;
-                var dy = y-yFirst;
-
-                var newAct = {
-                    undo: function() {
-                        objectList[id].move(-dx, -dy);
-                    },
-                    redo: function() {
-                        objectList[id].move(dx, dy);
-                    }
-                };
-
-                addAction(newAct);
-                break;
-            case 'rotate':
-                var obj = objectList[id];
-                var dTheta  = Math.atan2(y-obj.midY(), x-obj.midX()) - Math.atan2(yFirst-obj.midY(), xFirst-obj.midX());
-
-                var newAct = {
-                    undo: function() {
-                        objectList[id].rotate(-dTheta);
-                    },
-                    redo: function() {
-                        objectList[id].rotate(dTheta);
-                    }
-                };
-
-                addAction(newAct);
-                break;
-            case 'scale':
-                var obj = objectList[id];
-                var mx = obj.midX();
-                var my = obj.midY();
-                var pt = transformPoint(x-mx,y-my,
-                    mx, my,
-                    1, 1,
-                    obj.rotation);
-                x = pt[0]; y = pt[1];
-
-                var dx = x-xFirst;
-                var dy = y-yFirst;
-                if(shift) {
-                    var ratio = (yFirst-obj.midY())/(xFirst-obj.midX());
-                    if(Math.abs(x-xFirst) < Math.abs(y-yFirst)) {
-                        dx = x-xFirst;
-                        dy = (x-xFirst)*ratio;
-                    } else {
-                        dx = (y-yFirst)/ratio;
-                        dy = (y-yFirst);
-                    }
-                }
-
-                var newAct = {
-                    undo: function() {
-                        objectList[id].scale(-dx, -dy);
-                    },
-                    redo: function() {
-                        objectList[id].scale(dx, dy);
-                    }
-                };
-
-                addAction(newAct);
-                break;
-        }
+        endTransform(selectedId, x, y, dragMode);
     }
     
     isDragging = false;
@@ -551,272 +392,6 @@ function transformPoint(x,y,dx,dy,sx,sy,theta) {
 function distance(p1, p2) {
     return Math.sqrt(((p1[0]-p2[0])*(p1[0]-p2[0]))+
                      ((p1[1]-p2[1])*(p1[1]-p2[1])));
-}
-
-function createPencilTex(dObj){
-    
-    var patW = dObj.width;
-    var texcanvas = document.createElement('canvas');
-    texcanvas.width = patW;
-    texcanvas.height = patW;
-    var dc = texcanvas.getContext('2d');
-    dc.globalAlpha = .33;
-    dc.fillStyle = dObj.color;
-    var nbrDots = patW*patW;
-    if(dObj.type == 'graphite'){
-        for (var i = 0; i < nbrDots; ++i) {
-            var px = Math.floor(Math.random()*patW);         
-            var py = Math.floor(Math.random()*patW);
-            dc.fillRect(px,py,1,1);
-        }
-        dObj.pattern =  dc.createPattern(texcanvas, "repeat");
-    }
-    dc.globalAlpha = 1;
-
-}
-function createSpraytex(dObj){
-    var scanvas = document.createElement('canvas');
-    scanvas.height = scanvas.width = dObj.width;
-    var ctx = scanvas.getContext('2d');
-    var w = dObj.width;
-    var grd=ctx.createRadialGradient(w/2,w/2,0,w/2,w/2,w/2);
-    grd.addColorStop(0,dObj.color);
-    grd.addColorStop(1, "rgba(255,0,0,0)");
-    //dObj.grd = grd;
-    ctx.fillStyle = grd;
-    var w = dObj.width;
-    ctx.fillRect(0,0,w,w);
-    dObj.scanvas = scanvas;
-}
-
-
-function startLine(dObj) {
-    assignID(dObj);
-    if(dObj.type == 'spray'){
-        createSpraytex(dObj);
-    }
-    // create brush pattern
-    if(dObj.type == 'graphite'){
-        createPencilTex(dObj);
-    }
-
-    if(brushMode == 'simple' || brushMode == 'graphite'){
-        dObj.draw = function(ctx) {
-            ctx.save();
-            ctx.translate(this.mx,this.my);
-            ctx.scale(this.xScale, this.yScale);
-            ctx.rotate(-this.rotation);
-            ctx.beginPath();
-            ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
-            ctx.strokeStyle = this.color;
-            if(this.type == 'graphite'){
-                ctx.strokeStyle = this.pattern;
-            }
-                
-            ctx.fillStyle = this.color;
-            ctx.lineJoin = 'round';
-            ctx.lineCap = 'round';
-            ctx.lineWidth = this.width;
-            ctx.globalAlpha = this.opacity;
-
-            if(this.pts.length == 1) {
-                ctx.fillStyle = this.color;
-                if(this.type == 'graphite') {
-                    ctx.fillStyle = this.pattern;
-                }
-                ctx.lineWidth = 0;
-                ctx.arc(this.pts[0][0]-this.mx, this.pts[0][1]-this.my, this.width/2, 0, 2*Math.PI);
-                ctx.fill();
-            } else if(!this.bezier) {
-
-                // Draw the line without beziers
-                for(var i=1; i<this.pts.length; i++) {
-
-                    ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
-                };
-                ctx.stroke();
-            } else {
-
-                // Draw the line with beziers
-                for(var i=0; i<this.pts.length; i+=3) {
-                    if(this.pts.length <= i+4) {
-                        for(var j=i; j<this.pts.length; j++) {
-                            ctx.lineTo(this.pts[j][0]-this.mx,this.pts[j][1]-this.my);
-                        }
-                    } else {
-                        ctx.bezierCurveTo(this.pts[i+1][0]-this.mx, this.pts[i+1][1]-this.my,
-                            this.pts[i+2][0]-this.mx, this.pts[i+2][1]-this.my,
-                            this.pts[i+3][0]-this.mx, this.pts[i+3][1]-this.my);
-                    }
-                };
-                ctx.stroke();
-            }
-            ctx.restore();
-        };
-    }
-    else if(brushMode == 'spray'){
-        dObj.draw = function(ctx) {
-        ctx.save();
-            ctx.translate(this.mx,this.my);
-            ctx.scale(this.xScale, this.yScale);
-            ctx.rotate(-this.rotation);
-            ctx.beginPath();
-            ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
-            ctx.lineWidth = this.width;
-            ctx.globalAlpha = this.opacity;
-            var w = dObj.width;
-            
-            for(var i=1; i<this.pts.length; i++) {
-                var d = distance(this.pts[i-1],this.pts[i]);
-                var space =20;
-                var s = Math.ceil(d/space);
-                var v = [this.pts[i-1][0]-this.pts[i][0],this.pts[i-1][1]-this.pts[i][1]];
-                //console.log(d);
-                for(var j=0; j<s; j++){
-                    ctx.drawImage(dObj.scanvas,(j*1/s*v[0]+this.pts[i][0])-this.mx-w/2, (j*1/s*v[1]+this.pts[i][1])-this.my-w/2);
-                    //ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
-                }
-            };
-            ctx.stroke();
-        ctx.restore();
-        }
-    }
-    dObj.drawIcons = function(ctx) {
-        var leftCorner = transformPoint(
-            this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
-            this.mx, this.my,
-            this.xScale, this.yScale,
-            -this.rotation );
-
-            var scaleIcon = document.getElementById('resize_icon');
-            ctx.drawImage(scaleIcon, leftCorner[0]-32, leftCorner[1]-32);
-
-        var rightCorner = transformPoint(
-            this.rCorner[0]-this.mx, this.lCorner[1]-this.my,
-            this.mx, this.my,
-            this.xScale, this.yScale,
-            -this.rotation );
-
-            var rotateIcon = document.getElementById('rotate_icon');
-            ctx.drawImage(rotateIcon, rightCorner[0]-32, rightCorner[1]-32);
-
-    }
-    dObj.select = function(x,y) {
-
-       var pt = transformPoint(x-this.mx, y-this.my,
-           this.mx, this.my,
-           1, 1,
-           this.rotation);
-       if(this.xScale ==0 || this.yScale==0) {
-            return false;
-       } else {
-           pt = transformPoint(pt[0]-this.mx, pt[1]-this.my,
-               this.mx, this.my,
-               1/this.xScale, 1/this.yScale,
-               0);
-       }
-       x = pt[0]; y = pt[1];
-
-
-       for(var i=0; i<this.pts.length-1; i++) {
-
-           //Check to see if we're within the left end cap of this segment
-           if(distance([x,y],this.pts[i]) < (this.width/2)) {
-               return true;
-           } else {
-
-                //Create the first vector between pts[0] and pts[1].
-                var v1 = [this.pts[i][0]-this.pts[i+1][0],
-                          this.pts[i][1]-this.pts[i+1][1]];
-                //Create the second vector between pts[0] and (x,y).
-                var v2 = [this.pts[i][0]-x,
-                          this.pts[i][1]-y];
-                //Calculate the z-magnitude of the resulting cross product
-                //(The x and y magnitudes will always be zero)
-                var z = Math.abs(v1[0]*v2[1]-v2[0]*v1[1]);
-
-                //Now take the dot product
-                var d = (v1[0]*v2[0]) + (v1[1]+v2[1]);
-
-                var dist = distance(this.pts[i], this.pts[i+1]);
-
-                //Now MATH
-                if(((z/dist) < (this.width/2))  && (d >= 0) && (d <= (dist*dist))) {
-                    return true;
-                }
-            }
-        }
-        //Finally, check the right end cap of the entire line
-        return (distance([x,y],this.pts[this.pts.length-1]) < (this.width/2));
-    };
-    dObj.move = function(dx,dy) {
-        for(var i=0; i<this.pts.length; i++) {
-            this.pts[i][0]+=dx;
-            this.pts[i][1]+=dy;
-        }
-        this.mx+=dx;
-        this.my+=dy;
-
-        this.lCorner[0]+=dx;
-        this.rCorner[0]+=dx;
-        this.lCorner[1]+=dy;
-        this.rCorner[1]+=dy;
-    };
-    dObj.rotate = function(dr) {
-        this.rotation += dr;
-    };
-    dObj.scale = function(dx, dy) {
-        if((this.rCorner[0] == this.lCorner[0])) { this.xScale -= dx/this.width; }
-        else { this.xScale -= (dx/((this.rCorner[0]-this.lCorner[0])/2)); }
-        if((this.rCorner[1] == this.lCorner[1])) { this.yScale -= dy/this.width; }
-        else { this.yScale -= (dy/((this.rCorner[1]-this.lCorner[1])/2)); }
-    };
-    dObj.iconClicked = function(x,y) {
-        var leftCorner = transformPoint(
-            this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
-            this.mx, this.my,
-            this.xScale, this.yScale,
-            -this.rotation );
-        var rightCorner = transformPoint(
-            this.rCorner[0]-this.mx, this.lCorner[1]-this.my,
-            this.mx, this.my,
-            this.xScale, this.yScale,
-            -this.rotation );
-        if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'scale'; }
-        else if(distance([x,y],[rightCorner[0], rightCorner[1]]) < 32) { return 'rotate'; }
-        else { return false; }
-    }
-    dObj.midX = function() { return this.mx; }
-    dObj.midY = function() { return this.my; }
-
-    var newAct = {
-        undo: function() {
-            // Take the top layer off of layerList. The object still exists in the objects hash, but
-            // doesn't get drawn because ONLY the objects in layerList get drawn.
-            layerList.splice(layerList.length-1,1);
-        },
-        redo: function() {
-            // Put this object back in layerList.
-            layerList[layerList.length] = dObj.id;
-        }
-    };
-
-    // Add the new action and redraw.
-    addAction(newAct);
-}
-
-
-function continueLine(x,y) {
-    var dObj = objectList[layerList[layerList.length-1]];
-    dObj.pts.push([x, y]);
-
-    if(x < dObj.lCorner[0]) { dObj.lCorner[0] = x; }
-    if(x > dObj.rCorner[0]) { dObj.rCorner[0] = x; }
-    if(y < dObj.lCorner[1]) { dObj.lCorner[1] = y; }
-    if(y > dObj.rCorner[1]) { dObj.rCorner[1] = y; }
-    dObj.mx = (dObj.lCorner[0]+dObj.rCorner[0])/2;
-    dObj.my = (dObj.lCorner[1]+dObj.rCorner[1])/2;
-
 }
 
 // Undos an action.
