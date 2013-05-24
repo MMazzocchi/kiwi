@@ -529,10 +529,6 @@ $().ready( function() {
         document.body.style.cursor="url(img/spraycan.png)0 5, default";
         SelectTool('spraycan');
     });
-	$('#undo').on('tap', function() {
-        document.body.style.cursor="url(img/spraycan.png)0 5, default";
-        SelectTool('spraycan');
-    });
 
     $('#hand').click( function() {
         document.body.style.cursor="url(img/hand-tool.png)14 6, default";
@@ -540,6 +536,10 @@ $().ready( function() {
     });
 
     $('#pencil').click( function() {
+        document.body.style.cursor="url(img/pencil.png)0 28, default";
+        SelectTool('pencil');
+    });
+	$('#pencil').on('tap', function() {
         document.body.style.cursor="url(img/pencil.png)0 28, default";
         SelectTool('pencil');
     });
