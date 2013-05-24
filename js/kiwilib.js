@@ -513,7 +513,6 @@ $().ready( function() {
 
     // Bind the redo function to the redo button.
     $('#redo').click( redo );
-	$('#redo').tapHandler( redo );
     
     //.attr etc is to address a firefox bug that caches the disabled state of the redo button
     // http://stackoverflow.com/questions/2719044/jquery-ui-button-gets-disabled-on-refresh
@@ -527,6 +526,10 @@ $().ready( function() {
     });
 
     $('#spraycan').click( function() {
+        document.body.style.cursor="url(img/spraycan.png)0 5, default";
+        SelectTool('spraycan');
+    });
+	$('#undo').on('tap', function() {
         document.body.style.cursor="url(img/spraycan.png)0 5, default";
         SelectTool('spraycan');
     });
