@@ -13,6 +13,8 @@ var curColor = "#000000";
 var isDragging = false;
 var curStamp = '';
 var curZoom = 1;
+var mousex = 0;
+var mousey = 0;
 var scratch;
 
 var tx=0;
@@ -112,8 +114,10 @@ function refreshCanvas() {
             ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
     //ctx.restore();
-    // Redraw every object at the current zoom 
+    // Redraw every object at the current zoom
+	ctx.translate(mousex, mousey);
     ctx.scale(curZoom, curZoom);
+	ctx.translate(-mousex, -mousey);
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
         // Get the object for this layer
@@ -288,6 +292,8 @@ function pointerDown(e) {
                 break;
             case "zoom":
                 curZoom = curZoom*1.5;
+				mousex = e.clientX;
+				mousey = e.clientY;
                 break;
         }
     }
