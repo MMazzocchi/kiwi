@@ -501,24 +501,20 @@ $().ready( function() {
     });
     $('#drawing_canvas').mousemove( pointerMove );
     $('#drawing_canvas').mouseup( pointerEnd );
-	$('#toolbar').mousedown( function(event){
-        pointerDown(event);
-    });
-    $('#toolbar').mousemove( pointerMove );
-    $('#toolbar').mouseup( pointerEnd );
     
     canvas.addEventListener('touchmove', pointerMove );
     canvas.addEventListener('touchstart', pointerDown );
     canvas.addEventListener('touchend', pointerEnd );
-	toolbar.addEventListener('touchmove', pointerMove );
-    toolbar.addEventListener('touchstart', pointerDown );
-    toolbar.addEventListener('touchend', pointerEnd );
+	
+	toolbar.on('tap', tapHandler);
 
     // Bind the undo function to the undo button.
     $('#undo').click( undo );
+	$('#undo').tapHandler( undo );
 
     // Bind the redo function to the redo button.
     $('#redo').click( redo );
+	$('#redo').tapHandler( redo );
     
     //.attr etc is to address a firefox bug that caches the disabled state of the redo button
     // http://stackoverflow.com/questions/2719044/jquery-ui-button-gets-disabled-on-refresh
