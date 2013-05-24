@@ -78,11 +78,16 @@ function createBrush(dObj, brushMode) {
             ctx.moveTo(this.mx, this.pts[0][1]-this.my);
             ctx.lineWidth = this.width;
             ctx.globalAlpha = this.opacity;
+			//ctx.globalCompositeOperation = 'source-out';
             var w = dObj.width;
 
             for(var i=1; i<this.pts.length; i++) {
+			
+			//drawSoftLine(ctx, this.pts[i-1][0]-this.mx,  this.pts[i-1][1]-this.my, this.pts[i][0]-this.mx, this.pts[i][1]-this.my,  dObj.width,  255, 0,   0,   1);
+			//ctx.drawImage(dObj.scanvas,this.pts[i][0]-w/2-this.mx, this.pts[i][1]-w/2-this.my);
+			
                 var d = distance(this.pts[i-1],this.pts[i]);
-                var space =20;
+                var space =dObj.width/4;
                 var s = Math.ceil(d/space);
                 var v = [this.pts[i-1][0]-this.pts[i][0],this.pts[i-1][1]-this.pts[i][1]];
                 //console.log(d);
@@ -90,6 +95,7 @@ function createBrush(dObj, brushMode) {
                     ctx.drawImage(dObj.scanvas,(j*1/s*v[0]+this.pts[i][0])-this.mx-w/2, (j*1/s*v[1]+this.pts[i][1])-this.my-w/2);
                     //ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
                 }
+				
             };
             ctx.stroke();
         ctx.restore();

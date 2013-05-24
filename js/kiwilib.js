@@ -274,7 +274,6 @@ function pointerDown(e) {
                 $.get(dObj.url, function(xmlData) {
                     //console.log("Got svg: " + dObj.url + " for " + curStamp);
                     dObj.svg = xmlData;
-                    console.log(dObj.svg);
                 });
                 createBMP(dObj);
                 createStamp(dObj);
