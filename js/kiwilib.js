@@ -7,7 +7,7 @@ var idPtr = 0;            // This is the next available id.
 var actionPtr = 0;        // This is the action stack pointer; anything below this is real, and anything above it has been undo'd.
 var curTool = "draw";   // This is the current tool selected by the user
 var brushMode = 'simple';
-var thickness = 10;     // Thickness of the line to be drawn
+var thickness = 25;     // Thickness of the line to be drawn
 var alpha = 1;          // Opacity of the object to be drawn
 var curColor = "#000000";
 var isDragging = false;
@@ -613,7 +613,7 @@ $().ready( function() {
         range: "min",
         min: 4,
         max: 80,
-        value: 10,
+        value: 25,
         slide: function( event, ui ) {
             updateThick( ui.value );
         },
