@@ -256,9 +256,10 @@ function pointerDown(e) {
 
             case "fill":
                 var dObj = {
-                    color: curColor,
-                    pts: [x, y]
-                }
+                    color: hslToRgb(myCP.curH, myCP.curS/100, myCP.curL/100),
+                    opacity: alpha,
+                    pts: [[x, y]]
+                };
                 createFill(dObj);
                 break;
 
@@ -346,38 +347,6 @@ function pointerEnd(e) {
     }
     
     isDragging = false;
-}
-
-function createFill(dObj){
-    assignID(dObj);
-    
-    dObj.draw = function(ctx) {
-        ctx.save();
-            var height = canvas.height;
-            var width = canvas.width;
-            var img = ctx.getImageData(0,0,width,height);
-            var x = dObj.pts[0];
-            var y = dObj.pts[1];
-            var cx = (y*width+x)
-            var fillColor = curColor;
-            
-            console.log(curColor);
-            
-            ctx.putImageData(img,0,0);
-        ctx.restore();
-    };
-
-    var newAct = {
-        undo: function() {
-            layerList.splice(layerList.length-1,1);
-        },
-        redo: function() {
-            layerList[layerList.length] = dObj.id;
-        }
-    };
-
-    // Add the new action and redraw.
-    addAction(newAct);
 }
 
 function transformPoint(x,y,dx,dy,sx,sy,theta) {
