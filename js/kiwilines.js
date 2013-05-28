@@ -85,7 +85,7 @@ function startLine(dObj) {
             -this.rotation );
 
             var scaleIcon = document.getElementById('resize_icon');
-            ctx.drawImage(scaleIcon, leftCorner[0]-32-mobileX, leftCorner[1]-32-mobileY);
+            ctx.drawImage(scaleIcon, leftCorner[0]-32, leftCorner[1]-32);
 
         var rightCorner = transformPoint(
             this.rCorner[0]-this.mx, this.lCorner[1]-this.my,
@@ -94,7 +94,7 @@ function startLine(dObj) {
             -this.rotation );
 
             var rotateIcon = document.getElementById('rotate_icon');
-            ctx.drawImage(rotateIcon, rightCorner[0]-32-mobileX, rightCorner[1]-32-mobileY);
+            ctx.drawImage(rotateIcon, rightCorner[0]-32, rightCorner[1]-32);
 
     }
     dObj.select = function(x,y) {
