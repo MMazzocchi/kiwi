@@ -75,6 +75,9 @@ function startLine(dObj) {
 
     // Draw the rotate/scale icons
     dObj.drawIcons = function(ctx) {
+        var mobileX = (orienting() ? 32 : 0);
+        var mobileY = mobileX;
+
         var leftCorner = transformPoint(
             this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
             this.mx, this.my,
