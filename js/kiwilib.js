@@ -13,9 +13,8 @@ var curColor = "#000000";
 var isDragging = false;
 var curStamp = '';
 var curZoom = 1;
-var mousex = 0;
-var mousey = 0;
-var originx = $("#toolbar").width();
+var prevZoom = 1;
+var originx = 0;
 var originy = 0;
 var scratch;
 var tx=0;
@@ -206,7 +205,9 @@ function pointerDown(e) {
     var x = c[0]; var y = c[1];
     if (e.which == 3){
         if (curTool == "zoom"){
+			prevZoom = curZoom;
             curZoom = curZoom/1.5;
+			applyZoom(curZoom, prevZoom, e);
         }
     }
     else{
@@ -299,17 +300,18 @@ function pointerDown(e) {
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
             case "zoom":
+				prevZoom = curZoom;
 				curZoom = curZoom*1.5;
-                applyZoom(curZoom, e);
+                applyZoom(curZoom, prevZoom, e);
                 break;
         }
     }
 }
 
-function applyZoom(newZoom, e){
-	startx = e.clientX;
-	starty = e.clientY;
-	var mouse = transformCoordinates(e);
+function applyZoom(newZoom, oldZoom, event){
+	startx = event.clientX;
+	starty = event.clientY;
+	var mouse = transformCoordinates(event);
 	originx = -1*(mouse[0]*newZoom - startx);
 	originy = -1*(mouse[1]*newZoom - starty);
 }
@@ -603,7 +605,7 @@ $().ready( function() {
     });
     
     $('#fill').click( function() {
-        document.body.style.cursor="url(img/paintbucket.png), default";
+        document.body.style.cursor="url(img/paintbucket.png)0 28, default";
         SelectTool('fill');
     });
     
