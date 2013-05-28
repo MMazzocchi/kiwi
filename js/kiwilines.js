@@ -75,6 +75,9 @@ function startLine(dObj) {
 
     // Draw the rotate/scale icons
     dObj.drawIcons = function(ctx) {
+        var mobileX = (orienting() ? 32 : 0);
+        var mobileY = mobileX;
+
         var leftCorner = transformPoint(
             this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
             this.mx, this.my,
@@ -82,7 +85,7 @@ function startLine(dObj) {
             -this.rotation );
 
             var scaleIcon = document.getElementById('resize_icon');
-            ctx.drawImage(scaleIcon, leftCorner[0]-32, leftCorner[1]-32);
+            ctx.drawImage(scaleIcon, leftCorner[0]-32-mobileX, leftCorner[1]-32-mobileY);
 
         var rightCorner = transformPoint(
             this.rCorner[0]-this.mx, this.lCorner[1]-this.my,
@@ -91,7 +94,7 @@ function startLine(dObj) {
             -this.rotation );
 
             var rotateIcon = document.getElementById('rotate_icon');
-            ctx.drawImage(rotateIcon, rightCorner[0]-32, rightCorner[1]-32);
+            ctx.drawImage(rotateIcon, rightCorner[0]-32-mobileX, rightCorner[1]-32-mobileY);
 
     }
     dObj.select = function(x,y) {
