@@ -241,6 +241,12 @@ function pointerDown(e) {
                     if(dragMode == 'scale') {
                         beginScale(selectedId, x, y);
                     }
+					else if(dragMode == 'layerUp') {
+						layerUp(selectedId);
+					}
+					else if(dragMode == 'layerDown') {
+						layerDown(selectedId);
+					}
                 } else {
                     selectedId = getObjectID(x, y);
                     if(selectedId != -1) {
@@ -357,6 +363,58 @@ function pointerEnd(e) {
     isDragging = false;
 }
 
+function layerUp (selectedId) {
+	if (selectedId != -1){
+		var currentId = objectList[selectedId].id;
+		$.each(layerList, function(i, id) {
+			if (id == currentId && i < layerList.length-1){
+				layerList[i] = layerList[i+1];
+				layerList[i+1] = currentId;
+				var newAct = {
+					undo: function() {
+						layerList[i+1] = layerList[i];
+						layerList[i] = currentId;
+					},
+					redo: function() {
+						layerList[i] = layerList[i+1];
+						layerList[i+1] = currentId;
+					}
+				};
+
+				addAction(newAct);
+				return false;
+			}
+		});
+	}
+	return false;
+}
+	
+function layerDown(selectedId) {
+	if (selectedId != -1){
+		var currentId = objectList[selectedId].id;
+		$.each(layerList, function(i, id) {
+			if (id == currentId && i > 0){
+				layerList[i] = layerList[i-1];
+				layerList[i-1] = currentId;
+				var newAct = {
+					undo: function() {
+						layerList[i-1] = layerList[i];
+						layerList[i] = currentId;
+					},
+					redo: function() {
+						layerList[i] = layerList[i-1];
+						layerList[i-1] = currentId;
+					}
+				};
+
+				addAction(newAct);
+				return false;
+			}
+		});
+	}
+	return false;
+}
+	
 function transformPoint(x,y,dx,dy,sx,sy,theta) {
         var tx = x*sx;
         var ty = -1*y*sy;
@@ -660,6 +718,8 @@ $().ready( function() {
 
   $('#resize_icon').load(function() {});
   $('#rotate_icon').load(function() {});
+  $('#arrow_up').load(function() {});
+  $('#arrow_down').load(function() {});
 
     // Redraw.
     setInterval(refreshCanvas, 10);
