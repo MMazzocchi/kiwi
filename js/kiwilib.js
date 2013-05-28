@@ -15,6 +15,8 @@ var curStamp = '';
 var curZoom = 1;
 var mousex = 0;
 var mousey = 0;
+var originx = $("#toolbar").width();
+var originy = 0;
 var scratch;
 var tx=0;
 var ty=0;
@@ -114,9 +116,9 @@ function refreshCanvas() {
     }
     //ctx.restore();
     // Redraw every object at the current zoom
-	ctx.translate(mousex, mousey);
+	ctx.translate(-originx, -originy);
     ctx.scale(curZoom, curZoom);
-	ctx.translate(-mousex, -mousey);
+//	ctx.translate(originx, originy);
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
         // Get the object for this layer
@@ -256,9 +258,10 @@ function pointerDown(e) {
 
             case "fill":
                 var dObj = {
-                    color: curColor,
-                    pts: [x, y]
-                }
+                    color: hslToRgb(myCP.curH, myCP.curS/100, myCP.curL/100),
+                    opacity: alpha,
+                    pts: [[x, y]]
+                };
                 createFill(dObj);
                 break;
 
@@ -274,10 +277,11 @@ function pointerDown(e) {
                     rotation: 0,
                     pts: [x, y],
                 };    
-                $.get(dObj.url, function(xmlData) {
-                    //console.log("Got svg: " + dObj.url + " for " + curStamp);
+ /*               $.get(dObj.url, function(xmlData) {
+                    console.log("Got svg: " + dObj.url + " for " + curStamp);
                     dObj.svg = xmlData;
                 });
+*/
                 createBMP(dObj);
                 createStamp(dObj);
                 break;
@@ -290,8 +294,13 @@ function pointerDown(e) {
                 break;
             case "zoom":
                 curZoom = curZoom*1.5;
-				mousex = e.clientX;
-				mousey = e.clientY;
+				var points = transformCoordinates(e);
+				mousex = points[0];
+				mousey = points[1];
+				var diffx = (mousex - originx)/curZoom;
+				var diffy = (mousey - originy)/curZoom;
+				originx = mousex - diffx;
+				originy = mousey - diffy;
                 break;
         }
     }
@@ -346,38 +355,6 @@ function pointerEnd(e) {
     }
     
     isDragging = false;
-}
-
-function createFill(dObj){
-    assignID(dObj);
-    
-    dObj.draw = function(ctx) {
-        ctx.save();
-            var height = canvas.height;
-            var width = canvas.width;
-            var img = ctx.getImageData(0,0,width,height);
-            var x = dObj.pts[0];
-            var y = dObj.pts[1];
-            var cx = (y*width+x)
-            var fillColor = curColor;
-            
-            console.log(curColor);
-            
-            ctx.putImageData(img,0,0);
-        ctx.restore();
-    };
-
-    var newAct = {
-        undo: function() {
-            layerList.splice(layerList.length-1,1);
-        },
-        redo: function() {
-            layerList[layerList.length] = dObj.id;
-        }
-    };
-
-    // Add the new action and redraw.
-    addAction(newAct);
 }
 
 function transformPoint(x,y,dx,dy,sx,sy,theta) {
@@ -649,6 +626,10 @@ $().ready( function() {
         }
         
         switch (key) {
+			case 97:  // A = AIRBRUSH
+			  document.body.style.cursor="url(img/spraycan.png)0 5, default";
+			  SelectTool('spraycan');
+              break;
             case 100: // D=DRAW
               document.body.style.cursor="url(img/paintbrush.png)0 28, default";
               SelectTool('draw');
@@ -661,11 +642,15 @@ $().ready( function() {
               document.body.style.cursor="url(img/paintbucket.png), default";
               SelectTool('fill');
               break;
+			case 112: // P=PENCIL
+              document.body.style.cursor="url(img/pencil.png)0 28, default";
+			  SelectTool('pencil');
+              break;
             case 115: // S=SELECT
               document.body.style.cursor="url(img/hand-tool.png)14 6, default";
               SelectTool('select');
               break;
-            case 103:  // G=dropper
+            case 103:  // G=DROPPER
               document.body.style.cursor="url(img/dropper.png)0 28, default";
               SelectTool('dropper');
               break;
