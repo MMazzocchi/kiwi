@@ -28,8 +28,13 @@ function createSpraytex(dObj){
     var w = dObj.width;
     var grd=ctx.createRadialGradient(w/2,w/2,0.0,w/2,w/2,w/2);
     grd.addColorStop(0,dObj.color);
-    grd.addColorStop(1, "rgba(255,0,0,0)");
-	console.log(dObj.color);
+	var color = hslToRgb(myCP.curH, myCP.curS/100, myCP.curL/100);
+	var r = color[0];
+	var g = color[1];
+	var b = color[2];
+	grd.addColorStop(1,"rgba("+Math.round(r)+","+Math.round(g)+","+Math.round(b)+",0)");
+	
+	
     //dObj.grd = grd;
     ctx.fillStyle = grd;
     var w = dObj.width;
