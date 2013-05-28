@@ -299,17 +299,19 @@ function pointerDown(e) {
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
             case "zoom":
-                curZoom = curZoom*1.5;
-				var points = transformCoordinates(e);
-				mousex = points[0];
-				mousey = points[1];
-				var diffx = (mousex - originx)/curZoom;
-				var diffy = (mousey - originy)/curZoom;
-				originx = mousex - diffx;
-				originy = mousey - diffy;
+				curZoom = curZoom*1.5;
+                applyZoom(curZoom, e);
                 break;
         }
     }
+}
+
+function applyZoom(newZoom, e){
+	startx = e.clientX;
+	starty = e.clientY;
+	var mouse = transformCoordinates(e);
+	originx = -1*(mouse[0]*newZoom - startx);
+	originy = -1*(mouse[1]*newZoom - starty);
 }
 
 function pointerMove(e) {
@@ -495,6 +497,10 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
         case 'fill':
             curTool = 'fill';
             break;
+		case 'stamp':
+			document.body.style.cursor="url(img/stamper.png)14 28, default";
+			curTool = toolName;
+			break;
         default:
             curTool = toolName;
             break;
