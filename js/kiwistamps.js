@@ -1,8 +1,8 @@
 var svgList = {
     'mickey':{
         svg:null,
-        cx:383, cy:495,
-        bounds:[0,0,765,990],
+        cx:156, cy:145,
+        bounds:[0,0,313,290],
         url:'svg/mickey.svg' },
 	'butterfly':{
         svg:null,

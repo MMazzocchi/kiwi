@@ -28,7 +28,13 @@ function createSpraytex(dObj){
     var w = dObj.width;
     var grd=ctx.createRadialGradient(w/2,w/2,0.0,w/2,w/2,w/2);
     grd.addColorStop(0,dObj.color);
-    grd.addColorStop(1, "rgba(255,0,0,0)");
+	var color = hslToRgb(myCP.curH, myCP.curS/100, myCP.curL/100);
+	var r = color[0];
+	var g = color[1];
+	var b = color[2];
+	grd.addColorStop(1,"rgba("+Math.round(r)+","+Math.round(g)+","+Math.round(b)+",0)");
+	
+	
     //dObj.grd = grd;
     ctx.fillStyle = grd;
     var w = dObj.width;
@@ -36,28 +42,7 @@ function createSpraytex(dObj){
     dObj.scanvas = scanvas;
 }
 
-function drawSoftLine(ctx, x1, y1, x2, y2, lineWidth, r, g, b, a) {
-   var lx = x2 - x1;
-   var ly = y2 - y1;
-   var lineLength = Math.sqrt(lx*lx + ly*ly);
-   var wy = lx / lineLength * lineWidth;
-   var wx = ly / lineLength * lineWidth;
-   var gradient = ctx.createLinearGradient(x1-wx/2, y1+wy/2, x1+wx/2, y1-wy/2);
-      // The gradient must be defined accross the line, 90° turned compared to the line direction.
-   gradient.addColorStop(0,    "rgba("+r+","+g+","+b+",0)");
-   gradient.addColorStop(0.5, "rgba("+r+","+g+","+b+","+a+")");
-   gradient.addColorStop(0.5, "rgba("+r+","+g+","+b+","+a+")");
-   gradient.addColorStop(1,    "rgba("+r+","+g+","+b+",0)");
-   ctx.save();
-	   ctx.beginPath();
-	   ctx.lineWidth = lineWidth;
-	   // ctx.lineCap = "round";
-	   ctx.strokeStyle = gradient;
-	   ctx.moveTo(x1, y1);
-	   ctx.lineTo(x2, y2);
-	   ctx.stroke();
-   ctx.restore(); 
-}
+
 
 // Create a line
 function startLine(dObj) {
@@ -227,7 +212,6 @@ function startLine(dObj) {
             layerList[layerList.length] = dObj.id;
         }
     };
-
     // Add the new action and redraw.
     addAction(newAct);
 }
