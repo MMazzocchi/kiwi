@@ -15,6 +15,8 @@ var curStamp = '';
 var curZoom = 1;
 var mousex = 0;
 var mousey = 0;
+var originx = $("#toolbar").width();
+var originy = 0;
 var scratch;
 var tx=0;
 var ty=0;
@@ -114,9 +116,9 @@ function refreshCanvas() {
     }
     //ctx.restore();
     // Redraw every object at the current zoom
-	ctx.translate(mousex, mousey);
+	ctx.translate(-originx, -originy);
     ctx.scale(curZoom, curZoom);
-	ctx.translate(-mousex, -mousey);
+//	ctx.translate(originx, originy);
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
         // Get the object for this layer
@@ -274,10 +276,11 @@ function pointerDown(e) {
                     rotation: 0,
                     pts: [x, y],
                 };    
-                $.get(dObj.url, function(xmlData) {
-                    //console.log("Got svg: " + dObj.url + " for " + curStamp);
+ /*               $.get(dObj.url, function(xmlData) {
+                    console.log("Got svg: " + dObj.url + " for " + curStamp);
                     dObj.svg = xmlData;
                 });
+*/
                 createBMP(dObj);
                 createStamp(dObj);
                 break;
@@ -290,8 +293,13 @@ function pointerDown(e) {
                 break;
             case "zoom":
                 curZoom = curZoom*1.5;
-				mousex = e.clientX;
-				mousey = e.clientY;
+				var points = transformCoordinates(e);
+				mousex = points[0];
+				mousey = points[1];
+				var diffx = (mousex - originx)/curZoom;
+				var diffy = (mousey - originy)/curZoom;
+				originx = mousex - diffx;
+				originy = mousey - diffy;
                 break;
         }
     }

@@ -1,14 +1,14 @@
 var svgList = {
-    'butterfly':{
-        svg:null,
-        cx:205, cy:143,
-        bounds:[0,0,410,286],
-        url:'svg/butterfly.svg' },
     'mickey':{
         svg:null,
         cx:383, cy:495,
         bounds:[0,0,765,990],
         url:'svg/mickey.svg' },
+	'butterfly':{
+        svg:null,
+        cx:205, cy:143,
+        bounds:[0,0,410,286],
+        url:'svg/troll_face.svg' },
     'bnl':{
         svg:null,
         cx:197, cy:154,
@@ -28,8 +28,8 @@ function createBMP(dObj){
     scanvas.width = dObj.bound[2]*dObj.xScale;
     scanvas.height = dObj.bound[3]*dObj.yScale;
     var sctx = scanvas.getContext('2d');
-	//canvg(scanvas,dObj.url);
-    sctx.drawSvg(dObj.url, 0, 0, 0, 0);
+	canvg(scanvas,dObj.url);
+ //   sctx.drawSvg(dObj.url, 0, 0, 0, 0);
     dObj.scanvas = scanvas;
 	
 	
