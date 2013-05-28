@@ -114,10 +114,12 @@ function refreshCanvas() {
             ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
     //ctx.restore();
+	
     // Redraw every object at the current zoom
 	ctx.translate(-originx, -originy);
     ctx.scale(curZoom, curZoom);
 //	ctx.translate(originx, originy);
+
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
         // Get the object for this layer
@@ -284,7 +286,7 @@ function pointerDown(e) {
                     rotation: 0,
                     pts: [x, y],
                 };    
- /*               $.get(dObj.url, function(xmlData) {
+/*                $.get(dObj.url, function(xmlData) {
                     console.log("Got svg: " + dObj.url + " for " + curStamp);
                     dObj.svg = xmlData;
                 });
@@ -314,6 +316,18 @@ function applyZoom(newZoom, oldZoom, event){
 	var mouse = transformCoordinates(event);
 	originx = -1*(mouse[0]*newZoom - startx);
 	originy = -1*(mouse[1]*newZoom - starty);
+	
+	var newAct = {
+		undo: function() {
+			// change variables back
+		},
+		redo: function() {
+			// repeat main function
+		}
+	};
+
+	addAction(newAct);
+	return false;
 }
 
 function pointerMove(e) {
