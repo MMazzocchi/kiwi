@@ -28,21 +28,21 @@ function hslToRgb(h, s, l) {
 }
 
 function matchColor(c1, c2) {
-//   console.log("Attempting to match:")
-//   console.log(c1);
-//   console.log(c2);
    for(var i=0; i<3; i++) {
-       if(Math.abs(c1[i] - c2[i]) > 50) { return false }
+       if(Math.abs(c1[i] - c2[i]) > 100) { return false }
    }
    return true;
 }
 
-function validPoint(x,y, color, checked, ctx, cData, width) {
+function validPoint(x,y, color, checked, ctx, cData, width, height) {
+    if((x < 0) || (x > width) ||
+       (y < 0) || (y > height)) {
+        return false;
+    }
     if(checked[""+x+","+y] == 1) {
         return false;
     }
     return matchColor(color, getData(x,y,cData,width));
-//    return matchColor(color, ctx.getImageData(x,y,1,1).data);
 }
 
 function getData(x, y, cData, width) {
@@ -70,19 +70,15 @@ function findSegments(x,y, segments, width, height, ctx) {
     var segmentS = false;
 
     while(ptr < queue.length) {
-//        console.log("ptr: "+ptr);
         var pt = queue[ptr];
-//        console.log("pt from queue: "+pt);
-//        console.log("Looking west...");
         segmentN = false;
         segmentS = false;
 
         var sx = pt[0];
 
-        while(validPoint(sx,pt[1],color,checked,ctx,cData,width)) {
-//            console.log("pt: "+pt);
+        while(validPoint(sx,pt[1],color,checked,ctx,cData,width,height)) {
             checked[""+sx+","+pt[1]] = 1;
-            if(validPoint(sx,pt[1]+1,color,checked,ctx,cData,width)) {
+            if(validPoint(sx,pt[1]+1,color,checked,ctx,cData,width,height)) {
                 if(!segmentN) {
                     queue.push([sx, pt[1]+1]);
                     segmentN = true;
@@ -93,7 +89,7 @@ function findSegments(x,y, segments, width, height, ctx) {
                 }
             }
 
-            if(validPoint(sx,pt[1]-1,color,checked,ctx,cData,width)) {
+            if(validPoint(sx,pt[1]-1,color,checked,ctx,cData,width,height)) {
                 if(!segmentS) {
                     queue.push([sx, pt[1]-1]);
                     segmentS = true;
@@ -105,18 +101,17 @@ function findSegments(x,y, segments, width, height, ctx) {
             }
             sx--;
         }
-        segments.push([pt,[sx+1,pt[1]]]);
+        segments.push([pt,[sx,pt[1]]]);
 
         pt = [queue[ptr][0]+1, queue[ptr][1]];
-//        console.log("Looking east...");
         sx = pt[0];
 
         segmentN = false;
         segmentS = false;
 
-        while(validPoint(sx,pt[1],color,checked,ctx,cData,width)) {
+        while(validPoint(sx,pt[1],color,checked,ctx,cData,width,height)) {
             checked[""+sx+","+pt[1]] = 1;
-            if(validPoint(sx,pt[1]+1,color,checked,ctx,cData,width)) {
+            if(validPoint(sx,pt[1]+1,color,checked,ctx,cData,width,height)) {
                 if(!segmentN) {
                     queue.push([sx, pt[1]+1]);
                     segmentN = true;
@@ -126,7 +121,7 @@ function findSegments(x,y, segments, width, height, ctx) {
                     segmentN = false;
                 }
             }
-            if(validPoint(sx,pt[1]-1,color,checked,ctx,cData,width)) {
+            if(validPoint(sx,pt[1]-1,color,checked,ctx,cData,width,height)) {
                 if(!segmentS) {
                     queue.push([sx, pt[1]-1]);
                     segmentS = true;
@@ -145,89 +140,6 @@ function findSegments(x,y, segments, width, height, ctx) {
 
 }
 
-function findArea(x,y, points, width, height, ctx) {
-    console.log("Initial point: ("+x+","+y+")");
-
-    var ptr = 0;
-    var color = ctx.getImageData(x,y,1,1).data;
-    var checked = {};
-    var queue = [points[0]];
-
-    var cData = ctx.getImageData(0,0,width,height).data;
-
-    var segmentN = false;
-    var segmentS = false;
-
-    while(ptr < queue.length) {
-//        console.log("ptr: "+ptr);
-        var pt = queue[ptr];
-//        console.log("pt from queue: "+pt);
-//        console.log("Looking west...");
-        segmentN = false;
-        segmentS = false;
-
-        while(validPoint(pt[0],pt[1],color,checked,ctx,cData,width)) {
-//            console.log("pt: "+pt);
-            points.push(pt);
-            checked[""+pt[0]+","+pt[1]] = 1;
-            if(validPoint(pt[0],pt[1]+1,color,checked,ctx,cData,width)) {
-                if(!segmentN) {
-                    queue.push([pt[0], pt[1]+1]);
-                    segmentN = true;
-                }
-            } else {
-                if(segmentN) {
-                    segmentN = false;
-                }
-            }
-
-            if(validPoint(pt[0],pt[1]-1,color,checked,ctx,cData,width)) {
-                if(!segmentS) {
-                    queue.push([pt[0], pt[1]-1]);
-                    segmentS = true;
-                }
-            } else {
-                if(segmentS) {
-                    segmentS = false;
-                }
-            }
-            pt = [pt[0]-1, pt[1]];
-        }
-        pt = queue[ptr];
-//        console.log("Looking east...");
-
-        segmentN = false;
-        segmentS = false;
-
-        while(validPoint(pt[0],pt[1],color,checked,ctx,cData,width)) {
-            points.push(pt);
-            checked[""+pt[0]+","+pt[1]] = 1;
-            if(validPoint(pt[0],pt[1]+1,color,checked,ctx,cData,width)) {
-                if(!segmentN) {
-                    queue.push([pt[0], pt[1]+1]);
-                    segmentN = true;
-                }
-            } else {
-                if(segmentN) {
-                    segmentN = false;
-                }
-            }
-            if(validPoint(pt[0],pt[1]-1,color,checked,ctx,cData,width)) {
-                if(!segmentS) {
-                    queue.push([pt[0], pt[1]-1]);
-                    segmentS = true;
-                }
-            } else {
-                if(segmentS) {
-                    segmentS = false;
-                }
-            }
-            pt = [pt[0]+1, pt[1]];
-        }
-        ptr++;
-    }
-}
-
 function createFill(dObj){
     assignID(dObj);
 
@@ -235,7 +147,6 @@ function createFill(dObj){
     var width = canvas.width;
     var x = dObj.pts[0][0];
     var y = dObj.pts[0][1];
-//    findArea(x,y, dObj.pts, width, height, canvas.getContext('2d'));
     dObj.segments = [];
     findSegments(x,y,dObj.segments, width, height, canvas.getContext('2d'));
 
@@ -253,7 +164,6 @@ function createFill(dObj){
         ctx.stroke(); 
         ctx.restore();
 
-//        ctx.lineWidth = oldlw;
     };
     dObj.select = function() {
         return false;
