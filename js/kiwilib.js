@@ -812,7 +812,7 @@ $().ready( function() {
 			  SelectTool('pencil');
               break;
 			case 113: // Q=SHAPE
-			  SelectTool('circle');
+			  SelectTool('square');
               break;
             case 115: // S=SELECT
               document.body.style.cursor="url(img/hand-tool.png)14 6, default";
