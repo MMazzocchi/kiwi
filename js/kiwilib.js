@@ -258,7 +258,7 @@ function pointerDown(e) {
 
             case "fill":
                 var dObj = {
-                    color: hslToRgb(myCP.curH, myCP.curS/100, myCP.curL/100),
+                    color: curColor, //hslToRgb(myCP.curH, myCP.curS/100, myCP.curL/100),
                     opacity: alpha,
                     pts: [[x, y]]
                 };
