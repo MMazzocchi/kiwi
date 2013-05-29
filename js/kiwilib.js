@@ -7,6 +7,7 @@ var idPtr = 0;            // This is the next available id.
 var actionPtr = 0;        // This is the action stack pointer; anything below this is real, and anything above it has been undo'd.
 var curTool = "draw";   // This is the current tool selected by the user
 var brushMode = 'simple';
+var shapeType = '';
 var thickness = 25;     // Thickness of the line to be drawn
 var alpha = 1;          // Opacity of the object to be drawn
 var curColor = "#000000";
@@ -290,6 +291,24 @@ function pointerDown(e) {
                 if(id != -1) { eraseObject(id); }
                 break;
 
+			case "shape":
+				isDragging = true;
+                var dObj = {
+                    pts: [[x, y]],
+                    lCorner: [x,y],
+                    rCorner: [x,y],
+                    mx: x, my: y,
+                    width: thickness,
+                    opacity: alpha,
+                    color: curColor,
+                    type: shapeType,
+					radius: 0,
+                    xScale: 1,
+                    yScale: 1,
+                    rotation: 0
+                };
+                startShape(dObj);
+				break;
             case "fill":
                 var dObj = {
                     color: curColor, //hslToRgb(myCP.curH, myCP.curS/100, myCP.curL/100),
@@ -365,6 +384,8 @@ function pointerMove(e) {
                     eraseObject(id);
                 }
                 break;
+			case "shape":
+				contShape(x,y);
             case "select":
                 applyTransform(selectedId, x, y, dragMode, e);
                 break;
@@ -533,6 +554,22 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 			document.body.style.cursor="url(img/stamper.png)14 28, default";
 			curTool = toolName;
 			break;
+		case 'circle':
+            curTool = 'shape';
+            shapeType = 'circle';
+            break;
+		case 'square':
+            curTool = 'shape';
+            shapeType = 'square';
+            break;
+		case 'line':
+            curTool = 'shape';
+            shapeType = 'line';
+            break;
+		case 'triangle':
+            curTool = 'shape';
+            shapeType = 'triangle';
+            break;
         default:
             curTool = toolName;
             break;
@@ -741,6 +778,9 @@ $().ready( function() {
 			case 112: // P=PENCIL
               document.body.style.cursor="url(img/pencil.png)0 28, default";
 			  SelectTool('pencil');
+              break;
+			case 113: // Q=SHAPE
+			  SelectTool('triangle');
               break;
             case 115: // S=SELECT
               document.body.style.cursor="url(img/hand-tool.png)14 6, default";
