@@ -169,25 +169,6 @@ function createStamp(dObj) {
     addAction(newAct);
 }
 
-function getText(){
-	$(document).keypress(function(e) {
-        var key = e.which;
-
-        // Ctrl-Z or CMD-Z for Undo   Shift-* for Redo
-        if ((e.ctrlKey) && ((key == 122 || key == 90))) {  // CTRL-Z
-            if (key == 122 || key == 90){            // UNDO and REDO
-                if (e.shiftKey) {
-                    redo();
-                } else {
-                    undo();
-                }
-            }
-            return false;
-        } 
-    });
-
-}
-
 function drawBalloon(ctx, x, y, w, h, radius)
 {
 	var r = x + w;
@@ -217,7 +198,6 @@ function createTextBox(dObj) {
     dObj.draw = function(ctx) {
         var xScale = this.xScale;
         var yScale = this.yScale;
-        var bound = [this.bound[2],this.bound[3]];
 
         ctx.save();
             ctx.globalAlpha = this.opacity;
@@ -229,16 +209,19 @@ function createTextBox(dObj) {
 			var metrics = ctx.measureText(this.theText[this.max]);
 			this.width = metrics.width+20;
 			this.height = this.fontSize*this.theText.length+10;
-			drawBalloon(ctx, -10,-this.fontSize,this.width, this.height, 10);
+			drawBalloon(ctx, 0,0,this.width, this.height, 10);
 			ctx.fillStyle = "#000000";
 			for(var i=0; i<this.theText.length; i++)
-				ctx.fillText(this.theText[i],0,i*this.fontSize+2);
+				ctx.fillText(this.theText[i],10,(i+1)*this.fontSize+2);
         ctx.restore();
     };
 
-    //Return true of false if x and y are within this stamp
     dObj.select = function(x,y) {
-        return false;
+		console.log(x + " " + y);
+		var pts = this.pts;
+		var w = this.width*this.xScale;
+		var h = this.height*this.yScale;
+        return x >= pts[0] && y >= pts[1] && x < pts[0]+w && y < pts[1]+h;
     };
 
     // Move this stamp by dx, dy
@@ -250,7 +233,7 @@ function createTextBox(dObj) {
     // Draw the rotate/scale icons in the top corners of this stamp.
     dObj.drawIcons = function(ctx) {
         var leftCorner = transformPoint(
-            -(this.bound[2]/2), -(this.bound[3]/2),
+            0, 0,
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
@@ -259,7 +242,7 @@ function createTextBox(dObj) {
             ctx.drawImage(scaleIcon, leftCorner[0]-32, leftCorner[1]-32);
 
         var rightCorner = transformPoint(
-            (this.bound[2]/2), -(this.bound[3]/2),
+            (this.width), 0,
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
@@ -275,19 +258,19 @@ function createTextBox(dObj) {
 
     // Scale this object based on a a change of dx and dy in the scale icon's position
     dObj.scale = function(dx, dy) {
-        this.xScale -= (dx/(this.bound[2]/2));
-        this.yScale -= (dy/(this.bound[3]/2));
+        this.xScale -= (dx/(this.width/2));
+        this.yScale -= (dy/(this.height/2));
     }
 
     // Return if x and y were inside of an icon and which icon
     dObj.iconClicked = function(x,y) {
         var leftCorner = transformPoint(
-            -this.bound[2]/2, -this.bound[3]/2,
+            0, 0,
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
         var rightCorner = transformPoint(
-            this.bound[2]/2, -this.bound[3]/2,
+            this.width, 0,
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );

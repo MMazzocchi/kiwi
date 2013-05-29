@@ -716,23 +716,43 @@ $().ready( function() {
         }
     });
     
-    $(document).keypress(function(e) {
+    $(document).keydown(function(e) {
         var key = e.which;
-		if(objectList[layerList[layerList.length-1]].theText){
-			var length = objectList[layerList[layerList.length-1]].theText.length;
-			if(e.shiftKey)
-				objectList[layerList[layerList.length-1]].theText[length-1] += String.fromCharCode(key-32);
-			else
-				objectList[layerList[layerList.length-1]].theText[length-1] += String.fromCharCode(key);
+		var id;
+		if(selectedId != -1 && objectList[selectedId].theText){ //short circuiting works in JS
+			id = selectedId;
+		}
+		else if(objectList[layerList[layerList.length-1]].theText){
+			id = layerList[layerList.length-1];
+		}
+		
+		
+		if(objectList[id].theText){
+			var length = objectList[id].theText.length;
 			if(key == 13){	//enter pressed
-				objectList[layerList[layerList.length-1]].theText.push(new String());
+				objectList[id].theText.push(new String());
 				console.log("enter");
+			}
+			else if(key == 8){	//enter pressed
+				var s = objectList[id].theText[length-1];
+				if(s.length > 0){
+					objectList[id].theText[length-1] = s.substring(0,s.length-1);
+				}
+				else if(s.length == 0 && objectList[id].theText.length > 1)
+					objectList[id].theText.pop();
+				console.log("back");
+			}
+			else{
+				if(e.shiftKey)
+					objectList[id].theText[length-1] += String.fromCharCode(key);
+				else
+					objectList[id].theText[length-1] += String.fromCharCode(key+32);
 			}
 			var max = 0;
 			for(var i=0; i< length; i++){
-				if(objectList[layerList[layerList.length-1]].theText[i].length > max){
-					max = objectList[layerList[layerList.length-1]].theText[i].length;
-					objectList[layerList[layerList.length-1]].max = i;
+				if(objectList[id].theText[i] && objectList[id].theText[i].length > max){
+					max = objectList[id].theText[i].length;
+					objectList[id].max = i;
 				}
 			}
 			
