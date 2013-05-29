@@ -13,9 +13,8 @@ var curColor = "#000000";
 var isDragging = false;
 var curStamp = '';
 var curZoom = 1;
-var mousex = 0;
-var mousey = 0;
-var originx = $("#toolbar").width();
+var prevZoom = 1;
+var originx = 0;
 var originy = 0;
 var scratch;
 var tx=0;
@@ -206,7 +205,9 @@ function pointerDown(e) {
     var x = c[0]; var y = c[1];
     if (e.which == 3){
         if (curTool == "zoom"){
+			prevZoom = curZoom;
             curZoom = curZoom/1.5;
+			applyZoom(curZoom, prevZoom, e);
         }
     }
     else{
@@ -241,6 +242,12 @@ function pointerDown(e) {
                     if(dragMode == 'scale') {
                         beginScale(selectedId, x, y);
                     }
+					else if(dragMode == 'layerUp') {
+						layerUp(selectedId);
+					}
+					else if(dragMode == 'layerDown') {
+						layerDown(selectedId);
+					}
                 } else {
                     selectedId = getObjectID(x, y);
                     if(selectedId != -1) {
@@ -293,17 +300,20 @@ function pointerDown(e) {
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
             case "zoom":
-                curZoom = curZoom*1.5;
-				var points = transformCoordinates(e);
-				mousex = points[0];
-				mousey = points[1];
-				var diffx = (mousex - originx)/curZoom;
-				var diffy = (mousey - originy)/curZoom;
-				originx = mousex - diffx;
-				originy = mousey - diffy;
+				prevZoom = curZoom;
+				curZoom = curZoom*1.5;
+                applyZoom(curZoom, prevZoom, e);
                 break;
         }
     }
+}
+
+function applyZoom(newZoom, oldZoom, event){
+	startx = event.clientX;
+	starty = event.clientY;
+	var mouse = transformCoordinates(event);
+	originx = -1*(mouse[0]*newZoom - startx);
+	originy = -1*(mouse[1]*newZoom - starty);
 }
 
 function pointerMove(e) {
@@ -357,6 +367,58 @@ function pointerEnd(e) {
     isDragging = false;
 }
 
+function layerUp (selectedId) {
+	if (selectedId != -1){
+		var currentId = objectList[selectedId].id;
+		$.each(layerList, function(i, id) {
+			if (id == currentId && i < layerList.length-1){
+				layerList[i] = layerList[i+1];
+				layerList[i+1] = currentId;
+				var newAct = {
+					undo: function() {
+						layerList[i+1] = layerList[i];
+						layerList[i] = currentId;
+					},
+					redo: function() {
+						layerList[i] = layerList[i+1];
+						layerList[i+1] = currentId;
+					}
+				};
+
+				addAction(newAct);
+				return false;
+			}
+		});
+	}
+	return false;
+}
+	
+function layerDown(selectedId) {
+	if (selectedId != -1){
+		var currentId = objectList[selectedId].id;
+		$.each(layerList, function(i, id) {
+			if (id == currentId && i > 0){
+				layerList[i] = layerList[i-1];
+				layerList[i-1] = currentId;
+				var newAct = {
+					undo: function() {
+						layerList[i-1] = layerList[i];
+						layerList[i] = currentId;
+					},
+					redo: function() {
+						layerList[i] = layerList[i-1];
+						layerList[i-1] = currentId;
+					}
+				};
+
+				addAction(newAct);
+				return false;
+			}
+		});
+	}
+	return false;
+}
+	
 function transformPoint(x,y,dx,dy,sx,sy,theta) {
         var tx = x*sx;
         var ty = -1*y*sy;
@@ -437,6 +499,10 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
         case 'fill':
             curTool = 'fill';
             break;
+		case 'stamp':
+			document.body.style.cursor="url(img/stamper.png)14 28, default";
+			curTool = toolName;
+			break;
         default:
             curTool = toolName;
             break;
@@ -539,7 +605,7 @@ $().ready( function() {
     });
     
     $('#fill').click( function() {
-        document.body.style.cursor="url(img/paintbucket.png), default";
+        document.body.style.cursor="url(img/paintbucket.png)0 28, default";
         SelectTool('fill');
     });
     
@@ -660,6 +726,8 @@ $().ready( function() {
 
   $('#resize_icon').load(function() {});
   $('#rotate_icon').load(function() {});
+  $('#arrow_up').load(function() {});
+  $('#arrow_down').load(function() {});
 
     // Redraw.
     setInterval(refreshCanvas, 10);
