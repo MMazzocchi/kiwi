@@ -91,6 +91,25 @@ function createStamp(dObj) {
 
             var rotateIcon = document.getElementById('rotate_icon');
             ctx.drawImage(rotateIcon, rightCorner[0]-32, rightCorner[1]-32);
+			
+		var leftBottom = transformPoint(
+            -(this.bound[2]/2), (this.bound[3]/2),
+            this.pts[0], this.pts[1],
+            this.xScale, this.yScale,
+            -this.rotation );
+
+            var downIcon = document.getElementById('arrow_down');
+            ctx.drawImage(downIcon, leftBottom[0], leftBottom[1]-32);
+
+        var rightBottom = transformPoint(
+            (this.bound[2]/2), (this.bound[3]/2),
+            this.pts[0], this.pts[1],
+            this.xScale, this.yScale,
+            -this.rotation );
+
+            var upIcon = document.getElementById('arrow_up');
+            ctx.drawImage(upIcon, rightBottom[0]-32, rightBottom[1]-32);
+
     }
 
     // Rotate this stamp by dr radians.
@@ -103,7 +122,7 @@ function createStamp(dObj) {
         this.xScale -= (dx/(this.bound[2]/2));
         this.yScale -= (dy/(this.bound[3]/2));
     }
-
+	
     // Return if x and y were inside of an icon and which icon
     dObj.iconClicked = function(x,y) {
         var leftCorner = transformPoint(
@@ -116,8 +135,21 @@ function createStamp(dObj) {
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
+		var leftBottom = transformPoint(
+            -(this.bound[2]/2), (this.bound[3]/2),
+            this.pts[0], this.pts[1],
+            this.xScale, this.yScale,
+            -this.rotation );
+        var rightBottom = transformPoint(
+            (this.bound[2]/2), (this.bound[3]/2),
+            this.pts[0], this.pts[1],
+            this.xScale, this.yScale,
+            -this.rotation );
+		
         if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'scale'; }
         else if(distance([x,y],[rightCorner[0], rightCorner[1]]) < 32) { return 'rotate'; }
+		else if(distance([x,y],[rightBottom[0], rightBottom[1]]) < 32) { return 'layerUp'; }
+		else if(distance([x,y],[leftBottom[0], leftBottom[1]]) < 32) { return 'layerDown'; } 
         else { return false; }
     }
 
