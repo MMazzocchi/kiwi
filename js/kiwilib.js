@@ -12,8 +12,9 @@ var alpha = 1;          // Opacity of the object to be drawn
 var curColor = "#000000";
 var isDragging = false;
 var curStamp = '';
-var curZoom = 1;
-var prevZoom = 1;
+var zoomCount = 0;		// number of times user has zoomed in
+var factor = 1.2;		// base multiplier for zoom value
+var zoom = 1;			// cumulative zoom (factor^zoomCount)
 var originx = 0;
 var originy = 0;
 var scratch;
@@ -54,8 +55,8 @@ function transformCoordinates(e) {
         }
     }
 
-    x = x/curZoom;
-    y = y/curZoom;
+    x = x/zoom;
+    y = y/zoom;
     return [x,y];
 }
 
@@ -78,7 +79,7 @@ function refreshCanvas() {
         ctx.canvas.width  = window.innerWidth - widthoffset;
         ctx.canvas.height = window.innerHeight;
     }
-
+	
     if(orienting()) {
         orientation = window.orientation;
         ctx.rotate(-orientation*Math.PI/180);
@@ -116,9 +117,10 @@ function refreshCanvas() {
     //ctx.restore();
 	
     // Redraw every object at the current zoom
+	zoom = Math.pow(factor,zoomCount);
+	ctx.translate(originx, originy);
+	ctx.scale(zoom, zoom);
 	ctx.translate(-originx, -originy);
-    ctx.scale(curZoom, curZoom);
-//	ctx.translate(originx, originy);
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
@@ -201,15 +203,38 @@ function eraseObject(id) {
     addAction(newAct);
 }
 
+//Set coordinates for the translations due to the zoom
+function applyZoom(x, y, curZoom, prevZoom){
+	var prevx = originx; 
+	var prevy = originy;
+	originx = x;
+	originy = y;
+
+	var newAct = {
+		undo: function() {
+			originx = prevx;
+			originy = prevy;
+			zoomCount = prevZoom;
+		},
+		redo: function() {
+			originx = x;
+			originy = y;
+			zoomCount = curZoom;
+		}
+	};
+
+	addAction(newAct);
+	return false;
+}
+
 function pointerDown(e) {
     var c = transformCoordinates(e);
     var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
     if (e.which == 3){
-        if (curTool == "zoom"){
-			prevZoom = curZoom;
-            curZoom = curZoom/1.5;
-			applyZoom(curZoom, prevZoom, e);
+        if (curTool == "zoom" && zoomCount > 0){
+            zoomCount -= 1;
+			applyZoom(x, y, zoomCount, zoomCount+1);
         }
     }
     else{
@@ -302,32 +327,13 @@ function pointerDown(e) {
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
             case "zoom":
-				prevZoom = curZoom;
-				curZoom = curZoom*1.5;
-                applyZoom(curZoom, prevZoom, e);
+				if (zoomCount < 8){
+					zoomCount += 1;
+					applyZoom(x, y, zoomCount, zoomCount-1);
+				}
                 break;
         }
     }
-}
-
-function applyZoom(newZoom, oldZoom, event){
-	startx = event.clientX;
-	starty = event.clientY;
-	var mouse = transformCoordinates(event);
-	originx = -1*(mouse[0]*newZoom - startx);
-	originy = -1*(mouse[1]*newZoom - starty);
-	
-	var newAct = {
-		undo: function() {
-			// change variables back
-		},
-		redo: function() {
-			// repeat main function
-		}
-	};
-
-	addAction(newAct);
-	return false;
 }
 
 function pointerMove(e) {
