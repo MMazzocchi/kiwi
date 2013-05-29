@@ -183,39 +183,7 @@ function getText(){
                 }
             }
             return false;
-        }
-        
-        switch (key) {
-			case 97:  // A = AIRBRUSH
-			  document.body.style.cursor="url(img/spraycan.png)0 5, default";
-			  SelectTool('spraycan');
-              break;
-            case 100: // D=DRAW
-              document.body.style.cursor="url(img/paintbrush.png)0 28, default";
-              SelectTool('draw');
-              break;
-            case 101: // E=ERASE
-              document.body.style.cursor="url(img/eraser.png)0 28, default";
-              SelectTool('erase');
-              break;
-            case 102: // F=FILL
-              document.body.style.cursor="url(img/paintbucket.png), default";
-              SelectTool('fill');
-              break;
-			case 112: // P=PENCIL
-              document.body.style.cursor="url(img/pencil.png)0 28, default";
-			  SelectTool('pencil');
-              break;
-            case 115: // S=SELECT
-              document.body.style.cursor="url(img/hand-tool.png)14 6, default";
-              SelectTool('select');
-              break;
-            case 103:  // G=DROPPER
-              document.body.style.cursor="url(img/dropper.png)0 28, default";
-              SelectTool('dropper');
-              break;
-        }
-        
+        } 
     });
 
 }
@@ -257,10 +225,14 @@ function createTextBox(dObj) {
             ctx.translate(this.pts[0],this.pts[1]);
             ctx.rotate(this.rotation);
             ctx.scale(xScale,yScale);
-			drawBalloon(ctx, -10,-20,120, 80, 10);
-			ctx.font="normal 18px Comic Sans MS";
-			ctx.fillStyle = "#000000"
-            ctx.fillText(this.theText,0,0);
+			ctx.font="normal "+this.fontSize+"px Comic Sans MS";
+			var metrics = ctx.measureText(this.theText[this.max]);
+			this.width = metrics.width+20;
+			this.height = this.fontSize*this.theText.length+10;
+			drawBalloon(ctx, -10,-this.fontSize,this.width, this.height, 10);
+			ctx.fillStyle = "#000000";
+			for(var i=0; i<this.theText.length; i++)
+				ctx.fillText(this.theText[i],0,i*this.fontSize+2);
         ctx.restore();
     };
 

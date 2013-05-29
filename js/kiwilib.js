@@ -311,8 +311,14 @@ function pointerDown(e) {
 				break;
             case "fill":
                 var dObj = {
-                    color: curColor, //hslToRgb(myCP.curH, myCP.curS/100, myCP.curL/100),
+                    color: curColor,
                     opacity: alpha,
+                    lCorner: -1,
+                    rCorner: -1,
+                    mx: -1, my: -1,
+                    rotation: 0,
+                    xScale: 1,
+                    yScale: 1,
                     pts: [[x, y]]
                 };
                 createFill(dObj);
@@ -337,7 +343,10 @@ function pointerDown(e) {
                 break;
 			case "textbox":
                 var dObj = {
-					theText: "hurr",
+					theText: [new String()],
+					width: 120,
+					height: 80,
+					fontSize: 18,
                     opacity: alpha,
                     xScale: 1, 
                     yScale: 1, 
@@ -674,6 +683,7 @@ $().ready( function() {
         SelectTool('fill');
     });
 	$('#balloon').click( function() {
+		document.body.style.cursor="default";
          SelectTool('textbox');
     });
     $('#butterfly').click( function() {
@@ -745,7 +755,29 @@ $().ready( function() {
     
     $(document).keypress(function(e) {
         var key = e.which;
-
+		if(objectList[layerList[layerList.length-1]].theText){
+			var length = objectList[layerList[layerList.length-1]].theText.length;
+			if(e.shiftKey)
+				objectList[layerList[layerList.length-1]].theText[length-1] += String.fromCharCode(key-32);
+			else
+				objectList[layerList[layerList.length-1]].theText[length-1] += String.fromCharCode(key);
+			if(key == 13){	//enter pressed
+				objectList[layerList[layerList.length-1]].theText.push(new String());
+				console.log("enter");
+			}
+			var max = 0;
+			for(var i=0; i< length; i++){
+				if(objectList[layerList[layerList.length-1]].theText[i].length > max){
+					max = objectList[layerList[layerList.length-1]].theText[i].length;
+					objectList[layerList[layerList.length-1]].max = i;
+				}
+			}
+			
+			
+		   return;
+		}
+		
+		
         // Ctrl-Z or CMD-Z for Undo   Shift-* for Redo
         if ((e.ctrlKey) && ((key == 122 || key == 90))) {  // CTRL-Z
             if (key == 122 || key == 90){            // UNDO and REDO
