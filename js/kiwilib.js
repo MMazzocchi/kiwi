@@ -272,18 +272,32 @@ function pointerDown(e) {
                     cy: svgList[ curStamp ].cy,
                     opacity: alpha,
                     xScale: 1, 
-                    yScale: 1,
+                    yScale: 1, 
                     bound: svgList[ curStamp ].bounds,
                     rotation: 0,
                     pts: [x, y],
                 };    
- /*               $.get(dObj.url, function(xmlData) {
+                /*$.get(dObj.url, function(xmlData) {
                     console.log("Got svg: " + dObj.url + " for " + curStamp);
                     dObj.svg = xmlData;
-                });
-*/
+					//console.log(dObj.svg);
+                });*/
+
                 createBMP(dObj);
                 createStamp(dObj);
+                break;
+			case "textbox":
+                var dObj = {
+					theText: "hurr",
+                    opacity: alpha,
+                    xScale: 1, 
+                    yScale: 1, 
+                    bound: [1,1],
+                    rotation: 0,
+                    pts: [x, y],
+                };    
+
+                createTextBox(dObj);
                 break;
             case "dropper":
                 isDragging = true;
@@ -449,12 +463,10 @@ $().ready( function() {
     //Ceate Color picker
     myCP = new ColorPicker();
     myCP.setHSL(0,90,50);
-
     // Prevent default actions for touch events
     document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
-
     //Refresh on orientation changes
     window.addEventListener( 'resize', refreshCanvas );
     window.addEventListener( 'orientationchange', refreshCanvas );
@@ -542,7 +554,9 @@ $().ready( function() {
         document.body.style.cursor="url(img/paintbucket.png), default";
         SelectTool('fill');
     });
-    
+	$('#balloon').click( function() {
+         SelectTool('textbox');
+    });
     $('#butterfly').click( function() {
          SelectTool('stamp');
          curStamp = 'butterfly'
