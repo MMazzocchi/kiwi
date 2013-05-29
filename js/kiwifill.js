@@ -61,7 +61,7 @@ function getData(x, y, cData, width) {
 
 function findSegments(dObj, x,y, segments, width, height, ctx) {
     console.log("Initial point: ("+x+","+y+")");
-
+    x = Math.round(x); y = Math.round(y);
     var ptr = 0;
     var color = ctx.getImageData(x,y,1,1).data;
     var checked = {};
