@@ -28,8 +28,11 @@ function hslToRgb(h, s, l) {
 }
 
 function matchColor(c1, c2) {
+   var r = c1[0]/c2[0];
+
    for(var i=0; i<3; i++) {
-       if(Math.abs(c1[i] - c2[i]) > 100) { return false }
+//       if(Math.abs(c1[i] - c2[i]) > 100) { return false }
+         if((Math.abs((c2[i]/c1[i]) - r)/r) > .8) { return false; }
    }
    return true;
 }
@@ -58,7 +61,7 @@ function getData(x, y, cData, width) {
 
 function findSegments(dObj, x,y, segments, width, height, ctx) {
     console.log("Initial point: ("+x+","+y+")");
-
+    x = Math.round(x); y = Math.round(y);
     var ptr = 0;
     var color = ctx.getImageData(x,y,1,1).data;
     var checked = {};
