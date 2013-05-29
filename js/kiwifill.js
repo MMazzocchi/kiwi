@@ -241,29 +241,23 @@ function createFill(dObj){
 
     dObj.draw = function(ctx) {
         ctx.save();
-/*            var data = ctx.getImageData(0,0,1,1);
-                data.data[0] = this.color[0];
-                data.data[1] = this.color[1];
-                data.data[2] = this.color[2];
-                data.data[3] = this.opacity*255;
-            for(var i=0; i<this.pts.length; i++) {
-//                console.log("Coloring point "+this.pts[i]);
-//                console.log(data.data);
-//                console.log(this.color);
-                ctx.putImageData(data, this.pts[i][0], this.pts[i][1]);
-            }
-*/
         ctx.lineWidth = 1;
         ctx.strokeStyle = this.color;
         ctx.globalAlpha = this.opacity;
+        ctx.beginPath();
         for(var i=0; i<this.segments.length; i++) {
             var seg = this.segments[i];
             ctx.moveTo(seg[0][0], seg[0][1]);
             ctx.lineTo(seg[1][0], seg[1][1]);
         }
-        ctx.stroke();    
+        ctx.stroke(); 
         ctx.restore();
+
+//        ctx.lineWidth = oldlw;
     };
+    dObj.select = function() {
+        return false;
+    }
 
     var newAct = {
         undo: function() {
