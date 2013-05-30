@@ -227,6 +227,49 @@ function applyZoom(x, y, curZoom, prevZoom){
 	addAction(newAct);
 	return false;
 }
+/*
+function saveImage(){
+	var img = canvas.toDataURL("image/jpeg;base64;");
+//	img = img.replace("image/jpeg","image/octet-stream"); // force download, user would have to give the file name.
+// you can also use anchor tag with download attribute to force download the canvas with file name.
+	window.open(img,"","width=700,height=700");
+}
+*/
+
+// from http://www.joeltrost.com/blog/2012/01/29/html5-canvas-save-a-jpeg-with-extension/
+function downloadImage(){
+	var cs = new CanvasSaver('http://joeltrost.com/php/functions/saveme.php');
+	cs.saveJPEG(canvas, 'image');
+
+	function CanvasSaver(url) {
+	  this.url = url;
+	  this.saveJPEG = function(cnvs, fname) {
+	  if(!cnvs || !url) return;
+		fname = fname || 'picture';
+
+		var data = cnvs.toDataURL("image/jpeg");
+		data = data.substr(data.indexOf(',') + 1).toString();
+		var dataInput = document.createElement("input") ;
+		dataInput.setAttribute("name", 'imgdata') ;
+		dataInput.setAttribute("value", data);
+
+		var nameInput = document.createElement("input") ;
+		nameInput.setAttribute("name", 'name') ;
+		nameInput.setAttribute("value", fname + '.jpg');
+
+		var myForm = document.createElement("form");
+		myForm.method = 'post';
+		myForm.action = url;
+		myForm.appendChild(dataInput);
+		myForm.appendChild(nameInput);
+
+		document.body.appendChild(myForm) ;
+		myForm.submit() ;
+		document.body.removeChild(myForm) ;
+		
+	  };
+	}
+}
 
 function pointerDown(e) {
     var c = transformCoordinates(e);
@@ -426,7 +469,7 @@ function pointerEnd(e) {
     
     isDragging = false;
 }
-
+// moves selected object up in the layerList
 function layerUp (selectedId) {
 	if (selectedId != -1){
 		var currentId = objectList[selectedId].id;
@@ -452,7 +495,7 @@ function layerUp (selectedId) {
 	}
 	return false;
 }
-	
+// moves the selected object down in the layerList	
 function layerDown(selectedId) {
 	if (selectedId != -1){
 		var currentId = objectList[selectedId].id;
@@ -635,11 +678,36 @@ $().ready( function() {
     $('#redo_button').attr('disabled', true);
     $('button').button().attr("autocomplete", "off");
 
+	
+	$('#download').click( function() {
+        downloadImage();
+    });
+	
     $('#brush').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('draw');
     });
 
+	$('#line').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('line');
+    });
+	
+	$('#circle').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('circle');
+    });
+	
+	$('#square').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('square');
+    });
+	
+	$('#triangle').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('triangle');
+    });
+	
     $('#spraycan').click( function() {
         document.body.style.cursor="url(img/spraycan.png)0 5, default";
         SelectTool('spraycan');
@@ -659,10 +727,6 @@ $().ready( function() {
         SelectTool('pencil');
     });
     
-    $('#fill').click( function() {
-        SelectTool('fill');
-    });
-    
     $('#erase').click( function() {
         document.body.style.cursor="url(img/eraser.png)0 28, default";
         SelectTool('erase');
@@ -679,7 +743,7 @@ $().ready( function() {
     });
     
     $('#fill').click( function() {
-        document.body.style.cursor="url(img/paintbucket.png)0 28, default";
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
         SelectTool('fill');
     });
 	$('#balloon').click( function() {
