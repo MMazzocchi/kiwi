@@ -18,6 +18,7 @@ var factor = 1.2;		// base multiplier for zoom value
 var zoom = 1;			// cumulative zoom (factor^zoomCount)
 var originx = 0;
 var originy = 0;
+var textMode;
 var scratch;
 var tx=0;
 var ty=0;
@@ -343,19 +344,19 @@ function pointerDown(e) {
                 break;
 			case "textbox":
                 var dObj = {
-					theText: [new String()],
-					width: 120,
-					height: 80,
-					fontSize: 18,
+					theText: [[new String()]],
+					fontSize: thickness,
                     opacity: alpha,
+					type: textMode,
                     xScale: 1, 
                     yScale: 1, 
                     bound: [1,1],
                     rotation: 0,
                     pts: [x, y],
+					tPos: [x,y],
                 };    
-
-                createTextBox(dObj);
+				isDragging = true;
+                createTextBalloon(dObj);
                 break;
             case "dropper":
                 isDragging = true;
@@ -404,6 +405,9 @@ function pointerMove(e) {
                 myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
+			case "textbox":
+				placeTextArea(x,y);
+				break;
         }
     }
 }
@@ -685,6 +689,12 @@ $().ready( function() {
 	$('#balloon').click( function() {
 		document.body.style.cursor="default";
          SelectTool('textbox');
+		 textMode = "balloon";
+    });
+	$('#textbox').click( function() {
+		document.body.style.cursor="default";
+         SelectTool('textbox');
+		 textMode = "box";
     });
     $('#butterfly').click( function() {
          SelectTool('stamp');
@@ -755,22 +765,23 @@ $().ready( function() {
     
     $(document).keydown(function(e) {
         var key = e.which;
-		var id;
+	
+		var id = layerList[layerList.length-1];
 		if(selectedId != -1 && objectList[selectedId].theText){ //short circuiting works in JS
 			id = selectedId;
 		}
-		else if(objectList[layerList[layerList.length-1]].theText){
-			id = layerList[layerList.length-1];
-		}
-		
-		
-		if(objectList[id].theText){
-			var length = objectList[id].theText.length;
+
+		console.log(id);
+		if(id != -1 && objectList[id].theText){
+			var num_lines = objectList[id].theText.length;
+			var num_words = objectList[id].theText[num_lines-1].length;
+			
 			if(key == 13){	//enter pressed
-				objectList[id].theText.push(new String());
+				objectList[id].theText.push([new String()]);
 				console.log("enter");
 			}
-			else if(key == 8){	//enter pressed
+			else if(key == 8){	//backspace pressed
+				var num_words = objectList[id].theText[length-1].length;
 				var s = objectList[id].theText[length-1];
 				if(s.length > 0){
 					objectList[id].theText[length-1] = s.substring(0,s.length-1);
@@ -779,24 +790,37 @@ $().ready( function() {
 					objectList[id].theText.pop();
 				console.log("back");
 			}
-			else{
+			else if(key == 32){	//space pressed
+				objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key);
+				objectList[id].theText[num_lines-1].push(new String());
+			}
+			else{ //alphanumeric
 				if(e.shiftKey)
-					objectList[id].theText[length-1] += String.fromCharCode(key);
-				else
-					objectList[id].theText[length-1] += String.fromCharCode(key+32);
+					objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key);
+				else{
+					objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key+32);
+					}
 			}
 			var max = 0;
-			for(var i=0; i< length; i++){
+			for(var i=0; i< num_lines; i++){
+				var n = objectList[id].theText[num_lines-1].length;
+				var t = 0;
+				for(var j=0; j<n ; j++){
+					t += objectList[id].theText[i][j].length;
+				}
+				if(t > max){
+					max = t;
+					objectList[id].max = i;
+				}
+				/*
 				if(objectList[id].theText[i] && objectList[id].theText[i].length > max){
 					max = objectList[id].theText[i].length;
 					objectList[id].max = i;
 				}
+				*/
 			}
-			
-			
-		   return;
+		    return;
 		}
-		
 		
         // Ctrl-Z or CMD-Z for Undo   Shift-* for Redo
         if ((e.ctrlKey) && ((key == 122 || key == 90))) {  // CTRL-Z
