@@ -115,7 +115,7 @@ function refreshCanvas() {
         else // landscape
             ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
-    //ctx.restore();
+    ctx.translate(.5,.5);
 	
     // Redraw every object at the current zoom
 	zoom = Math.pow(factor,zoomCount);

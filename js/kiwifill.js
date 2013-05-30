@@ -31,9 +31,11 @@ function matchColor(c1, c2) {
    var r = c1[0]/c2[0];
 
    for(var i=0; i<3; i++) {
-//       if(Math.abs(c1[i] - c2[i]) > 100) { return false }
-         if((Math.abs((c2[i]/c1[i]) - r)/r) > .8) { return false; }
-   }
+       if((Math.abs(c1[i] - c2[i]) > 100) || 
+         (Math.abs((c2[i]/c1[i]) - r)/r) > .8) {
+             return false;
+         }
+   } 
    return true;
 }
 
