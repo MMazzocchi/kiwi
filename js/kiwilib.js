@@ -228,14 +228,19 @@ function applyZoom(x, y, curZoom, prevZoom){
 	return false;
 }
 /*
-function saveImage(){
+function downloadImage(){
 	var img = canvas.toDataURL("image/jpeg;base64;");
 //	img = img.replace("image/jpeg","image/octet-stream"); // force download, user would have to give the file name.
 // you can also use anchor tag with download attribute to force download the canvas with file name.
 	window.open(img,"","width=700,height=700");
 }
 */
+// save canvas to server
+function saveImage(){
 
+}
+
+// download canvas as JPEG
 // from http://www.joeltrost.com/blog/2012/01/29/html5-canvas-save-a-jpeg-with-extension/
 function downloadImage(){
 	var cs = new CanvasSaver('http://joeltrost.com/php/functions/saveme.php');
