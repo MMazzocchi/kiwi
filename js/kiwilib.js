@@ -12,6 +12,8 @@ var thickness = 25;     // Thickness of the line to be drawn
 var alpha = 1;          // Opacity of the object to be drawn
 var curColor = "#000000";
 var isDragging = false;
+var isZoom = true;
+var zoomType = '';
 var curStamp = '';
 var zoomCount = 0;		// number of times user has zoomed in
 var factor = 1.2;		// base multiplier for zoom value
@@ -227,6 +229,14 @@ function applyZoom(x, y, curZoom, prevZoom){
 	addAction(newAct);
 	return false;
 }
+
+// allows you to move translate the canvas while zoomed in
+function dragZoom(x, y){
+	isZoom = false;
+	originx = x*zoom;
+	originy = y*zoom;
+}
+
 /*
 function downloadImage(){
 	var img = canvas.toDataURL("image/jpeg;base64;");
@@ -281,9 +291,11 @@ function pointerDown(e) {
     var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
     if (e.which == 3){
-        if (curTool == "zoom" && zoomCount > 0){
-            zoomCount -= 1;
-			applyZoom(x, y, zoomCount, zoomCount+1);
+        if (curTool == "zoom"){
+			isDragging = true;
+			zoomType = 'out';
+//          zoomCount -= 1;
+//			applyZoom(x, y, zoomCount, zoomCount+1);
         }
     }
     else{
@@ -413,10 +425,12 @@ function pointerDown(e) {
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
             case "zoom":
-				if (zoomCount < 8){
-					zoomCount += 1;
-					applyZoom(x, y, zoomCount, zoomCount-1);
-				}
+//				if (zoomCount < 8){
+					isDragging = true;
+					zoomType = 'in';
+//					zoomCount += 1;
+//					applyZoom(x, y, zoomCount, zoomCount-1);
+//				}
                 break;
         }
     }
@@ -441,8 +455,12 @@ function pointerMove(e) {
                     eraseObject(id);
                 }
                 break;
+			case "zoom":
+				dragZoom(x,y);
+				break;
 			case "shape":
 				contShape(x,y);
+				break;
             case "select":
                 applyTransform(selectedId, x, y, dragMode, e);
                 break;
@@ -467,7 +485,24 @@ function pointerEnd(e) {
         obj.rCorner[0] += 32;
         obj.rCorner[1] += 32;
     }
-
+	else if(curTool == 'zoom'){
+		if(isZoom == true){
+			if (zoomType == 'in'){
+				if (zoomCount < 8){
+					zoomCount += 1;
+					applyZoom(x, y, zoomCount, zoomCount-1);
+				}
+			}
+			else{
+				if(zoomCount > 0){
+					zoomCount -= 1;
+					applyZoom(x, y, zoomCount, zoomCount+1);
+				}
+			}
+		}
+		isZoom = true;
+	}
+	
     if(isDragging && (curTool == 'select')) {
         endTransform(selectedId, x, y, dragMode);
     }
