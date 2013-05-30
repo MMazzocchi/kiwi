@@ -101,52 +101,14 @@ function startLine(dObj) {
 
     }
     dObj.select = function(x,y) {
-
-       var pt = transformPoint(x-this.mx, y-this.my,
-           this.mx, this.my,
-           1, 1,
-           this.rotation);
-       if(this.xScale ==0 || this.yScale==0) {
-            return false;
-       } else {
-           pt = transformPoint(pt[0]-this.mx, pt[1]-this.my,
-               this.mx, this.my,
-               1/this.xScale, 1/this.yScale,
-               0);
-       }
-       x = pt[0]; y = pt[1];
-
-
-       for(var i=0; i<this.pts.length-1; i++) {
-
-           //Check to see if we're within the left end cap of this segment
-           if(distance([x,y],this.pts[i]) < (this.width/2)) {
-               return true;
-           } else {
-
-                //Create the first vector between pts[0] and pts[1].
-                var v1 = [this.pts[i][0]-this.pts[i+1][0],
-                          this.pts[i][1]-this.pts[i+1][1]];
-                //Create the second vector between pts[0] and (x,y).
-                var v2 = [this.pts[i][0]-x,
-                          this.pts[i][1]-y];
-                //Calculate the z-magnitude of the resulting cross product
-                //(The x and y magnitudes will always be zero)
-                var z = Math.abs(v1[0]*v2[1]-v2[0]*v1[1]);
-
-                //Now take the dot product
-                var d = (v1[0]*v2[0]) + (v1[1]+v2[1]);
-
-                var dist = distance(this.pts[i], this.pts[i+1]);
-
-                //Now MATH
-                if(((z/dist) < (this.width/2))  && (d >= 0) && (d <= (dist*dist))) {
-                    return true;
-                }
-            }
-        }
-        //Finally, check the right end cap of the entire line
-        return (distance([x,y],this.pts[this.pts.length-1]) < (this.width/2));
+        //"Scratch canvas" method
+        var scanvas = document.createElement('canvas');
+        scanvas.width = window.innerWidth;
+        scanvas.height = window.innerHeight;
+        var ctx = scanvas.getContext('2d');
+        this.draw(ctx);
+        var imageData = ctx.getImageData(x, y, 1, 1);
+        return (imageData.data[3] > 0 || imageData.data[0] > 0);
     };
     dObj.move = function(dx,dy) {
         for(var i=0; i<this.pts.length; i++) {

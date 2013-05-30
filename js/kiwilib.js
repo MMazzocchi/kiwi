@@ -12,6 +12,8 @@ var thickness = 25;     // Thickness of the line to be drawn
 var alpha = 1;          // Opacity of the object to be drawn
 var curColor = "#000000";
 var isDragging = false;
+var isZoom = true;
+var zoomType = '';
 var curStamp = '';
 var zoomCount = 0;		// number of times user has zoomed in
 var factor = 1.2;		// base multiplier for zoom value
@@ -116,7 +118,7 @@ function refreshCanvas() {
         else // landscape
             ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
-    //ctx.restore();
+    ctx.translate(.5,.5);
 	
     // Redraw every object at the current zoom
 	zoom = Math.pow(factor,zoomCount);
@@ -209,8 +211,8 @@ function eraseObject(id) {
 function applyZoom(x, y, curZoom, prevZoom){
 	var prevx = originx; 
 	var prevy = originy;
-	originx = x;
-	originy = y;
+	originx = x*zoom;
+	originy = y*zoom;
 
 	var newAct = {
 		undo: function() {
@@ -219,8 +221,8 @@ function applyZoom(x, y, curZoom, prevZoom){
 			zoomCount = prevZoom;
 		},
 		redo: function() {
-			originx = x;
-			originy = y;
+			originx = x*zoom;
+			originy = y*zoom;
 			zoomCount = curZoom;
 		}
 	};
@@ -229,14 +231,72 @@ function applyZoom(x, y, curZoom, prevZoom){
 	return false;
 }
 
+// allows you to move translate the canvas while zoomed in
+function dragZoom(x, y){
+	isZoom = false;
+	originx = x*zoom;
+	originy = y*zoom;
+}
+
+/*
+function downloadImage(){
+	var img = canvas.toDataURL("image/jpeg;base64;");
+//	img = img.replace("image/jpeg","image/octet-stream"); // force download, user would have to give the file name.
+// you can also use anchor tag with download attribute to force download the canvas with file name.
+	window.open(img,"","width=700,height=700");
+}
+*/
+// save canvas to server
+function saveImage(){
+
+}
+
+// download canvas as JPEG
+// from http://www.joeltrost.com/blog/2012/01/29/html5-canvas-save-a-jpeg-with-extension/
+function downloadImage(){
+	var cs = new CanvasSaver('http://joeltrost.com/php/functions/saveme.php');
+	cs.saveJPEG(canvas, 'image');
+
+	function CanvasSaver(url) {
+	  this.url = url;
+	  this.saveJPEG = function(cnvs, fname) {
+	  if(!cnvs || !url) return;
+		fname = fname || 'picture';
+
+		var data = cnvs.toDataURL("image/jpeg");
+		data = data.substr(data.indexOf(',') + 1).toString();
+		var dataInput = document.createElement("input") ;
+		dataInput.setAttribute("name", 'imgdata') ;
+		dataInput.setAttribute("value", data);
+
+		var nameInput = document.createElement("input") ;
+		nameInput.setAttribute("name", 'name') ;
+		nameInput.setAttribute("value", fname + '.jpg');
+
+		var myForm = document.createElement("form");
+		myForm.method = 'post';
+		myForm.action = url;
+		myForm.appendChild(dataInput);
+		myForm.appendChild(nameInput);
+
+		document.body.appendChild(myForm) ;
+		myForm.submit() ;
+		document.body.removeChild(myForm) ;
+		
+	  };
+	}
+}
+
 function pointerDown(e) {
     var c = transformCoordinates(e);
     var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
     if (e.which == 3){
-        if (curTool == "zoom" && zoomCount > 0){
-            zoomCount -= 1;
-			applyZoom(x, y, zoomCount, zoomCount+1);
+        if (curTool == "zoom"){
+			isDragging = true;
+			zoomType = 'out';
+//          zoomCount -= 1;
+//			applyZoom(x, y, zoomCount, zoomCount+1);
         }
     }
     else{
@@ -366,10 +426,12 @@ function pointerDown(e) {
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
             case "zoom":
-				if (zoomCount < 8){
-					zoomCount += 1;
-					applyZoom(x, y, zoomCount, zoomCount-1);
-				}
+//				if (zoomCount < 8){
+					isDragging = true;
+					zoomType = 'in';
+//					zoomCount += 1;
+//					applyZoom(x, y, zoomCount, zoomCount-1);
+//				}
                 break;
         }
     }
@@ -394,8 +456,12 @@ function pointerMove(e) {
                     eraseObject(id);
                 }
                 break;
+			case "zoom":
+				dragZoom(x,y);
+				break;
 			case "shape":
 				contShape(x,y);
+				break;
             case "select":
                 applyTransform(selectedId, x, y, dragMode, e);
                 break;
@@ -423,14 +489,31 @@ function pointerEnd(e) {
         obj.rCorner[0] += 32;
         obj.rCorner[1] += 32;
     }
-
+	else if(curTool == 'zoom'){
+		if(isZoom == true){
+			if (zoomType == 'in'){
+				if (zoomCount < 8){
+					zoomCount += 1;
+					applyZoom(x, y, zoomCount, zoomCount-1);
+				}
+			}
+			else{
+				if(zoomCount > 0){
+					zoomCount -= 1;
+					applyZoom(x, y, zoomCount, zoomCount+1);
+				}
+			}
+		}
+		isZoom = true;
+	}
+	
     if(isDragging && (curTool == 'select')) {
         endTransform(selectedId, x, y, dragMode);
     }
     
     isDragging = false;
 }
-
+// moves selected object up in the layerList
 function layerUp (selectedId) {
 	if (selectedId != -1){
 		var currentId = objectList[selectedId].id;
@@ -456,7 +539,7 @@ function layerUp (selectedId) {
 	}
 	return false;
 }
-	
+// moves the selected object down in the layerList	
 function layerDown(selectedId) {
 	if (selectedId != -1){
 		var currentId = objectList[selectedId].id;
@@ -639,11 +722,36 @@ $().ready( function() {
     $('#redo_button').attr('disabled', true);
     $('button').button().attr("autocomplete", "off");
 
+	
+	$('#download').click( function() {
+        downloadImage();
+    });
+	
     $('#brush').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('draw');
     });
 
+	$('#line').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('line');
+    });
+	
+	$('#circle').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('circle');
+    });
+	
+	$('#square').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('square');
+    });
+	
+	$('#triangle').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('triangle');
+    });
+	
     $('#spraycan').click( function() {
         document.body.style.cursor="url(img/spraycan.png)0 5, default";
         SelectTool('spraycan');
@@ -663,10 +771,6 @@ $().ready( function() {
         SelectTool('pencil');
     });
     
-    $('#fill').click( function() {
-        SelectTool('fill');
-    });
-    
     $('#erase').click( function() {
         document.body.style.cursor="url(img/eraser.png)0 28, default";
         SelectTool('erase');
@@ -683,7 +787,7 @@ $().ready( function() {
     });
     
     $('#fill').click( function() {
-        document.body.style.cursor="url(img/paintbucket.png)0 28, default";
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
         SelectTool('fill');
     });
 	$('#balloon').click( function() {
@@ -856,7 +960,7 @@ $().ready( function() {
 			  SelectTool('pencil');
               break;
 			case 113: // Q=SHAPE
-			  SelectTool('circle');
+			  SelectTool('square');
               break;
             case 115: // S=SELECT
               document.body.style.cursor="url(img/hand-tool.png)14 6, default";
