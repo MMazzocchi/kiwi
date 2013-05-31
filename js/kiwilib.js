@@ -728,7 +728,7 @@ $().ready( function() {
         downloadImage();
     });
 	
-    $('#brush').click( function() {
+    $('#brush').mousedown( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('draw');
     });
@@ -753,7 +753,7 @@ $().ready( function() {
         SelectTool('triangle');
     });
 	
-    $('#spraycan').click( function() {
+    $('#spraycan').mousedown( function() {
         document.body.style.cursor="url(img/spraycan.png)0 5, default";
         SelectTool('spraycan');
     });
