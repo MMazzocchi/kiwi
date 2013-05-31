@@ -183,6 +183,7 @@ function createShape(dObj) {
 	}
 }
 
+// if the user is drawing a shape and is dragging the mouse
 function contShape(x,y,e){
 	var dObj = objectList[layerList[layerList.length-1]];
 	if (dObj.type == 'circle'){
@@ -201,6 +202,7 @@ function contShape(x,y,e){
 }
 
 function contCircle(dObj, x, y, e){
+	// adding pts to be drawn
 	if (dObj.pts.length > 1){
 		dObj.pts.pop();
 		dObj.pts.push([(dObj.pts[0][0]+x)/2, (dObj.pts[0][1]+y)/2]);
@@ -208,6 +210,8 @@ function contCircle(dObj, x, y, e){
 	else{
 		dObj.pts.push([(dObj.pts[0][0]+x)/2, (dObj.pts[0][1]+y)/2]);
 	}
+	
+	// resetting the corners/midpoint of the object
 	dObj.radius = Math.sqrt(Math.pow(x-dObj.pts[0][0], 2) + Math.pow(y-dObj.pts[0][1], 2));
 	dObj.lCorner[0] = dObj.pts[0][0]-dObj.radius;
 	dObj.lCorner[1] = dObj.pts[0][1]-dObj.radius;
@@ -218,8 +222,11 @@ function contCircle(dObj, x, y, e){
 }
 
 function contSquare(dObj, x, y, e){
+	// resetting the corners of the object
 	dObj.rCorner[0] = x;
 	dObj.rCorner[1] = y;
+	
+	// adding pts to be drawn
 	if (dObj.pts.length > 1){
 		dObj.pts.pop();
 		dObj.pts.pop();
@@ -249,17 +256,21 @@ function contSquare(dObj, x, y, e){
 			dObj.pts.push([x, dObj.pts[0][1]]);
 		}
 	}
+	// resetting the midpoint of the object
 	dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
 	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
 }
 
 function contLine(dObj, x, y, e){
+	// resetting the corners/midpoint of the object
 	if(x < dObj.pts[0][0]) { dObj.lCorner[0] = x; }
     if(x > dObj.pts[0][0]) { dObj.rCorner[0] = x; }
     if(y < dObj.pts[0][1]) { dObj.lCorner[1] = y; }
     if(y > dObj.pts[0][1]) { dObj.rCorner[1] = y; }
 	dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
 	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
+	
+	// adding pts to be drawn
 	if (dObj.pts.length > 1){
 		dObj.pts.pop();
 		dObj.pts.push([x, y]);
@@ -270,7 +281,7 @@ function contLine(dObj, x, y, e){
 }
 
 function contTriangle(dObj, x, y, e){
-	console.log("triangle");
+	// resetting the corners/midpoint of the object
 	if(x < dObj.pts[0][0]) { dObj.lCorner[0] = x; }
 	else{ dObj.lCorner[0] = dObj.pts[0][0]-(x-dObj.pts[0][0]); }
     if(x > dObj.pts[0][0]) { dObj.rCorner[0] = x; }
@@ -279,6 +290,8 @@ function contTriangle(dObj, x, y, e){
     if(y > dObj.pts[0][1]) { dObj.rCorner[1] = y; }
 	dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
 	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
+	
+	// adding pts to be drawn
 	if (dObj.pts.length > 1){
 		dObj.pts.pop();
 		dObj.pts.pop();
