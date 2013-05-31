@@ -210,8 +210,8 @@ function eraseObject(id) {
 function applyZoom(x, y, curZoom, prevZoom){
 	var prevx = originx; 
 	var prevy = originy;
-	originx = x*zoom;
-	originy = y*zoom;
+	originx = (x*zoom/2);
+	originy = (y*zoom/2);
 
 	var newAct = {
 		undo: function() {

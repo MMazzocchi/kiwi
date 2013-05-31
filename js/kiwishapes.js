@@ -238,10 +238,10 @@ function contSquare(dObj, x, y){
 }
 
 function contLine(dObj, x, y){
-	if(x < dObj.lCorner[0]) { dObj.lCorner[0] = x; }
-    if(x > dObj.rCorner[0]) { dObj.rCorner[0] = x; }
-    if(y < dObj.lCorner[1]) { dObj.lCorner[1] = y; }
-    if(y > dObj.rCorner[1]) { dObj.rCorner[1] = y; }
+	if(x < dObj.pts[0][0]) { dObj.lCorner[0] = x; }
+    if(x > dObj.pts[0][0]) { dObj.rCorner[0] = x; }
+    if(y < dObj.pts[0][1]) { dObj.lCorner[1] = y; }
+    if(y > dObj.pts[0][1]) { dObj.rCorner[1] = y; }
 	dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
 	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
 	if (dObj.pts.length > 1){
