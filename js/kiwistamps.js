@@ -235,7 +235,36 @@ function createTextBalloon(dObj) {
 			}
 			else{
 				ctx.fillStyle = "#000000";
-				ctx.strokeRect(0,0,this.tPos[0]-this.pts[0],this.tPos[1]-this.pts[1]);
+				if(layerList[layerList.length-1] == this.id || selectedId == this.id)
+					ctx.strokeRect(0,0,this.tPos[0]-this.pts[0],this.tPos[1]-this.pts[1]);
+				if(this.tPos[1] < this.pts[1])
+					ctx.translate(0,this.tPos[1]-this.pts[1]);
+				if(this.tPos[0] < this.pts[0])
+					ctx.translate(this.tPos[0]-this.pts[0],0);
+
+				this.width = Math.abs(this.tPos[0]-this.pts[0]);
+				this.height = Math.abs(this.tPos[1]-this.pts[1]);
+		
+				var wraps = 0;
+				for(var i=0; i<this.theText.length; i++){
+					for(var j=0; j<this.theText[i].length; j++){
+						var line_length = 0;
+						var span = 0;
+						for(var k=0; k<j; k++){
+							var met = ctx.measureText(this.theText[i][k]);
+							line_length += met.width;
+						}
+						for(var k=0; k<=j; k++){
+							var last = ctx.measureText(this.theText[i][k]);
+							span += last.width;
+						}
+						if(span > this.width && this.theText[i].length > 1){
+							wraps++;
+							line_length = 0;
+						}
+						ctx.fillText(this.theText[i][j],10 + line_length,(i+wraps+1)*this.fontSize+2);
+					}
+				}
 			}
         ctx.restore();
     };
