@@ -220,7 +220,7 @@ function createTextBalloon(dObj) {
 				this.width = max_length;
 				this.height = this.fontSize*this.theText.length+10;
 				drawBalloon(ctx, 0,0,this.width, this.height, 15);
-				ctx.fillStyle = "#000000";
+				ctx.fillStyle = curColor;
 				for(var i=0; i<this.theText.length; i++){
 					for(var j=0; j<this.theText[i].length; j++){
 						var line_length = 0;
@@ -234,7 +234,7 @@ function createTextBalloon(dObj) {
 				}
 			}
 			else{
-				ctx.fillStyle = "#000000";
+				ctx.fillStyle = curColor;
 				if(layerList[layerList.length-1] == this.id || selectedId == this.id)
 					ctx.strokeRect(0,0,this.tPos[0]-this.pts[0],this.tPos[1]-this.pts[1]);
 				if(this.tPos[1] < this.pts[1])
