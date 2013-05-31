@@ -238,10 +238,12 @@ function contSquare(dObj, x, y){
 }
 
 function contLine(dObj, x, y){
-	dObj.rCorner[0] = x;
-	dObj.rCorner[1] = y;
-	dObj.mx = (lCorner[0] + rCorner[0])/2;
-	dObj.my = (lCorner[1] + rCorner[1])/2;
+	if(x < dObj.pts[0][0]) { dObj.lCorner[0] = x; }
+    if(x > dObj.pts[0][0]) { dObj.rCorner[0] = x; }
+    if(y < dObj.pts[0][1]) { dObj.lCorner[1] = y; }
+    if(y > dObj.pts[0][1]) { dObj.rCorner[1] = y; }
+	dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
+	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
 	if (dObj.pts.length > 1){
 		dObj.pts.pop();
 		dObj.pts.push([x, y]);
@@ -253,19 +255,20 @@ function contLine(dObj, x, y){
 
 function contTriangle(dObj, x, y){
 	console.log("triangle");
-	dObj.lCorner[0] = dObj.pts[0][0] - ((y - dObj.pts[0][1])/2);
-	dObj.rCorner[0] = dObj.pts[0][0] + ((y - dObj.pts[0][1])/2);
-	dObj.rCorner[1] = y;
+	if(x < dObj.pts[0][0]) { dObj.lCorner[0] = x; }
+    if(x > dObj.pts[0][0]) { dObj.rCorner[0] = x; }
+    if(y < dObj.pts[0][1]) { dObj.lCorner[1] = y; }
+    if(y > dObj.pts[0][1]) { dObj.rCorner[1] = y; }
 	dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
 	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
 	if (dObj.pts.length > 1){
 		dObj.pts.pop();
 		dObj.pts.pop();
-		dObj.pts.push([dObj.pts[0][0] - ((y - dObj.pts[0][1])/2), y]);
-		dObj.pts.push([dObj.pts[0][0] + ((y - dObj.pts[0][1])/2), y]);
+		dObj.pts.push([dObj.pts[0][0], y]);
+		dObj.pts.push([x, y]);
 	}
 	else{
-		dObj.pts.push([dObj.pts[0][0] - ((dObj.pts[0][1] - y)/2), y]);
-		dObj.pts.push([dObj.pts[0][0] + ((dObj.pts[0][1] - y)/2), y]);
+		dObj.pts.push([dObj.pts[0][0], y]);
+		dObj.pts.push([x, y]);
 	}
 }

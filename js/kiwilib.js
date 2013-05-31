@@ -12,12 +12,15 @@ var thickness = 25;     // Thickness of the line to be drawn
 var alpha = 1;          // Opacity of the object to be drawn
 var curColor = "#000000";
 var isDragging = false;
+var isZoom = true;
+var zoomType = '';
 var curStamp = '';
 var zoomCount = 0;		// number of times user has zoomed in
 var factor = 1.2;		// base multiplier for zoom value
 var zoom = 1;			// cumulative zoom (factor^zoomCount)
 var originx = 0;
 var originy = 0;
+var textMode;
 var scratch;
 var tx=0;
 var ty=0;
@@ -208,8 +211,8 @@ function eraseObject(id) {
 function applyZoom(x, y, curZoom, prevZoom){
 	var prevx = originx; 
 	var prevy = originy;
-	originx = x;
-	originy = y;
+	originx = (x*zoom/2);
+	originy = (y*zoom/2);
 
 	var newAct = {
 		undo: function() {
@@ -218,8 +221,8 @@ function applyZoom(x, y, curZoom, prevZoom){
 			zoomCount = prevZoom;
 		},
 		redo: function() {
-			originx = x;
-			originy = y;
+			originx = x*zoom;
+			originy = y*zoom;
 			zoomCount = curZoom;
 		}
 	};
@@ -228,14 +231,72 @@ function applyZoom(x, y, curZoom, prevZoom){
 	return false;
 }
 
+// allows you to move translate the canvas while zoomed in
+function dragZoom(x, y){
+	isZoom = false;
+	originx = x*zoom;
+	originy = y*zoom;
+}
+
+/*
+function downloadImage(){
+	var img = canvas.toDataURL("image/jpeg;base64;");
+//	img = img.replace("image/jpeg","image/octet-stream"); // force download, user would have to give the file name.
+// you can also use anchor tag with download attribute to force download the canvas with file name.
+	window.open(img,"","width=700,height=700");
+}
+*/
+// save canvas to server
+function saveImage(){
+
+}
+
+// download canvas as JPEG
+// from http://www.joeltrost.com/blog/2012/01/29/html5-canvas-save-a-jpeg-with-extension/
+function downloadImage(){
+	var cs = new CanvasSaver('http://joeltrost.com/php/functions/saveme.php');
+	cs.saveJPEG(canvas, 'image');
+
+	function CanvasSaver(url) {
+	  this.url = url;
+	  this.saveJPEG = function(cnvs, fname) {
+	  if(!cnvs || !url) return;
+		fname = fname || 'picture';
+
+		var data = cnvs.toDataURL("image/jpeg");
+		data = data.substr(data.indexOf(',') + 1).toString();
+		var dataInput = document.createElement("input") ;
+		dataInput.setAttribute("name", 'imgdata') ;
+		dataInput.setAttribute("value", data);
+
+		var nameInput = document.createElement("input") ;
+		nameInput.setAttribute("name", 'name') ;
+		nameInput.setAttribute("value", fname + '.jpg');
+
+		var myForm = document.createElement("form");
+		myForm.method = 'post';
+		myForm.action = url;
+		myForm.appendChild(dataInput);
+		myForm.appendChild(nameInput);
+
+		document.body.appendChild(myForm) ;
+		myForm.submit() ;
+		document.body.removeChild(myForm) ;
+		
+	  };
+	}
+}
+
 function pointerDown(e) {
     var c = transformCoordinates(e);
     var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
     if (e.which == 3){
-        if (curTool == "zoom" && zoomCount > 0){
-            zoomCount -= 1;
-			applyZoom(x, y, zoomCount, zoomCount+1);
+        if (curTool == "zoom"){
+			isDragging = true;
+			zoomType = 'out';
+//          zoomCount -= 1;
+//			applyZoom(x, y, zoomCount, zoomCount+1);
         }
     }
     else{
@@ -343,19 +404,19 @@ function pointerDown(e) {
                 break;
 			case "textbox":
                 var dObj = {
-					theText: [new String()],
-					width: 120,
-					height: 80,
-					fontSize: 18,
+					theText: [[new String()]],
+					fontSize: thickness,
                     opacity: alpha,
+					type: textMode,
                     xScale: 1, 
                     yScale: 1, 
                     bound: [1,1],
                     rotation: 0,
                     pts: [x, y],
+					tPos: [x,y],
                 };    
-
-                createTextBox(dObj);
+				isDragging = true;
+                createTextBalloon(dObj);
                 break;
             case "dropper":
                 isDragging = true;
@@ -365,10 +426,12 @@ function pointerDown(e) {
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
             case "zoom":
-				if (zoomCount < 8){
-					zoomCount += 1;
-					applyZoom(x, y, zoomCount, zoomCount-1);
-				}
+//				if (zoomCount < 8){
+					isDragging = true;
+					zoomType = 'in';
+//					zoomCount += 1;
+//					applyZoom(x, y, zoomCount, zoomCount-1);
+//				}
                 break;
         }
     }
@@ -393,8 +456,12 @@ function pointerMove(e) {
                     eraseObject(id);
                 }
                 break;
+			case "zoom":
+				dragZoom(x,y);
+				break;
 			case "shape":
 				contShape(x,y);
+				break;
             case "select":
                 applyTransform(selectedId, x, y, dragMode, e);
                 break;
@@ -404,6 +471,9 @@ function pointerMove(e) {
                 myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
+			case "textbox":
+				placeTextArea(x,y);
+				break;
         }
     }
 }
@@ -419,14 +489,31 @@ function pointerEnd(e) {
         obj.rCorner[0] += 32;
         obj.rCorner[1] += 32;
     }
-
+	else if(curTool == 'zoom'){
+		if(isZoom == true){
+			if (zoomType == 'in'){
+				if (zoomCount < 8){
+					zoomCount += 1;
+					applyZoom(x, y, zoomCount, zoomCount-1);
+				}
+			}
+			else{
+				if(zoomCount > 0){
+					zoomCount -= 1;
+					applyZoom(x, y, zoomCount, zoomCount+1);
+				}
+			}
+		}
+		isZoom = true;
+	}
+	
     if(isDragging && (curTool == 'select')) {
         endTransform(selectedId, x, y, dragMode);
     }
     
     isDragging = false;
 }
-
+// moves selected object up in the layerList
 function layerUp (selectedId) {
 	if (selectedId != -1){
 		var currentId = objectList[selectedId].id;
@@ -452,7 +539,7 @@ function layerUp (selectedId) {
 	}
 	return false;
 }
-	
+// moves the selected object down in the layerList	
 function layerDown(selectedId) {
 	if (selectedId != -1){
 		var currentId = objectList[selectedId].id;
@@ -587,6 +674,7 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
+	document.onselectstart = function () { return false; };
     document.body.style.cursor="url(img/paintbrush.png) 0 28, default"; // sets the default cursor to the paintbrush
     //Ceate Color picker
     myCP = new ColorPicker();
@@ -635,11 +723,36 @@ $().ready( function() {
     $('#redo_button').attr('disabled', true);
     $('button').button().attr("autocomplete", "off");
 
+	
+	$('#download').click( function() {
+        downloadImage();
+    });
+	
     $('#brush').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('draw');
     });
 
+	$('#line').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('line');
+    });
+	
+	$('#circle').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('circle');
+    });
+	
+	$('#square').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('square');
+    });
+	
+	$('#triangle').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('triangle');
+    });
+	
     $('#spraycan').click( function() {
         document.body.style.cursor="url(img/spraycan.png)0 5, default";
         SelectTool('spraycan');
@@ -659,10 +772,6 @@ $().ready( function() {
         SelectTool('pencil');
     });
     
-    $('#fill').click( function() {
-        SelectTool('fill');
-    });
-    
     $('#erase').click( function() {
         document.body.style.cursor="url(img/eraser.png)0 28, default";
         SelectTool('erase');
@@ -679,12 +788,18 @@ $().ready( function() {
     });
     
     $('#fill').click( function() {
-        document.body.style.cursor="url(img/paintbucket.png)0 28, default";
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
         SelectTool('fill');
     });
 	$('#balloon').click( function() {
 		document.body.style.cursor="default";
          SelectTool('textbox');
+		 textMode = "balloon";
+    });
+	$('#textbox').click( function() {
+		document.body.style.cursor="default";
+         SelectTool('textbox');
+		 textMode = "box";
     });
     $('#butterfly').click( function() {
          SelectTool('stamp');
@@ -755,22 +870,23 @@ $().ready( function() {
     
     $(document).keydown(function(e) {
         var key = e.which;
-		var id;
+	
+		var id = layerList[layerList.length-1];
 		if(selectedId != -1 && objectList[selectedId].theText){ //short circuiting works in JS
 			id = selectedId;
 		}
-		else if(objectList[layerList[layerList.length-1]].theText){
-			id = layerList[layerList.length-1];
-		}
-		
-		
-		if(objectList[id].theText){
-			var length = objectList[id].theText.length;
+
+		console.log(id);
+		if(id != -1 && objectList[id].theText){
+			var num_lines = objectList[id].theText.length;
+			var num_words = objectList[id].theText[num_lines-1].length;
+			
 			if(key == 13){	//enter pressed
-				objectList[id].theText.push(new String());
+				objectList[id].theText.push([new String()]);
 				console.log("enter");
 			}
-			else if(key == 8){	//enter pressed
+			else if(key == 8){	//backspace pressed
+				var num_words = objectList[id].theText[length-1].length;
 				var s = objectList[id].theText[length-1];
 				if(s.length > 0){
 					objectList[id].theText[length-1] = s.substring(0,s.length-1);
@@ -779,24 +895,37 @@ $().ready( function() {
 					objectList[id].theText.pop();
 				console.log("back");
 			}
-			else{
+			else if(key == 32){	//space pressed
+				objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key);
+				objectList[id].theText[num_lines-1].push(new String());
+			}
+			else{ //alphanumeric
 				if(e.shiftKey)
-					objectList[id].theText[length-1] += String.fromCharCode(key);
-				else
-					objectList[id].theText[length-1] += String.fromCharCode(key+32);
+					objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key);
+				else{
+					objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key+32);
+					}
 			}
 			var max = 0;
-			for(var i=0; i< length; i++){
+			for(var i=0; i< num_lines; i++){
+				var n = objectList[id].theText[num_lines-1].length;
+				var t = 0;
+				for(var j=0; j<n ; j++){
+					t += objectList[id].theText[i][j].length;
+				}
+				if(t > max){
+					max = t;
+					objectList[id].max = i;
+				}
+				/*
 				if(objectList[id].theText[i] && objectList[id].theText[i].length > max){
 					max = objectList[id].theText[i].length;
 					objectList[id].max = i;
 				}
+				*/
 			}
-			
-			
-		   return;
+		    return;
 		}
-		
 		
         // Ctrl-Z or CMD-Z for Undo   Shift-* for Redo
         if ((e.ctrlKey) && ((key == 122 || key == 90))) {  // CTRL-Z
