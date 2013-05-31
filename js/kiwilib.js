@@ -123,16 +123,16 @@ function refreshCanvas() {
     // Redraw every object at the current zoom
 	z0 = Math.pow(factor,zoomCount-1);
 	zoom = Math.pow(factor,zoomCount);
-	var L1 = canvas.width*z0;
+	var L1 = drawing_canvas.width*z0;
 	var L2 = L1*zoom;
-	var x1 = originx*zoom;
+	var x1 = originx;
 	var x2 = x1*L2/L1;
 	
-	var L1 = canvas.height*z0;
-	var L2 = L1*zoom;
-	var y1 = originy*zoom;
-	var y2 = y1*L2/L1;
-	
+	var L3 = drawing_canvas.height*z0;
+	var L4 = L3*zoom;
+	var y1 = originy;
+	var y2 = y1*L4/L3;
+	//console.log(x1+ " " + y1);
 	
 	//console.log(ctx.canvas.width);
 	ctx.translate(x1-x2, y1-y2);
@@ -226,8 +226,8 @@ function eraseObject(id) {
 function applyZoom(x, y, curZoom, prevZoom){
 	var prevx = originx; 
 	var prevy = originy;
-	originx = (x);
-	originy = (y);
+	originx = (x*zoom);
+	originy = (y*zoom);
 
 	var newAct = {
 		undo: function() {
@@ -249,8 +249,8 @@ function applyZoom(x, y, curZoom, prevZoom){
 // allows you to move translate the canvas while zoomed in
 function dragZoom(x, y){
 	isZoom = false;
-	originx = x;
-	originy = y;
+	originx = x*zoom;
+	originy = y*zoom;
 }
 
 /*
