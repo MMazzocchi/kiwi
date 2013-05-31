@@ -121,10 +121,25 @@ function refreshCanvas() {
     ctx.translate(.5,.5);
 	
     // Redraw every object at the current zoom
+	z0 = Math.pow(factor,zoomCount-1);
 	zoom = Math.pow(factor,zoomCount);
-	ctx.translate(originx, originy);
+	var L1 = canvas.width*z0;
+	var L2 = L1*zoom;
+	var x1 = originx*zoom;
+	var x2 = x1*L2/L1;
+	
+	var L1 = canvas.height*z0;
+	var L2 = L1*zoom;
+	var y1 = originy*zoom;
+	var y2 = y1*L2/L1;
+	
+	
+	//console.log(ctx.canvas.width);
+	ctx.translate(x1-x2, y1-y2);
+	//ctx.save();
 	ctx.scale(zoom, zoom);
-	ctx.translate(-originx, -originy);
+	//ctx.translate(originx, originy);
+	//ctx.restore();
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
@@ -211,8 +226,8 @@ function eraseObject(id) {
 function applyZoom(x, y, curZoom, prevZoom){
 	var prevx = originx; 
 	var prevy = originy;
-	originx = (x*zoom/2);
-	originy = (y*zoom/2);
+	originx = (x);
+	originy = (y);
 
 	var newAct = {
 		undo: function() {
@@ -221,8 +236,8 @@ function applyZoom(x, y, curZoom, prevZoom){
 			zoomCount = prevZoom;
 		},
 		redo: function() {
-			originx = x*zoom;
-			originy = y*zoom;
+			originx = x;
+			originy = y;
 			zoomCount = curZoom;
 		}
 	};
@@ -234,8 +249,8 @@ function applyZoom(x, y, curZoom, prevZoom){
 // allows you to move translate the canvas while zoomed in
 function dragZoom(x, y){
 	isZoom = false;
-	originx = x*zoom;
-	originy = y*zoom;
+	originx = x;
+	originy = y;
 }
 
 /*
