@@ -617,7 +617,7 @@ function updateThick(slideAmount) {        // gets thickness from slider and set
 }
 function updateOpac(slideAmount) {        // gets opacity from slider and sets the global opacity
     alpha = slideAmount/100;
-    myCP.Refresh();
+    myCP.updateColor();
 }
 
 function updateTint(slideAmount) {        // gets tint from slider and sets the light setting in the color picker

@@ -64,14 +64,14 @@ function ColorPicker()
       dc.drawImage(cpdisc,0,0);
       dc.save();
       if (this.curL < 50) {
-        dc.globalAlpha = (50-this.curL)/50;
+        dc.globalAlpha = alpha;
         dc.fillStyle = '#000000';
         dc.beginPath();
         dc.arc(cx, cy, cx-1, 0, 2 * Math.PI, false);
         dc.fill();
       }
       else if (this.curL > 50) {
-        dc.globalAlpha = (this.curL-50)/50;
+        dc.globalAlpha = alpha;
         dc.fillStyle = '#FFFFFF';
         dc.beginPath();
         dc.arc(cx, cy, cx-1, 0, 2 * Math.PI, false);
