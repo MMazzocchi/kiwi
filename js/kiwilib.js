@@ -460,7 +460,7 @@ function pointerMove(e) {
 				dragZoom(x,y);
 				break;
 			case "shape":
-				contShape(x,y);
+				contShape(x,y,e);
 				break;
             case "select":
                 applyTransform(selectedId, x, y, dragMode, e);
