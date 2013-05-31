@@ -83,7 +83,7 @@ function refreshCanvas() {
 	
     if(orienting()) {
         orientation = window.orientation;
-        ctx.rotate(-orientation*Math.PI/180);
+      //  ctx.rotate(-orientation*Math.PI/180);
 
         ctx.fillStyle="#FFFFFF";
 
@@ -115,7 +115,7 @@ function refreshCanvas() {
         else // landscape
             ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
-    ctx.translate(.5,.5);
+//    ctx.translate(.5,.5);
 	
     // Redraw every object at the current zoom
 	zoom = Math.pow(factor,zoomCount);

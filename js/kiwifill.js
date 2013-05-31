@@ -61,102 +61,168 @@ function getData(x, y, cData, width) {
     return data;
 }
 
-function findSegments(dObj, x,y, segments, width, height, ctx) {
+function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
+    var segmentN = false;
+    var segmentS = false;
+
+    var nQueue = [];
+    var sQueue = [];
+
+    //ex is East x; it'll be the farthest point east we can go in the current segment
+    var ex = pt[0];
+
+    while(validPoint(ex,pt[1],color,checked,ctx,cData,width,height)) {
+        checked[""+ex+","+pt[1]] = 1;
+        if(validPoint(ex,pt[1]+1,color,checked,ctx,cData,width,height)) {
+            if(!segmentN) {
+                nQueue.push([ex, pt[1]+1]);
+                segmentN = true;
+            }
+        } else {
+            if(segmentN) {
+                segmentN = false;
+            }
+        }
+        if(validPoint(ex,pt[1]-1,color,checked,ctx,cData,width,height)) {
+            if(!segmentS) {
+                sQueue.push([ex, pt[1]-1]);
+                segmentS = true;
+            }
+        } else {
+            if(segmentS) {
+                segmentS = false;
+            }
+        }
+        ex--;
+    }
+
+    //Reset the point so we can start looking west
+    var wx = pt[0]+1;
+
+    //Eliminate duplicate segments
+    segmentN = validPoint(wx-1,pt[1]+1,color,checked,ctx,cData,width,height);
+    segmentS = validPoint(wx-1,pt[1]-1,color,checked,ctx,cData,width,height);
+
+    //Start going west
+    while(validPoint(wx,pt[1],color,checked,ctx,cData,width,height)) {
+        checked[""+wx+","+pt[1]] = 1;
+        if(validPoint(wx,pt[1]+1,color,checked,ctx,cData,width,height)) {
+            if(!segmentN) {
+                nQueue.push([wx, pt[1]+1]);
+                segmentN = true;
+            }
+        } else {
+            if(segmentN) {
+                segmentN = false;
+            }
+        }
+
+        if(validPoint(wx,pt[1]-1,color,checked,ctx,cData,width,height)) {
+            if(!segmentS) {
+                sQueue.push([wx, pt[1]-1]);
+                segmentS = true;
+            }
+        } else {
+            if(segmentS) {
+                segmentS = false;
+            }
+        }
+        wx++;
+    }
+
+    var data = {
+        ex: ex,
+        wx: wx,
+        nQueue: nQueue,
+        sQueue: sQueue,
+    };
+    return data;
+} 
+
+function findSectors(dObj, x, y, sectors, width, height, ctx) {
     console.log("Initial point: ("+x+","+y+")");
     x = Math.round(x); y = Math.round(y);
+    var nPtr = 0;
+    var sPtr = 0;
     var ptr = 0;
     var color = ctx.getImageData(x,y,1,1).data;
     var checked = {};
     var queue = [[x,y]];
+    var nQueue = [];
+    var sQueue = [];
 
     var cData = ctx.getImageData(0,0,width,height).data;
 
-    var segmentN = false;
-    var segmentS = false;
-
     while(ptr < queue.length) {
+
+        //queue holds "sector seeds"; the initial point we use to find the sector
         var pt = queue[ptr];
-        segmentN = false;
-        segmentS = false;
 
-        var sx1 = pt[0];
+        //lPts/rPts will hold the points bounding the left and right sides of this sector
+        var lPts = [];
+        var rPts = [];
 
-        while(validPoint(sx1,pt[1],color,checked,ctx,cData,width,height)) {
-            checked[""+sx1+","+pt[1]] = 1;
-            if(validPoint(sx1,pt[1]+1,color,checked,ctx,cData,width,height)) {
-                if(!segmentN) {
-                    queue.push([sx1, pt[1]+1]);
-                    segmentN = true;
-                }
-            } else {
-                if(segmentN) {
-                    segmentN = false;
-                }
-            }
+        var data = searchSegment(pt, color, checked, ctx, cData, width, height, 'both');
 
-            if(validPoint(sx1,pt[1]-1,color,checked,ctx,cData,width,height)) {
-                if(!segmentS) {
-                    queue.push([sx1, pt[1]-1]);
-                    segmentS = true;
-                }
-            } else {
-                if(segmentS) {
-                    segmentS = false;
-                }
-            }
-            sx1--;
-        }
+        //ex and wx now coorespond to the endpoints of this segment. nQueue and sQueue hold the seeds for the segments to the North and South of us
+        lPts.push([data.ex,pt[1]]);
+        rPts.push([data.wx,pt[1]]);
 
-        pt = [queue[ptr][0]+1, queue[ptr][1]];
-        var sx2 = pt[0];
-
-        segmentN = false;
-        segmentS = false;
-
-        while(validPoint(sx2,pt[1],color,checked,ctx,cData,width,height)) {
-            checked[""+sx2+","+pt[1]] = 1;
-            if(validPoint(sx2,pt[1]+1,color,checked,ctx,cData,width,height)) {
-                if(!segmentN) {
-                    queue.push([sx2, pt[1]+1]);
-                    segmentN = true;
-                }
-            } else {
-                if(segmentN) {
-                    segmentN = false;
-                }
-            }
-            if(validPoint(sx2,pt[1]-1,color,checked,ctx,cData,width,height)) {
-                if(!segmentS) {
-                    queue.push([sx2, pt[1]-1]);
-                    segmentS = true;
-                }
-            } else {
-                if(segmentS) {
-                    segmentS = false;
-                }
-            }
-            sx2++;
-        }
-
-        segments.push([[sx1,pt[1]],[sx2,pt[1]]]);
-
-        if(dObj.lCorner == -1) {
-            dObj.lCorner = [sx1, pt[1]];
-            dObj.rCorner = [sx2, pt[1]];
+        //If there are 2+ or no segments above us, the segment seeds of the nQueue become sector seeds
+        if(data.nQueue.length != 1) {
+            queue = queue.concat(data.nQueue);
         } else {
-            if(sx1 < dObj.lCorner[0]) { dObj.lCorner[0] = sx1; }
-            if(sx2 > dObj.rCorner[0]) { dObj.rCorner[0] = sx2; }
-            if(pt[1] < dObj.lCorner[1]) { dObj.lCorner[1] = pt[1]; }
-            if(pt[1] > dObj.rCorner[1]) { dObj.rCorner[1] = pt[1]; }
+            var nQueue = data.nQueue;
+            while(nQueue.length == 1) {
+                pt = nQueue[0];
+                var nData = searchSegment(pt, color, checked, ctx, cData, width, height, 'north');
+                lPts.push([nData.ex,pt[1]]);
+                rPts.splice(0,0,[nData.wx,pt[1]]);
+                nQueue = nData.nQueue;
+                queue = queue.concat(nData.sQueue);
+            }
+            queue = queue.concat(nQueue);
         }
 
-        dObj.mx = (dObj.lCorner[0]+dObj.rCorner[0])/2;
-        dObj.my = (dObj.lCorner[1]+dObj.rCorner[1])/2;
+        //If there are 2+ or no segments below us, the segment seeds of sQueue become sector seeds
+        if(data.sQueue.length != 1) {
+            queue = queue.concat(data.sQueue);
+        } else {
+            var sQueue = data.sQueue;
+            while(sQueue.length == 1) {
+                pt = sQueue[0];
+                var sData = searchSegment(pt, color, checked, ctx, cData, width, height, 'south');
+                lPts.splice(0,0,[sData.ex,pt[1]]);
+                rPts.push([sData.wx,pt[1]]);
+                sQueue = sData.sQueue;
+                queue = queue.concat(sData.nQueue);
+            }
+            queue = queue.concat(sQueue);
+        }
 
+        //Close up this sector
+        var sector = lPts.concat(rPts);
+        sector[0][1] += .25;
+        sector[sector.length-1][1] -= 1.25;
+        sectors.push(sector);
+
+        if(dObj.lCorner == -1) { 
+            dObj.lCorner = [sector[0][0], sector[0][1]];
+            dObj.rCorner = [sector[0][0], sector[0][1]];
+        }
+        for(var i=0; i<sector.length; i++) {
+            var sPt = sector[i];
+            if(sPt[0] < dObj.lCorner[0]) { dObj.lCorner[0] = sPt[0]; }
+            if(sPt[0] > dObj.rCorner[0]) { dObj.rCorner[0] = sPt[0]; }
+            if(sPt[1] < dObj.lCorner[1]) { dObj.lCorner[1] = sPt[1]; }
+            if(sPt[1] > dObj.rCorner[1]) { dObj.rCorner[1] = sPt[1]; }
+        }
         ptr++;
     }
-
+    dObj.mx = Math.round((dObj.lCorner[0]+dObj.rCorner[0])/2);
+    dObj.my = Math.round((dObj.lCorner[1]+dObj.rCorner[1])/2);
 }
+
 
 function createFill(dObj){
     assignID(dObj);
@@ -165,25 +231,46 @@ function createFill(dObj){
     var width = canvas.width;
     var x = dObj.pts[0][0];
     var y = dObj.pts[0][1];
-    dObj.segments = [];
-    findSegments(dObj, x,y,dObj.segments, width, height, canvas.getContext('2d'));
+    dObj.sectors = [];
+    findSectors(dObj,x,y,dObj.sectors,width,height,canvas.getContext('2d'));
 
-    dObj.draw = function(ctx) {
+    dObj.drawSector = function(i, ctx) {
         ctx.save();
-        ctx.translate(this.mx, this.my); 
+        ctx.translate(this.mx, this.my);
         ctx.rotate(this.rotation);
         ctx.scale(this.xScale, this.yScale);
 
-        ctx.lineWidth = 1;
-        ctx.strokeStyle = this.color;
-        ctx.globalAlpha = this.opacity;
+        var sector = this.sectors[i];
         ctx.beginPath();
-        for(var i=0; i<this.segments.length; i++) {
-            var seg = this.segments[i];
-            ctx.moveTo(seg[0][0]-this.mx, seg[0][1]-this.my);
-            ctx.lineTo(seg[1][0]-this.mx, seg[1][1]-this.my);
+        ctx.moveTo(sector[0][0]-this.mx, sector[0][1]-this.my);
+        for(var j=1; j<sector.length; j++) {
+            ctx.lineTo(sector[j][0]-this.mx, sector[j][1]-this.my);
         }
-        ctx.stroke(); 
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+    };
+
+    dObj.draw = function(ctx) {
+        ctx.save();
+        ctx.fillStyle = this.color;
+        ctx.globalAlpha = this.opacity;
+
+        ctx.translate(1,0);
+        ctx.translate(Math.round(this.mx), Math.round(this.my));
+        ctx.rotate(this.rotation);
+        ctx.scale(this.xScale, this.yScale);
+
+        for(var i=0; i<this.sectors.length; i++) {
+            var sector = this.sectors[i];
+            ctx.beginPath();
+            ctx.moveTo(sector[0][0]-this.mx, sector[0][1]-this.my);
+            for(var j=1; j<sector.length; j++) {
+                ctx.lineTo(sector[j][0]-this.mx-.5, sector[j][1]-this.my+.5);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
         ctx.restore();
     };
     dObj.select = function(x,y) {
@@ -197,11 +284,11 @@ function createFill(dObj){
         return (imageData.data[3] > 0 || imageData.data[0] > 0);
     };
     dObj.move = function(dx,dy) {
-        for(var i=0; i<this.segments.length; i++) {
-            this.segments[i][0][0]+=dx;
-            this.segments[i][1][0]+=dx;
-            this.segments[i][0][1]+=dy;
-            this.segments[i][1][1]+=dy;
+        for(var i=0; i<this.sectors.length; i++) {
+            for(var j=0; j<this.sectors[i].length; j++) {
+                this.sectors[i][j][0]+=dx;
+                this.sectors[i][j][1]+=dy;
+            }
         }
         this.lCorner[0]+=dx;
         this.rCorner[0]+=dx;
