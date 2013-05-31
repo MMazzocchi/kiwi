@@ -183,24 +183,24 @@ function createShape(dObj) {
 	}
 }
 
-function contShape(x,y){
+function contShape(x,y,e){
 	var dObj = objectList[layerList[layerList.length-1]];
 	if (dObj.type == 'circle'){
-		contCircle(dObj, x, y);
+		contCircle(dObj, x, y, e);
 	}
 	else if (dObj.type == 'square'){
-		contSquare(dObj, x, y);
+		contSquare(dObj, x, y, e);
 	}
 	else if (dObj.type == 'line'){
-		contLine(dObj, x, y);
+		contLine(dObj, x, y, e);
 	}
 	else if (dObj.type == 'triangle'){
-		contTriangle(dObj, x, y);
+		contTriangle(dObj, x, y, e);
 	}
 	return false;
 }
 
-function contCircle(dObj, x, y){
+function contCircle(dObj, x, y, e){
 	if (dObj.pts.length > 1){
 		dObj.pts.pop();
 		dObj.pts.push([(dObj.pts[0][0]+x)/2, (dObj.pts[0][1]+y)/2]);
@@ -217,27 +217,43 @@ function contCircle(dObj, x, y){
 	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
 }
 
-function contSquare(dObj, x, y){
+function contSquare(dObj, x, y, e){
 	dObj.rCorner[0] = x;
 	dObj.rCorner[1] = y;
-	dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
-	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
 	if (dObj.pts.length > 1){
 		dObj.pts.pop();
 		dObj.pts.pop();
 		dObj.pts.pop();
-		dObj.pts.push([dObj.pts[0][0], y]);
-		dObj.pts.push([x, y]);
-		dObj.pts.push([x, dObj.pts[0][1]]);
+		if(e.shiftKey){ // locks ratio
+			dObj.pts.push([dObj.pts[0][0], y]);
+			dObj.pts.push([dObj.pts[0][0]+(y-dObj.pts[0][1]), y]);
+			dObj.pts.push([dObj.pts[0][0]+(y-dObj.pts[0][1]), dObj.pts[0][1]]);
+			dObj.rCorner[0] = dObj.pts[0][0]+(y-dObj.pts[0][1]);
+		}
+		else{
+			dObj.pts.push([dObj.pts[0][0], y]);
+			dObj.pts.push([x, y]);
+			dObj.pts.push([x, dObj.pts[0][1]]);
+		}
 	}
 	else{
-		dObj.pts.push([dObj.pts[0][0], y]);
-		dObj.pts.push([x, y]);
-		dObj.pts.push([x, dObj.pts[0][1]]);
+		if(e.shiftKey){	// locks ratio
+			dObj.pts.push([dObj.pts[0][0], y]);
+			dObj.pts.push([dObj.pts[0][0]+(y-dObj.pts[0][1]), y]);
+			dObj.pts.push([dObj.pts[0][0]+(y-dObj.pts[0][1]), dObj.pts[0][1]]);
+			dObj.rCorner[0] = dObj.pts[0][0]+(y-dObj.pts[0][1]);
+		}
+		else{
+			dObj.pts.push([dObj.pts[0][0], y]);
+			dObj.pts.push([x, y]);
+			dObj.pts.push([x, dObj.pts[0][1]]);
+		}
 	}
+	dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
+	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
 }
 
-function contLine(dObj, x, y){
+function contLine(dObj, x, y, e){
 	if(x < dObj.pts[0][0]) { dObj.lCorner[0] = x; }
     if(x > dObj.pts[0][0]) { dObj.rCorner[0] = x; }
     if(y < dObj.pts[0][1]) { dObj.lCorner[1] = y; }
@@ -253,21 +269,36 @@ function contLine(dObj, x, y){
 	}
 }
 
-function contTriangle(dObj, x, y){
+function contTriangle(dObj, x, y, e){
 	console.log("triangle");
-	dObj.lCorner[0] = dObj.pts[0][0] - ((y - dObj.pts[0][1])/2);
-	dObj.rCorner[0] = dObj.pts[0][0] + ((y - dObj.pts[0][1])/2);
-	dObj.rCorner[1] = y;
+	if(x < dObj.pts[0][0]) { dObj.lCorner[0] = x; }
+	else{ dObj.lCorner[0] = dObj.pts[0][0]-(x-dObj.pts[0][0]); }
+    if(x > dObj.pts[0][0]) { dObj.rCorner[0] = x; }
+	else{ dObj.rCorner[0] = dObj.pts[0][0]-(x-dObj.pts[0][0]); }
+    if(y < dObj.pts[0][1]) { dObj.lCorner[1] = y; }
+    if(y > dObj.pts[0][1]) { dObj.rCorner[1] = y; }
 	dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
 	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
 	if (dObj.pts.length > 1){
 		dObj.pts.pop();
 		dObj.pts.pop();
-		dObj.pts.push([dObj.pts[0][0] - ((y - dObj.pts[0][1])/2), y]);
-		dObj.pts.push([dObj.pts[0][0] + ((y - dObj.pts[0][1])/2), y]);
+		if (e.shiftKey){	// locks ratio
+			dObj.pts.push([dObj.pts[0][0] - ((y - dObj.pts[0][1])/2), y]);
+			dObj.pts.push([dObj.pts[0][0] + ((y - dObj.pts[0][1])/2), y]);
+		}
+		else{
+			dObj.pts.push([dObj.pts[0][0]-(x-dObj.pts[0][0]), y]);
+			dObj.pts.push([x, y]);
+		}
 	}
 	else{
-		dObj.pts.push([dObj.pts[0][0] - ((dObj.pts[0][1] - y)/2), y]);
-		dObj.pts.push([dObj.pts[0][0] + ((dObj.pts[0][1] - y)/2), y]);
+		if (e.shiftKey){	// locks ratio
+			dObj.pts.push([dObj.pts[0][0] - ((y - dObj.pts[0][1])/2), y]);
+			dObj.pts.push([dObj.pts[0][0] + ((y - dObj.pts[0][1])/2), y]);
+		}
+		else{
+			dObj.pts.push([dObj.pts[0][0]-(x-dObj.pts[0][0]), y]);
+			dObj.pts.push([x, y]);
+		}
 	}
 }

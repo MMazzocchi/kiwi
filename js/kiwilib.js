@@ -86,7 +86,7 @@ function refreshCanvas() {
 	
     if(orienting()) {
         orientation = window.orientation;
-        ctx.rotate(-orientation*Math.PI/180);
+      //  ctx.rotate(-orientation*Math.PI/180);
 
         ctx.fillStyle="#FFFFFF";
 
@@ -118,7 +118,7 @@ function refreshCanvas() {
         else // landscape
             ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
-    ctx.translate(.5,.5);
+//    ctx.translate(.5,.5);
 	
     // Redraw every object at the current zoom
 	z0 = Math.pow(factor,zoomCount-1);
@@ -475,7 +475,7 @@ function pointerMove(e) {
 				dragZoom(x,y);
 				break;
 			case "shape":
-				contShape(x,y);
+				contShape(x,y,e);
 				break;
             case "select":
                 applyTransform(selectedId, x, y, dragMode, e);
