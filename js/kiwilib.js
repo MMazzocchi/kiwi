@@ -121,10 +121,25 @@ function refreshCanvas() {
 //    ctx.translate(.5,.5);
 	
     // Redraw every object at the current zoom
+	z0 = Math.pow(factor,zoomCount-1);
 	zoom = Math.pow(factor,zoomCount);
-	ctx.translate(originx, originy);
+	var L1 = drawing_canvas.width*z0;
+	var L2 = L1*zoom;
+	var x1 = originx;
+	var x2 = x1*L2/L1;
+	
+	var L3 = drawing_canvas.height*z0;
+	var L4 = L3*zoom;
+	var y1 = originy;
+	var y2 = y1*L4/L3;
+	//console.log(x1+ " " + y1);
+	
+	//console.log(ctx.canvas.width);
+	ctx.translate(x1-x2, y1-y2);
+	//ctx.save();
 	ctx.scale(zoom, zoom);
-	ctx.translate(-originx, -originy);
+	//ctx.translate(originx, originy);
+	//ctx.restore();
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
@@ -211,8 +226,8 @@ function eraseObject(id) {
 function applyZoom(x, y, curZoom, prevZoom){
 	var prevx = originx; 
 	var prevy = originy;
-	originx = (x*zoom/2);
-	originy = (y*zoom/2);
+	originx = (x*zoom);
+	originy = (y*zoom);
 
 	var newAct = {
 		undo: function() {
@@ -221,8 +236,8 @@ function applyZoom(x, y, curZoom, prevZoom){
 			zoomCount = prevZoom;
 		},
 		redo: function() {
-			originx = x*zoom;
-			originy = y*zoom;
+			originx = x;
+			originy = y;
 			zoomCount = curZoom;
 		}
 	};
@@ -460,7 +475,7 @@ function pointerMove(e) {
 				dragZoom(x,y);
 				break;
 			case "shape":
-				contShape(x,y);
+				contShape(x,y,e);
 				break;
             case "select":
                 applyTransform(selectedId, x, y, dragMode, e);
@@ -617,7 +632,7 @@ function updateThick(slideAmount) {        // gets thickness from slider and set
 }
 function updateOpac(slideAmount) {        // gets opacity from slider and sets the global opacity
     alpha = slideAmount/100;
-    myCP.Refresh();
+    myCP.updateColor();
 }
 
 function updateTint(slideAmount) {        // gets tint from slider and sets the light setting in the color picker
@@ -679,10 +694,7 @@ $().ready( function() {
     //Ceate Color picker
     myCP = new ColorPicker();
     myCP.setHSL(0,90,50);
-    // Prevent default actions for touch events
-    document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
-    document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
-    document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
+    
     //Refresh on orientation changes
     window.addEventListener( 'resize', refreshCanvas );
     window.addEventListener( 'orientationchange', refreshCanvas );
@@ -690,6 +702,10 @@ $().ready( function() {
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
 	toolbar = document.getElementById('toolbar');
+	
+	canvas.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
+    canvas.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
+    canvas.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
     
 
     // Bind an action.
