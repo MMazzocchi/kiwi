@@ -64,14 +64,14 @@ function ColorPicker()
       dc.drawImage(cpdisc,0,0);
       dc.save();
       if (this.curL < 50) {
-        dc.globalAlpha = alpha;
+        dc.globalAlpha = (50-this.curL)/50;
         dc.fillStyle = '#000000';
         dc.beginPath();
         dc.arc(cx, cy, cx-1, 0, 2 * Math.PI, false);
         dc.fill();
       }
       else if (this.curL > 50) {
-        dc.globalAlpha = alpha;
+        dc.globalAlpha = (this.curL-50)/50;
         dc.fillStyle = '#FFFFFF';
         dc.beginPath();
         dc.arc(cx, cy, cx-1, 0, 2 * Math.PI, false);
@@ -202,9 +202,9 @@ function ColorPicker()
 	$('#colorpicker_canvas').mousedown( HandleColorClick );
 	$('#colorpicker_canvas').mousemove( HandleColorDrag );
 	$('#colorpicker_canvas').mouseup( HandleColorUp );
-	cpcanvas.addEventListener('touchmove', HandleColorDrag );
-	cpcanvas.addEventListener('touchstart', HandleColorClick );
-    cpcanvas.addEventListener('touchend', HandleColorUp );
+	$('#colorpicker_canvas').bind('touchstart', HandleColorClick );
+    $('#colorpicker_canvas').bind('touchmove', HandleColorDrag );
+	$('#colorpicker_canvas').bind('touchend', HandleColorUp );
 }
 
  // Color Utility Functions - currently unused - using rgb(r,g,b) or rgba(r,g,b,a) or hsla(h,s,l,a) instead
