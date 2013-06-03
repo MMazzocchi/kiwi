@@ -176,10 +176,28 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
             while(nQueue.length == 1) {
                 pt = nQueue[0];
                 var nData = searchSegment(pt, color, checked, ctx, cData, width, height, 'north');
-                lPts.push([nData.ex,pt[1]]);
-                rPts.splice(0,0,[nData.wx,pt[1]]);
+                //Account for joints between sectors
+                if(nData.sQueue.length > 0) {
+                    for(var i=0; i<nData.sQueue.length; i++) {
+                        var sPt = nData.sQueue[i];
+                        if(sPt[0] < pt[0]) {
+                            lPts.push([sPt[0], pt[1]-1]);
+                        } else {
+                            rPts.splice(0,0,[sPt[0], pt[1]-1]);
+                        }
+                    }
+                    lPts.push([nData.ex,pt[1]-1]);
+                    rPts.splice(0,0,[nData.wx,pt[1]-1]);
+                } else {
+                    lPts.push([nData.ex,pt[1]]);
+                    rPts.splice(0,0,[nData.wx,pt[1]]);
+                }
                 nQueue = nData.nQueue;
                 queue = queue.concat(nData.sQueue);
+            }
+            if(nQueue.length > 0) {
+                lPts[lPts.length-1][1] += 1;
+                rPts[0][1] += 1;
             }
             queue = queue.concat(nQueue);
         }
@@ -192,18 +210,35 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
             while(sQueue.length == 1) {
                 pt = sQueue[0];
                 var sData = searchSegment(pt, color, checked, ctx, cData, width, height, 'south');
-                lPts.splice(0,0,[sData.ex,pt[1]]);
-                rPts.push([sData.wx,pt[1]]);
+                if(sData.nQueue.length > 0) {
+                    for(var i=0; i<sData.nQueue.length; i++) {
+                        var nPt = sData.nQueue[i];
+                        if(nPt[0] > pt[0]) {
+                            rPts.push([nPt[0], pt[1]+1]);
+                        } else {
+                            lPts.splice(0,0,[nPt[0], pt[1]+1]);
+                        }
+                    }
+                    lPts.splice(0,0,[sData.ex,pt[1]+1]);
+                    rPts.push([sData.wx,pt[1]+1]);
+                } else {
+                    lPts.splice(0,0,[sData.ex,pt[1]]);
+                    rPts.push([sData.wx,pt[1]]);
+                }
                 sQueue = sData.sQueue;
                 queue = queue.concat(sData.nQueue);
+            }
+            if(sQueue.length > 0) {
+                lPts[0][1] -= 1;
+                rPts[rPts.length-1][1] -= 1;
             }
             queue = queue.concat(sQueue);
         }
 
         //Close up this sector
         var sector = lPts.concat(rPts);
-        sector[0][1] += .25;
-        sector[sector.length-1][1] -= 1.25;
+//        sector[0][1] -= 1;
+//        sector[sector.length-1][1] -= 1;
         sectors.push(sector);
 
         if(dObj.lCorner == -1) { 
@@ -234,23 +269,6 @@ function createFill(dObj){
     dObj.sectors = [];
     findSectors(dObj,x,y,dObj.sectors,width,height,canvas.getContext('2d'));
 
-    dObj.drawSector = function(i, ctx) {
-        ctx.save();
-        ctx.translate(this.mx, this.my);
-        ctx.rotate(this.rotation);
-        ctx.scale(this.xScale, this.yScale);
-
-        var sector = this.sectors[i];
-        ctx.beginPath();
-        ctx.moveTo(sector[0][0]-this.mx, sector[0][1]-this.my);
-        for(var j=1; j<sector.length; j++) {
-            ctx.lineTo(sector[j][0]-this.mx, sector[j][1]-this.my);
-        }
-        ctx.closePath();
-        ctx.fill();
-        ctx.restore();
-    };
-
     dObj.draw = function(ctx) {
         ctx.save();
         ctx.fillStyle = this.color;
@@ -262,14 +280,29 @@ function createFill(dObj){
         ctx.scale(this.xScale, this.yScale);
 
         for(var i=0; i<this.sectors.length; i++) {
+            ctx.fillStyle = this.color;
             var sector = this.sectors[i];
             ctx.beginPath();
             ctx.moveTo(sector[0][0]-this.mx, sector[0][1]-this.my);
             for(var j=1; j<sector.length; j++) {
-                ctx.lineTo(sector[j][0]-this.mx-.5, sector[j][1]-this.my+.5);
+                ctx.lineTo(sector[j][0]-this.mx, sector[j][1]-this.my);
             }
             ctx.closePath();
             ctx.fill();
+/*
+            ctx.beginPath();
+            ctx.fillStyle = "black";
+            ctx.moveTo(sector[0][0]-this.mx, sector[0][1]-this.my);
+            ctx.lineTo(sector[sector.length-1][0]-this.mx, sector[sector.length-1][1]-this.my);
+            ctx.closePath();
+            ctx.stroke();
+//            ctx.beginPath();
+//            ctx.fillStyle = "black";
+//            ctx.moveTo(sector[sector.length/2][0]-this.mx, sector[sector.length/2][1]-this.my);
+//            ctx.lineTo(sector[(sector.length/2)-1][0]-this.mx, sector[(sector.length/2)-1][1]-this.my);
+//            ctx.closePath();
+//            ctx.stroke();
+*/
         }
         ctx.restore();
     };
