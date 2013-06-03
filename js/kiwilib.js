@@ -694,10 +694,7 @@ $().ready( function() {
     //Ceate Color picker
     myCP = new ColorPicker();
     myCP.setHSL(0,90,50);
-    // Prevent default actions for touch events
-    document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
-    document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
-    document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
+    
     //Refresh on orientation changes
     window.addEventListener( 'resize', refreshCanvas );
     window.addEventListener( 'orientationchange', refreshCanvas );
@@ -705,6 +702,10 @@ $().ready( function() {
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
 	toolbar = document.getElementById('toolbar');
+	
+	canvas.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
+    canvas.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
+    canvas.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
     
 
     // Bind an action.
