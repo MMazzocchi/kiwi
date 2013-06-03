@@ -171,7 +171,7 @@ function ColorPicker()
     e.preventDefault();
     var ofst = $(this).offset();
     var first = e;
-    if ("touches" in e.originalEvent) {
+    if ("touches" in e.originalEvent || e.originalEvent.type === 'keydown') {
       first = e.originalEvent.touches[0];
     }
     var px = first.pageX - ofst.left;
