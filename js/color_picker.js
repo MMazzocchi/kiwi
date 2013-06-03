@@ -172,7 +172,7 @@ function ColorPicker()
     var ofst = $(this).offset();
 	var first = e;
     //if ("keydown" in e.originalEvent || "touches" in e.originalEvent) {
-	if ($.inArray('keydown', e.originalEvent) > -1 || $.inArray('touches', e.originalEvent) > -1) {
+	if (inArray('keydown', e.originalEvent) > -1 || inArray('touches', e.originalEvent) > -1) {
       first = e.originalEvent.touches[0];
     }
     var px = first.pageX - ofst.left;
