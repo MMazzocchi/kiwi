@@ -86,7 +86,7 @@ function refreshCanvas() {
 	
     if(orienting()) {
         orientation = window.orientation;
-      //  ctx.rotate(-orientation*Math.PI/180);
+        ctx.rotate(-orientation*Math.PI/180);
 
         ctx.fillStyle="#FFFFFF";
 
