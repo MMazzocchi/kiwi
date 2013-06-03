@@ -255,18 +255,22 @@ function createTextBalloon(dObj) {
 					ctx.translate(this.tPos[0]-this.pts[0],0);
 				var wraps = 0;
 				for(var i=0; i<this.theText.length; i++){
+					var line_length = 0; 
 					for(var j=0; j<this.theText[i].length; j++){
-						var line_length = 0;
+						
 						var span = 0;
-						for(var k=0; k<j; k++){
-							var met = ctx.measureText(this.theText[i][k]);
+						var nl = 0;
+						
+						if(j > 0){
+							var met = ctx.measureText(this.theText[i][j-1]);
 							line_length += met.width;
 						}
-						for(var k=0; k<=j; k++){
-							var last = ctx.measureText(this.theText[i][k]);
-							span += last.width;
-						}
-						if(span > this.width && this.theText[i].length > 1){
+						
+						var last = ctx.measureText(this.theText[i][j]);
+						span = last.width+line_length;
+							
+						if(span > this.width && this.theText[i].length > j){
+							nl= j;
 							wraps++;
 							line_length = 0;
 						}
