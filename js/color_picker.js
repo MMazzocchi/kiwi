@@ -171,10 +171,11 @@ function ColorPicker()
     e.preventDefault();
     var ofst = $(this).offset();
 	var first = e;
-    //if ("keydown" in e.originalEvent || "touches" in e.originalEvent) {
-	if (e.originalEvent.indexOf('keydown') > -1 || e.originalEvent.indexOf('touches') > -1) {
-      first = e.originalEvent.touches[0];
-    }
+	if ( e.originalEvent === undefined )
+        alert( 'triggered programmatically' );   
+    else 
+		if ("keydown" in e.originalEvent || "touches" in e.originalEvent) 
+		  first = e.originalEvent.touches[0];
     var px = first.pageX - ofst.left;
     var py = first.pageY - ofst.top;
     myCP.handleClick(px,py);
