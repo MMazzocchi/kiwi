@@ -171,10 +171,8 @@ function ColorPicker()
     e.preventDefault();
     var ofst = $(this).offset();
 	var first = e;
-	if ( e.originalEvent !== undefined ) {
-		if ("keydown" in e.originalEvent || "touches" in e.originalEvent) 
-		  first = e.originalEvent.touches[0];
-	}
+	if (e.originalEvent !== undefined && "touches" in e.originalEvent) 
+		first = e.originalEvent.touches[0];
     var px = first.pageX - ofst.left;
     var py = first.pageY - ofst.top;
     myCP.handleClick(px,py);
