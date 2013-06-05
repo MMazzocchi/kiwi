@@ -1,0 +1,60 @@
+@charset "UTF-8";
+
+/* Icons from http://www.iconfinder.com/iconsets/Momentum_GlossyEntireSet
+ 			  http://www.iconfinder.com/iconsets/32x32-free-design-icons */
+
+html,
+body {
+	margin:0;
+	padding:0;	
+}
+body {
+	background:#CCC;
+	/*margin-top:40px; */
+}
+.clear {
+	clear:both;	
+}
+
+.navbar a,
+.navbar input {
+	cursor:pointer;	
+}
+input[type="range"] {
+	height:30px;	
+}
+.add-on {
+	width:75px;
+}
+
+.icon span {
+	display:none;
+}
+a.icon:hover {
+	background:#DDD!important;	
+}
+
+#canvaswrapp {
+	margin:0 auto;	
+}
+#artcanvas {
+	width:100%;
+	height:100%;
+	background:#FFF;	
+}
+
+
+@media (max-width: 979px) {
+	body { margin-top:0; position:relative; }
+	.navbar { position:absolute; top:0; right:0; }
+	.navbar-inner { background:none; }
+	.nav-collapse { background:#EEE; }
+	.icon span { display:inline-block; }
+}
+@media (max-width: 800px) {
+	#canvaswrapp { width:100%; height:100%; }
+}
+@media (max-width: 767px) {
+	.navbar input[type="color"],
+	.navbar .input-prepend { display:block; }
+}
