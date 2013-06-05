@@ -168,6 +168,7 @@ function startLine(dObj) {
             // Take the top layer off of layerList. The object still exists in the objects hash, but
             // doesn't get drawn because ONLY the objects in layerList get drawn.
             layerList.splice(layerList.length-1,1);
+			selectedId = -1;
         },
         redo: function() {
             // Put this object back in layerList.

@@ -22,6 +22,7 @@ var originx = 0;
 var originy = 0;
 var textMode;
 var scratch;
+var copiedObj;
 var tx=0;
 var ty=0;
 var orientation = orienting() ? window.orientation : 0;
@@ -196,6 +197,35 @@ function getObjectID(x, y) {
     return id;
 }
 
+//Copy the selected object
+function copy(){
+	if(selectedId != -1){
+		copiedObj = jQuery.extend(true, {}, objectList[selectedId]);
+		console.log("copy");
+	}
+}
+
+//Paste the copied object
+function paste(dObj){
+	var newObject = jQuery.extend(true, {}, dObj);
+	assignID(newObject);
+	newObject.move(40,40);
+	console.log("paste");	
+	var newAct = {
+		undo: function() {
+			// Take the top layer off of layerList. The object still exists in the objects hash, but
+			// doesn't get drawn because ONLY the objects in layerList get drawn.
+			layerList.splice(layerList.length-1,1);
+		},
+		redo: function() {
+			// Put this object back in layerList.
+			layerList[layerList.length] = dObj.id;
+		}
+	};
+	// Add the new action and redraw.
+	addAction(newAct);
+}
+
 //Erase object with given id
 function eraseObject(id) {
 
@@ -213,6 +243,7 @@ function eraseObject(id) {
     var newAct = {
         undo: function() {
             layerList.splice(layerId, 0, id);
+			selectedId = -1;
         },
         redo: function() {
             layerList.splice(layerId,1);
@@ -771,7 +802,7 @@ $().ready( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('triangle');
     });
-	
+
     $('#spraycan').click( function() {
         document.body.style.cursor="url(img/spraycan.png)0 5, default";
         SelectTool('spraycan');
@@ -810,32 +841,48 @@ $().ready( function() {
         document.body.style.cursor="url(img/paintbucket.png)4 28, default";
         SelectTool('fill');
     });
+	
 	$('#balloon').click( function() {
 		document.body.style.cursor="default";
          SelectTool('textbox');
 		 textMode = "balloon";
     });
+	
 	$('#textbox').click( function() {
 		document.body.style.cursor="default";
          SelectTool('textbox');
 		 textMode = "box";
     });
+	
     $('#butterfly').click( function() {
          SelectTool('stamp');
          curStamp = 'butterfly'
     });
+	
     $('#mickey_button').click( function() {
         SelectTool('stamp');
         curStamp = 'mickey'
     });
+	
     $('#bnl').click( function() {
         SelectTool('stamp');
         curStamp = 'bnl'
     });
+	
     $('#stamp').click( function() {
         SelectTool('stamp');
     });
 
+	$('#copy').click( function() {
+        copy();
+    });
+	
+	$('#paste').click( function() {
+		if(copiedObj){
+			paste(copiedObj);
+		}
+    });
+	
     $('#clear').click( function() {
         objectList = {};
         layerList = [];
