@@ -232,7 +232,7 @@ function createTextBalloon(dObj) {
 				this.rCorner[0] = this.pts[0] + this.width;
 				this.rCorner[1] = this.pts[1] + this.height;
 				drawBalloon(ctx, -this.width/2,-this.height/2,this.width, this.height, 15);
-				ctx.fillStyle = curColor;
+				ctx.fillStyle = this.color;
 				for(var i=0; i<this.theText.length; i++){
 					for(var j=0; j<this.theText[i].length; j++){
 						var line_length = 0;
@@ -251,7 +251,7 @@ function createTextBalloon(dObj) {
 				ctx.translate(this.mx, this.my);
 				ctx.rotate(this.rotation);
 				ctx.scale(xScale,yScale);
-				ctx.fillStyle = curColor;				
+				ctx.fillStyle = this.color;				
 				if(layerList[layerList.length-1] == this.id || selectedId == this.id)
 					ctx.strokeRect(-this.width/2,-this.height/2,this.width,this.height);//
 					var wraps = 0;
