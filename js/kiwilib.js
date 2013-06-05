@@ -23,6 +23,8 @@ var originy = 0;
 var textMode;
 var scratch;
 var copiedObj;
+var selectStart = [];
+var selectEnd = [];
 var tx=0;
 var ty=0;
 var orientation = orienting() ? window.orientation : 0;
@@ -219,13 +221,41 @@ function paste(dObj){
 		},
 		redo: function() {
 			// Put this object back in layerList.
-			layerList[layerList.length] = dObj.id;
+			layerList[layerList.length] = newObject.id;
 		}
 	};
 	// Add the new action and redraw.
 	addAction(newAct);
 }
+/*
+function groupSelection(){
+	var bigx, bigy, littlex, littley;
+	if(selectEnd[0] > selectStart[0]){
+		bigx = selectEnd[0];
+		littlex = selectStart[0];
+	}
+	else{
+		bigx = selectStart[0];
+		littlex = selectEnd[0];
+	}
+	if(selectEnd[1] > selectStart[1]){
+		bigy = selectEnd[1];
+		littley = selectStart[1];
+	}
+	else{
+		bigy = selectStart[1];
+		littley = selectEnd[1];
+	}
+	
+	$.each(layerList, function(i, id) {
+        var dObj = objectList[id];
 
+        if(dObj.pts.length > 0) {
+            if(dObj.pts.[0][0] > 
+        }
+    });
+}
+*/
 //Erase object with given id
 function eraseObject(id) {
 
@@ -385,9 +415,10 @@ function pointerDown(e) {
                 yOld = y;
                 xFirst = x;
                 yFirst = y;
+				isDragging  = true;
+				selectStart = [x,y];
                 if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
                     dragMode = objectList[selectedId].iconClicked(x, y);
-                    isDragging = true;
                     if(dragMode == 'scale') {
                         beginScale(selectedId, x, y);
                     }
@@ -400,7 +431,6 @@ function pointerDown(e) {
                 } else {
                     selectedId = getObjectID(x, y);
                     if(selectedId != -1) {
-                        isDragging = true;
                         dragMode = 'translate';
                     }
                 }
@@ -526,7 +556,9 @@ function pointerMove(e) {
 				contShape(x,y,e);
 				break;
             case "select":
-                applyTransform(selectedId, x, y, dragMode, e);
+				if(selectedId != -1){
+					applyTransform(selectedId, x, y, dragMode, e);
+				}
                 break;
             case "dropper":
                 var id = ctx.getImageData(x, y, 1, 1);
@@ -571,7 +603,15 @@ function pointerEnd(e) {
 	}
 	
     if(isDragging && (curTool == 'select')) {
-        endTransform(selectedId, x, y, dragMode);
+		selectEnd = [x,y];
+		if(selectedId != -1){
+			endTransform(selectedId, x, y, dragMode);
+		}
+		else{
+//			groupSelection();
+		}
+		selectStart = [];
+		selectEnd = [];
     }
     
     isDragging = false;
