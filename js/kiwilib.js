@@ -263,12 +263,17 @@ function downloadImage(){
 */
 // save canvas to server
 function saveImage(){
-
+	
 }
 
+// http://www.nihilogic.dk/labs/canvas2image/
+function downloadImage() {
+	var canvas = document.getElementById("drawing_canvas"); 
+	Canvas2Image.saveAsPNG(canvas);	
+}
 // download canvas as JPEG
 // from http://www.joeltrost.com/blog/2012/01/29/html5-canvas-save-a-jpeg-with-extension/
-function downloadImage(){
+/*function downloadImage(){
 	var cs = new CanvasSaver('http://joeltrost.com/php/functions/saveme.php');
 	cs.saveJPEG(canvas, 'image');
 
@@ -300,7 +305,7 @@ function downloadImage(){
 		
 	  };
 	}
-}
+}*/
 
 function pointerDown(e) {
     var c = transformCoordinates(e);
