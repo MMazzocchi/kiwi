@@ -483,6 +483,7 @@ function pointerDown(e) {
 					theText: [[new String()]],
 					fontSize: thickness,
                     opacity: alpha,
+					color: curColor,
 					type: textMode,
 					strpixel: 0,
                     xScale: 1, 
