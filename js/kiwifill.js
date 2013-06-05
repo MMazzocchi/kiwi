@@ -519,7 +519,7 @@ function createFill(dObj){
     var y = dObj.pts[0][1];
     dObj.sectors = [];
     findSectors(dObj,x,y,dObj.sectors,width,height,canvas.getContext('2d'));
-    findOneBigHugeFuckingSector(dObj,x,y,[],width,height,canvas.getContext('2d'));
+//    findOneBigHugeFuckingSector(dObj,x,y,[],width,height,canvas.getContext('2d'));
     dObj.draw = function(ctx) {
         ctx.save();
         ctx.fillStyle = this.color;
@@ -531,7 +531,6 @@ function createFill(dObj){
         ctx.rotate(this.rotation);
         ctx.scale(this.xScale, this.yScale);
 
-/*
         for(var i=0; i<this.sectors.length; i++) {
             if(i == this.highlight) { 
                 ctx.fillStyle = "red";
@@ -548,7 +547,8 @@ function createFill(dObj){
             if(sector.length == 2) { ctx.stroke(); }
             else { ctx.fill(); }
         }
-*/
+
+/*
         ctx.beginPath();
         ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
         for(var i=1; i<this.pts.length; i++) {
@@ -557,6 +557,7 @@ function createFill(dObj){
         ctx.closePath();
         ctx.fill();
 //        ctx.stroke();
+*/
         ctx.restore();
     };
     dObj.select = function(x,y) {
@@ -570,18 +571,19 @@ function createFill(dObj){
         return (imageData.data[3] > 0 || imageData.data[0] > 0);
     };
     dObj.move = function(dx,dy) {
-/*
+
         for(var i=0; i<this.sectors.length; i++) {
             for(var j=0; j<this.sectors[i].length; j++) {
                 this.sectors[i][j][0]+=dx;
                 this.sectors[i][j][1]+=dy;
             }
         }
-*/
+/*
         for(var i=0; i<this.pts.length; i++) {
             this.pts[i][0]+=dx;
             this.pts[i][1]+=dy;
         }
+*/
         this.lCorner[0]+=dx;
         this.rCorner[0]+=dx;
         this.lCorner[1]+=dy;
