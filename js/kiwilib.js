@@ -25,6 +25,7 @@ var scratch;
 var copiedObj;
 var selectStart = [];
 var selectEnd = [];
+var selectList = [];
 var tx=0;
 var ty=0;
 var orientation = orienting() ? window.orientation : 0;
@@ -227,35 +228,7 @@ function paste(dObj){
 	// Add the new action and redraw.
 	addAction(newAct);
 }
-/*
-function groupSelection(){
-	var bigx, bigy, littlex, littley;
-	if(selectEnd[0] > selectStart[0]){
-		bigx = selectEnd[0];
-		littlex = selectStart[0];
-	}
-	else{
-		bigx = selectStart[0];
-		littlex = selectEnd[0];
-	}
-	if(selectEnd[1] > selectStart[1]){
-		bigy = selectEnd[1];
-		littley = selectStart[1];
-	}
-	else{
-		bigy = selectStart[1];
-		littley = selectEnd[1];
-	}
-	
-	$.each(layerList, function(i, id) {
-        var dObj = objectList[id];
 
-        if(dObj.pts.length > 0) {
-            if(dObj.pts.[0][0] > 
-        }
-    });
-}
-*/
 //Erase object with given id
 function eraseObject(id) {
 
@@ -425,6 +398,27 @@ function pointerDown(e) {
                     if(selectedId != -1) {
                         dragMode = 'translate';
                     }
+				/*	else{
+						$.each(layerList, function(i, id) {
+							var dObj = objectList[id];
+							if(dObj.type == "bound") {
+								eraseObject(dObj.id);
+							}
+						});
+						var dObj = {
+							pts: [x, y],
+							tPos: [x, y],
+							lCorner: [x,y],
+							rCorner: [x,y],
+							mx: x, my: y,
+							boundList: selectList,
+							type: "bound",
+							xScale: 1,
+							yScale: 1,
+							rotation: 0
+						};
+						startBound(dObj);
+					}*/
                 }
                 break;
 
@@ -497,8 +491,8 @@ function pointerDown(e) {
 					mx: x, my: y,
                     bound: [1,1],
                     rotation: 0,
-                    pts: [x, y],
-					tPos: [x,y],
+                    pts: [x,y],
+					tPos: [x,y]
                 };    
 				isDragging = true;
                 createTextBalloon(dObj);
@@ -551,6 +545,9 @@ function pointerMove(e) {
 				if(selectedId != -1){
 					applyTransform(selectedId, x, y, dragMode, e);
 				}
+			//	else{
+			//		placeTextArea(x,y);
+			//	}
                 break;
             case "dropper":
                 var id = ctx.getImageData(x, y, 1, 1);

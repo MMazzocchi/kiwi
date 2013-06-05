@@ -194,6 +194,14 @@ function drawBalloon(ctx, x, y, w, h, radius)
 function placeTextArea(x,y){
 	var dObj = objectList[layerList[layerList.length-1]];
 	dObj.tPos = [x,y];
+
+	dObj.lCorner[0] = dObj.pts[0] < dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
+	dObj.lCorner[1] = dObj.pts[1] < dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
+	dObj.rCorner[0] = dObj.pts[0] > dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
+	dObj.rCorner[1] = dObj.pts[1] > dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
+	
+	dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
+	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
 }
 
 function createTextBalloon(dObj) {
@@ -238,23 +246,15 @@ function createTextBalloon(dObj) {
 				}
 			}
 			else{
-				this.width = Math.abs(this.tPos[0]-this.pts[0]);
-				this.height = Math.abs(this.tPos[1]-this.pts[1]);
-				ctx.translate(this.pts[0]+this.width/2, this.pts[1]+this.height/2);
+				this.width = Math.abs(this.rCorner[0]-this.lCorner[0]);
+				this.height = Math.abs(this.rCorner[1]-this.lCorner[1]);
+				ctx.translate(this.mx, this.my);
 				ctx.rotate(this.rotation);
 				ctx.scale(xScale,yScale);
 				ctx.fillStyle = curColor;				
-				this.rCorner[0] = this.pts[0] + this.width;
-				this.rCorner[1] = this.pts[1] + this.height;
-				this.mx = this.pts[0] + this.width/2;
-				this.my = this.pts[1] + this.height/2;
 				if(layerList[layerList.length-1] == this.id || selectedId == this.id)
-					ctx.strokeRect(-this.width/2,-this.height/2,this.tPos[0]-this.pts[0],this.tPos[1]-this.pts[1]);//
-				if(this.tPos[1] < this.pts[1])
-					ctx.translate(0,this.tPos[1]-this.pts[1]);
-				if(this.tPos[0] < this.pts[0])
-					ctx.translate(this.tPos[0]-this.pts[0],0);
-				var wraps = 0;
+					ctx.strokeRect(-this.width/2,-this.height/2,this.width,this.height);//
+					var wraps = 0;
 				for(var i=0; i<this.theText.length; i++){
 					var line_length = 0; 
 					for(var j=0; j<this.theText[i].length; j++){
@@ -283,10 +283,10 @@ function createTextBalloon(dObj) {
     };
 
     dObj.select = function(x,y) {
-		var pts = this.pts;
-		var w = this.width*this.xScale;
-		var h = this.height*this.yScale;
-        return x >= pts[0] && y >= pts[1] && x < pts[0]+w && y < pts[1]+h;
+		if(x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]){
+			return true;
+		}
+		return false;
 
     };
 
