@@ -263,13 +263,14 @@ function downloadImage(){
 */
 // save canvas to server
 function saveImage(){
-	
+	var scanvas = document.getElementById("drawing_canvas");
+	var img = Canvas2Image.saveAsPNG(scanvas, true);    
 }
 
 // http://www.nihilogic.dk/labs/canvas2image/
 function downloadImage() {
-	var canvas = document.getElementById("drawing_canvas"); 
-	Canvas2Image.saveAsPNG(canvas);	
+	var dcanvas = document.getElementById("drawing_canvas"); 
+	Canvas2Image.saveAsPNG(dcanvas);	
 }
 // download canvas as JPEG
 // from http://www.joeltrost.com/blog/2012/01/29/html5-canvas-save-a-jpeg-with-extension/
