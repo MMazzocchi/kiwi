@@ -103,8 +103,8 @@ function createBrush(dObj, brushMode) {
         dObj.draw = function(ctx) {
         ctx.save();
             ctx.translate(this.mx,this.my);
-            ctx.scale(this.xScale, this.yScale);
             ctx.rotate(this.rotation);
+            ctx.scale(this.xScale, this.yScale);
             ctx.beginPath();
             ctx.moveTo(this.mx, this.pts[0][1]-this.my);
             ctx.lineWidth = this.width;
