@@ -159,6 +159,7 @@ function createStamp(dObj) {
     var newAct = {
         undo: function() {
             layerList.splice(layerList.length-1,1);
+			selectedId = -1;
         },
         redo: function() {
             layerList[layerList.length] = dObj.id;
@@ -239,6 +240,14 @@ function drawBalloon(ctx, x, y, tx, ty, w, h, radius)
 function placeTextArea(x,y){
 	var dObj = objectList[layerList[layerList.length-1]];
 	dObj.tPos = [x,y];
+
+	dObj.lCorner[0] = dObj.pts[0] < dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
+	dObj.lCorner[1] = dObj.pts[1] < dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
+	dObj.rCorner[0] = dObj.pts[0] > dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
+	dObj.rCorner[1] = dObj.pts[1] > dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
+	
+	dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
+	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
 }
 
 function createTextBalloon(dObj) {
@@ -248,16 +257,14 @@ function createTextBalloon(dObj) {
     dObj.draw = function(ctx) {
         var xScale = this.xScale;
         var yScale = this.yScale;
-
         ctx.save();
             ctx.globalAlpha = this.opacity;
             ctx.beginPath();
-            ctx.translate(this.pts[0],this.pts[1]);
-            ctx.rotate(this.rotation);
-            ctx.scale(xScale,yScale);
 			ctx.font="normal "+this.fontSize+"px Comic Sans MS";
+			
 			if(this.type == "balloon"){
-				var max_length = 30;
+
+				var max_length = 20;
 				for(var i=0; this.theText[this.max] && i< this.theText[this.max].length; i++){
 					var metrics = ctx.measureText(this.theText[this.max][i]);
 					max_length += metrics.width;
@@ -272,6 +279,14 @@ function createTextBalloon(dObj) {
 					ctx.globalCompositeOperation = "lighter";
 					drawBalloon2(ctx,tx,ty,this.width, this.height, 15,1);
 				ctx.restore();
+				this.mx = this.pts[0] + this.width/2;
+				this.my = this.pts[1] + this.height/2;
+				ctx.translate(this.mx, this.my);
+				ctx.rotate(this.rotation);
+				ctx.scale(xScale,yScale);
+				this.rCorner[0] = this.pts[0] + this.width;
+				this.rCorner[1] = this.pts[1] + this.height;
+
 				ctx.fillStyle = curColor;
 				for(var i=0; i<this.theText.length; i++){
 					for(var j=0; j<this.theText[i].length; j++){
@@ -281,23 +296,22 @@ function createTextBalloon(dObj) {
 							line_length += met.width;
 						}
 						
-						ctx.fillText(this.theText[i][j],tx+15 + line_length,ty+(i+1)*this.fontSize+2);
+						//ctx.fillText(this.theText[i][j],tx+15 + line_length,ty+(i+1)*this.fontSize+2);
+					
+						ctx.fillText(this.theText[i][j],-this.width/2+10 + line_length,-this.height/2+(i+1)*this.fontSize+2);
 					}
 				}
 			}
 			else{
-				ctx.fillStyle = curColor;
+				this.width = Math.abs(this.rCorner[0]-this.lCorner[0]);
+				this.height = Math.abs(this.rCorner[1]-this.lCorner[1]);
+				ctx.translate(this.mx, this.my);
+				ctx.rotate(this.rotation);
+				ctx.scale(xScale,yScale);
+				ctx.fillStyle = curColor;				
 				if(layerList[layerList.length-1] == this.id || selectedId == this.id)
-					ctx.strokeRect(0,0,this.tPos[0]-this.pts[0],this.tPos[1]-this.pts[1]);
-				if(this.tPos[1] < this.pts[1])
-					ctx.translate(0,this.tPos[1]-this.pts[1]);
-				if(this.tPos[0] < this.pts[0])
-					ctx.translate(this.tPos[0]-this.pts[0],0);
-
-				this.width = Math.abs(this.tPos[0]-this.pts[0]);
-				this.height = Math.abs(this.tPos[1]-this.pts[1]);
-		
-				var wraps = 0;
+					ctx.strokeRect(-this.width/2,-this.height/2,this.width,this.height);//
+					var wraps = 0;
 				for(var i=0; i<this.theText.length; i++){
 					var line_length = 0; 
 					for(var j=0; j<this.theText[i].length; j++){
@@ -318,7 +332,7 @@ function createTextBalloon(dObj) {
 							wraps++;
 							line_length = 0;
 						}
-						ctx.fillText(this.theText[i][j],10 + line_length,(i+wraps+1)*this.fontSize+2);
+						ctx.fillText(this.theText[i][j],-this.width/2 + 10 + line_length,-this.height/2 + (i+wraps+1)*this.fontSize+2);
 					}
 				}
 			}
@@ -326,56 +340,67 @@ function createTextBalloon(dObj) {
     };
 
     dObj.select = function(x,y) {
-		console.log(x + " " + y);
-		var pts = this.pts;
-		var w = this.width*this.xScale;
-		var h = this.height*this.yScale;
-        return x >= pts[0] && y >= pts[1] && x < pts[0]+w && y < pts[1]+h;
+		if(x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]){
+			return true;
+		}
+		return false;
+
     };
 
     // Move this stamp by dx, dy
     dObj.move = function(dx,dy) {
         this.pts[0]+=dx;
         this.pts[1]+=dy;
+		this.tPos[0]+=dx;
+		this.tPos[1]+=dy;
+			
+        this.mx+=dx;
+        this.my+=dy;
+
+        this.lCorner[0]+=dx;
+        this.rCorner[0]+=dx;
+        this.lCorner[1]+=dy;
+        this.rCorner[1]+=dy;
     };
 
     // Draw the rotate/scale icons in the top corners of this stamp.
     dObj.drawIcons = function(ctx) {
         var leftCorner = transformPoint(
-            0, 0,
-            this.pts[0], this.pts[1],
+            this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
+            this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
 
             var scaleIcon = document.getElementById('resize_icon');
-            ctx.drawImage(scaleIcon, leftCorner[0]-32, leftCorner[1]-32);
+            ctx.drawImage(scaleIcon, leftCorner[0]-64, leftCorner[1]-64);
 
         var rightCorner = transformPoint(
-            (this.width), 0,
-            this.pts[0], this.pts[1],
+            this.rCorner[0]-this.mx, this.lCorner[1]-this.my,
+            this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
 
             var rotateIcon = document.getElementById('rotate_icon');
-            ctx.drawImage(rotateIcon, rightCorner[0]-32, rightCorner[1]-32);
+            ctx.drawImage(rotateIcon, rightCorner[0], rightCorner[1]-64);
 			
 		var leftBottom = transformPoint(
-            0, this.height,
-            this.pts[0], this.pts[1],
+            this.lCorner[0]-this.mx, this.rCorner[1]-this.my,
+            this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
 
             var downIcon = document.getElementById('arrow_down');
-            ctx.drawImage(downIcon, leftBottom[0]-16, leftBottom[1]-16);
+            ctx.drawImage(downIcon, leftBottom[0]-48, leftBottom[1]);
 
         var rightBottom = transformPoint(
-            this.width, this.height,
-            this.pts[0], this.pts[1],
+            this.rCorner[0]-this.mx, this.rCorner[1]-this.my,
+            this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
 
             var upIcon = document.getElementById('arrow_up');
-            ctx.drawImage(upIcon, rightBottom[0]-16, rightBottom[1]-16);
+            ctx.drawImage(upIcon, rightBottom[0]+16, rightBottom[1]);
+
     }
 
     // Rotate this stamp by dr radians.
@@ -385,47 +410,50 @@ function createTextBalloon(dObj) {
 
     // Scale this object based on a a change of dx and dy in the scale icon's position
     dObj.scale = function(dx, dy) {
-        this.xScale -= (dx/(this.width/2));
-        this.yScale -= (dy/(this.height/2));
+        if((this.rCorner[0] == this.lCorner[0])) { this.xScale -= dx/this.width; }
+        else { this.xScale -= (dx/((this.rCorner[0]-this.lCorner[0])/2)); }
+        if((this.rCorner[1] == this.lCorner[1])) { this.yScale -= dy/this.width; }
+        else { this.yScale -= (dy/((this.rCorner[1]-this.lCorner[1])/2)); }
     }
 
     // Return if x and y were inside of an icon and which icon
     dObj.iconClicked = function(x,y) {
         var leftCorner = transformPoint(
-            0, 0,
-            this.pts[0], this.pts[1],
+            this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
+            this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
         var rightCorner = transformPoint(
-            this.width, 0,
-            this.pts[0], this.pts[1],
+            this.rCorner[0]-this.mx, this.lCorner[1]-this.my,
+            this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
 		var leftBottom = transformPoint(
-            0, this.height,
-            this.pts[0], this.pts[1],
+            this.lCorner[0]-this.mx, this.rCorner[1]-this.my,
+            this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
         var rightBottom = transformPoint(
-            this.width, this.height,
-            this.pts[0], this.pts[1],
+            this.rCorner[0]-this.mx, this.rCorner[1]-this.my,
+            this.mx, this.my,
             this.xScale, this.yScale,
             -this.rotation );
 
-        if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'scale'; }
-        else if(distance([x,y],[rightCorner[0], rightCorner[1]]) < 32) { return 'rotate'; }
-		else if(distance([x,y],[rightBottom[0], rightBottom[1]]) < 16) { return 'layerUp'; }
-		else if(distance([x,y],[leftBottom[0], leftBottom[1]]) < 16) { return 'layerDown'; } 
+        if(distance([x,y],[leftCorner[0]-32, leftCorner[1]-32]) < 32) { return 'scale'; }
+        else if(distance([x,y],[rightCorner[0]+32, rightCorner[1]-32]) < 32) { return 'rotate'; }
+		else if(distance([x,y],[rightBottom[0]+16, rightBottom[1]]) < 32) { return 'layerUp'; }
+		else if(distance([x,y],[leftBottom[0]-16, leftBottom[1]+16]) < 32) { return 'layerDown'; } 
         else { return false; }
     }
 
     // Return the midpoint of this stamp
-    dObj.midX = function() { return this.pts[0]; }
-    dObj.midY = function() { return this.pts[1]; }
+    dObj.midX = function() { return this.mx; }
+    dObj.midY = function() { return this.my; }
 
     var newAct = {
         undo: function() {
             layerList.splice(layerList.length-1,1);
+			selectedId = -1;
         },
         redo: function() {
             layerList[layerList.length] = dObj.id;

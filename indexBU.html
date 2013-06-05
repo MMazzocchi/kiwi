@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Disney Create by CSM</title>
+<link rel="stylesheet" type="text/css" href="css/bootstrap.css" />
+<link rel="stylesheet" type="text/css" href="css/bootstrap-responsive.css" />
+<link rel="stylesheet" type="text/css" href="css/masterBU.css" />
+<script type="text/javascript" src="http://code.jquery.com/jquery.js"></script>
+<script type="text/javascript" src="js/kiwilib.js"></script>
+<script type="text/javascript" src="js/raphael-min.js"></script>
+<script type="text/javascript" src="js/color_picker.js"></script>
+
+<!-- SVG conversion library -->
+<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script> 
+<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
+
+<!-- Sliders -->
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+<style type="text/css" media="screen">
+  .ui-slider .ui-slider-handle {
+	  width: .1em;
+	  height: .3em;
+  }
+</style>
+</head>
+<body>
+<div class="navbar navbar-fixed-top">
+	<div class="navbar-inner">
+		<div class="container">
+			<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"><span class="icon-bar"></span><span class="icon-bar"></span><span class="icon-bar"></span></a>
+			<div class="nav-collapse collapse">
+            	<ul class="nav pull-left">
+                	<li class="dropdown"><a href="#" class="dropdown-toggle icon" data-toggle="dropdown"><img src="img/file.png" alt="File" title="File" /><span>File</span></a>
+                        <ul class="dropdown-menu">
+                        	<li><a id="save"><img src="img/save.png" /> Save</a></li>
+                            <li><a id="open"><img src="img/folder-open.png" /> Open</a></li>
+                            <li class="divider"></li>
+                            <li><a id="undo"><img src="img/arrow-undo.png" /> Undo</a></li>
+                   			<li><a id="redo"><img src="img/arrow-redo.png" /> Redo</a></li>
+                            <li class="divider"></li>
+                            <li><a id="clear"><img src="img/trash-can.png" /> Clear</a></li>
+                        </ul>
+					</li>
+                </ul>
+                <ul class="nav">
+					<li>
+					  <label for="thicknessSlider">Thickness:&nbsp;</label>
+					  <li id="thicknessSlider"style="width: 100px;"></li>
+					</li>
+					<li>
+					  <label for="opacitySlider">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Opacity:&nbsp;</label>
+					  <li id="opacitySlider"style="width: 100px;"></li>
+					</li>
+					<li><a class="icon" id="hand"><img src="img/hand-tool.png" alt="Hand" title="Hand" /><span>Hand</span></a></li>
+					<li><a class="icon" id="brush"><img src="img/paintbrush.png" alt="Brush" title="Brush" /><span>Brush</span></a></li>
+                    <li><a class="icon" id="pencil"><img src="img/pencil.png" alt="Pencil" title="Pencil" /><span>Pencil</span></a></li>
+                    <li><a class="icon" id="spraycan"><img src="img/spraycan.png" alt="Spraycan" title="Spraycan" /><span>Spraycan</span></a></li>
+                    <li><a class="icon" id="fill"><img src="img/paintbucket.png" alt="Paintbucket" title="Paintbucket" /><span>Paintbucket</span></a></li>
+                    <li><a class="icon" id="erase"><img src="img/eraser.png" alt="Eraser" title="Eraser" /><span>Eraser</span></a></li>
+                    <li class="dropdown"><a class="dropdown-toggle icon" data-toggle="dropdown"><img src="img/stamp.png" alt="Stamps" title="Stamps" /><span>Stamps</span></a>
+                        <ul class="dropdown-menu">
+                        	<li><a class="icon" id="mickey_button"><img src="img/mickey_icon.png" /><span>Mickey</span></a></li>
+                            <li><a class="icon" id="bnl"><img src="img/bnl_icon.png" /><span>BnL</span></a></li>
+                            <li><a class="icon" id="butterfly"><img src="img/butterfly_icon.png" /><span>Butterfly</span></a></li>
+                        </ul>
+					</li>
+					<li class="cp_canvas"><canvas id="colorpicker_canvas"></canvas></li>
+					<li>
+					  <label for="tintSlider">Tint:&nbsp;</label>
+					  <li id="tintSlider"style="width: 100px;"></li>
+					</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="canvaswrapp">
+	<canvas id="drawing_canvas"></canvas>
+
+</div>
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+</body>
+</html>

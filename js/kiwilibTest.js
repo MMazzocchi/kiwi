@@ -5,27 +5,18 @@ var layerList = [];       // This is the list of layers. Each element is an obje
 var actionList = [];      // This is the list of actions. Each element is an "event", which gets defined later on.
 var idPtr = 0;            // This is the next available id.
 var actionPtr = 0;        // This is the action stack pointer; anything below this is real, and anything above it has been undo'd.
-var curTool = "draw";   // This is the current tool selected by the user
+var curTool = "draw";     // This is the current tool selected by the user
 var brushMode = 'simple';
-var shapeType = '';
-var thickness = 25;     // Thickness of the line to be drawn
-var alpha = 1;          // Opacity of the object to be drawn
+var thickness = 25;       // Thickness of the line to be drawn
+var alpha = 1;            // Opacity of the object to be drawn
 var curColor = "#000000";
 var isDragging = false;
-var isZoom = true;
-var zoomType = '';
 var curStamp = '';
-var zoomCount = 0;		// number of times user has zoomed in
-var factor = 1.2;		// base multiplier for zoom value
-var zoom = 1;			// cumulative zoom (factor^zoomCount)
+var curZoom = 1;
+var prevZoom = 1;
 var originx = 0;
 var originy = 0;
-var textMode;
 var scratch;
-var copiedObj;
-var selectStart = [];
-var selectEnd = [];
-var selectList = [];
 var tx=0;
 var ty=0;
 var orientation = orienting() ? window.orientation : 0;
@@ -63,8 +54,8 @@ function transformCoordinates(e) {
         }
     }
 
-    x = x/zoom;
-    y = y/zoom;
+    x = x/curZoom;
+    y = y/curZoom;
     return [x,y];
 }
 
@@ -76,18 +67,10 @@ function refreshCanvas() {
     }
 
     var ctx = canvas.getContext('2d');
-    var heightoffset = $("#toolbar").height();
-    var widthoffset = $("#toolbar").width();
     
-    if (window.innerWidth < window.innerHeight) { // portrait
-        ctx.canvas.width  = window.innerWidth;
-        ctx.canvas.height = window.innerHeight - heightoffset;
-    }
-    else { // landscape
-        ctx.canvas.width  = window.innerWidth - widthoffset;
-        ctx.canvas.height = window.innerHeight;
-    }
-	
+    ctx.canvas.width  = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
+
     if(orienting()) {
         orientation = window.orientation;
         ctx.rotate(-orientation*Math.PI/180);
@@ -117,34 +100,13 @@ function refreshCanvas() {
         }
     } else {
         ctx.fillStyle="#FFFFFF";
-        if (window.innerWidth < window.innerHeight) // portrait
-            ctx.fillRect(0,0,window.innerWidth,window.innerHeight-heightoffset);
-        else // landscape
-            ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
+        ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
     }
-//    ctx.translate(.5,.5);
-	
+    //ctx.restore();
     // Redraw every object at the current zoom
-	z0 = Math.pow(factor,zoomCount-1);
-	zoom = Math.pow(factor,zoomCount);
-	var L1 = drawing_canvas.width*z0;
-	var L2 = L1*zoom;
-	var x1 = originx;
-	var x2 = x1*L2/L1;
-	
-	var L3 = drawing_canvas.height*z0;
-	var L4 = L3*zoom;
-	var y1 = originy;
-	var y2 = y1*L4/L3;
-	//console.log(x1+ " " + y1);
-	
-	//console.log(ctx.canvas.width);
-	ctx.translate(x1-x2, y1-y2);
-	//ctx.save();
-	ctx.scale(zoom, zoom);
-	//ctx.translate(originx, originy);
-	//ctx.restore();
-
+	ctx.translate(-originx, -originy);
+    ctx.scale(curZoom, curZoom);
+//	ctx.translate(originx, originy);
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
         // Get the object for this layer
@@ -200,35 +162,6 @@ function getObjectID(x, y) {
     return id;
 }
 
-//Copy the selected object
-function copy(){
-	if(selectedId != -1){
-		copiedObj = jQuery.extend(true, {}, objectList[selectedId]);
-		console.log("copy");
-	}
-}
-
-//Paste the copied object
-function paste(dObj){
-	var newObject = jQuery.extend(true, {}, dObj);
-	assignID(newObject);
-	newObject.move(40,40);
-	console.log("paste");	
-	var newAct = {
-		undo: function() {
-			// Take the top layer off of layerList. The object still exists in the objects hash, but
-			// doesn't get drawn because ONLY the objects in layerList get drawn.
-			layerList.splice(layerList.length-1,1);
-		},
-		redo: function() {
-			// Put this object back in layerList.
-			layerList[layerList.length] = newObject.id;
-		}
-	};
-	// Add the new action and redraw.
-	addAction(newAct);
-}
-
 //Erase object with given id
 function eraseObject(id) {
 
@@ -246,7 +179,6 @@ function eraseObject(id) {
     var newAct = {
         undo: function() {
             layerList.splice(layerId, 0, id);
-			selectedId = -1;
         },
         redo: function() {
             layerList.splice(layerId,1);
@@ -256,102 +188,15 @@ function eraseObject(id) {
     addAction(newAct);
 }
 
-//Set coordinates for the translations due to the zoom
-function applyZoom(x, y, curZoom, prevZoom){
-	var prevx = originx; 
-	var prevy = originy;
-	originx = (x*zoom);
-	originy = (y*zoom);
-
-	var newAct = {
-		undo: function() {
-			originx = prevx;
-			originy = prevy;
-			zoomCount = prevZoom;
-		},
-		redo: function() {
-			originx = x;
-			originy = y;
-			zoomCount = curZoom;
-		}
-	};
-
-	addAction(newAct);
-	return false;
-}
-
-// allows you to move translate the canvas while zoomed in
-function dragZoom(x, y){
-	isZoom = false;
-	originx = x*zoom;
-	originy = y*zoom;
-}
-
-/*
-function downloadImage(){
-	var img = canvas.toDataURL("image/jpeg;base64;");
-//	img = img.replace("image/jpeg","image/octet-stream"); // force download, user would have to give the file name.
-// you can also use anchor tag with download attribute to force download the canvas with file name.
-	window.open(img,"","width=700,height=700");
-}
-*/
-// save canvas to server
-function saveImage(){
-	var scanvas = document.getElementById("drawing_canvas");
-	var img = Canvas2Image.saveAsPNG(scanvas, true);    
-}
-
-// http://www.nihilogic.dk/labs/canvas2image/
-function downloadImage() {
-	var dcanvas = document.getElementById("drawing_canvas"); 
-	Canvas2Image.saveAsPNG(dcanvas);	
-}
-// download canvas as JPEG
-// from http://www.joeltrost.com/blog/2012/01/29/html5-canvas-save-a-jpeg-with-extension/
-/*function downloadImage(){
-	var cs = new CanvasSaver('http://joeltrost.com/php/functions/saveme.php');
-	cs.saveJPEG(canvas, 'image');
-
-	function CanvasSaver(url) {
-	  this.url = url;
-	  this.saveJPEG = function(cnvs, fname) {
-	  if(!cnvs || !url) return;
-		fname = fname || 'picture';
-
-		var data = cnvs.toDataURL("image/jpeg");
-		data = data.substr(data.indexOf(',') + 1).toString();
-		var dataInput = document.createElement("input") ;
-		dataInput.setAttribute("name", 'imgdata') ;
-		dataInput.setAttribute("value", data);
-
-		var nameInput = document.createElement("input") ;
-		nameInput.setAttribute("name", 'name') ;
-		nameInput.setAttribute("value", fname + '.jpg');
-
-		var myForm = document.createElement("form");
-		myForm.method = 'post';
-		myForm.action = url;
-		myForm.appendChild(dataInput);
-		myForm.appendChild(nameInput);
-
-		document.body.appendChild(myForm) ;
-		myForm.submit() ;
-		document.body.removeChild(myForm) ;
-		
-	  };
-	}
-}*/
-
 function pointerDown(e) {
     var c = transformCoordinates(e);
     var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
     if (e.which == 3){
         if (curTool == "zoom"){
-			isDragging = true;
-			zoomType = 'out';
-//          zoomCount -= 1;
-//			applyZoom(x, y, zoomCount, zoomCount+1);
+			prevZoom = curZoom;
+            curZoom = curZoom/1.5;
+			applyZoom(curZoom, prevZoom, e);
         }
     }
     else{
@@ -380,10 +225,9 @@ function pointerDown(e) {
                 yOld = y;
                 xFirst = x;
                 yFirst = y;
-				isDragging  = true;
-				selectStart = [x,y];
                 if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
                     dragMode = objectList[selectedId].iconClicked(x, y);
+                    isDragging = true;
                     if(dragMode == 'scale') {
                         beginScale(selectedId, x, y);
                     }
@@ -396,29 +240,9 @@ function pointerDown(e) {
                 } else {
                     selectedId = getObjectID(x, y);
                     if(selectedId != -1) {
+                        isDragging = true;
                         dragMode = 'translate';
                     }
-				/*	else{
-						$.each(layerList, function(i, id) {
-							var dObj = objectList[id];
-							if(dObj.type == "bound") {
-								eraseObject(dObj.id);
-							}
-						});
-						var dObj = {
-							pts: [x, y],
-							tPos: [x, y],
-							lCorner: [x,y],
-							rCorner: [x,y],
-							mx: x, my: y,
-							boundList: selectList,
-							type: "bound",
-							xScale: 1,
-							yScale: 1,
-							rotation: 0
-						};
-						startBound(dObj);
-					}*/
                 }
                 break;
 
@@ -428,34 +252,10 @@ function pointerDown(e) {
                 if(id != -1) { eraseObject(id); }
                 break;
 
-			case "shape":
-				isDragging = true;
-                var dObj = {
-                    pts: [[x, y]],
-                    lCorner: [x,y],
-                    rCorner: [x,y],
-                    mx: x, my: y,
-                    width: thickness,
-                    opacity: alpha,
-                    color: curColor,
-                    type: shapeType,
-					radius: 0,
-                    xScale: 1,
-                    yScale: 1,
-                    rotation: 0
-                };
-                startShape(dObj);
-				break;
             case "fill":
                 var dObj = {
-                    color: curColor,
+                    color: hslToRgb(myCP.curH, myCP.curS/100, myCP.curL/100),
                     opacity: alpha,
-                    lCorner: -1,
-                    rCorner: -1,
-                    mx: -1, my: -1,
-                    rotation: 0,
-                    xScale: 1,
-                    yScale: 1,
                     pts: [[x, y]]
                 };
                 createFill(dObj);
@@ -468,35 +268,18 @@ function pointerDown(e) {
                     cy: svgList[ curStamp ].cy,
                     opacity: alpha,
                     xScale: 1, 
-                    yScale: 1, 
+                    yScale: 1,
                     bound: svgList[ curStamp ].bounds,
                     rotation: 0,
                     pts: [x, y],
                 };    
-
-
+ /*               $.get(dObj.url, function(xmlData) {
+                    console.log("Got svg: " + dObj.url + " for " + curStamp);
+                    dObj.svg = xmlData;
+                });
+*/
                 createBMP(dObj);
                 createStamp(dObj);
-                break;
-			case "textbox":
-                var dObj = {
-					theText: [[new String()]],
-					fontSize: thickness,
-                    opacity: alpha,
-					type: textMode,
-					strpixel: 0,
-                    xScale: 1, 
-                    yScale: 1,
-					lCorner: [x,y],
-                    rCorner: [x,y],
-					mx: x, my: y,
-                    bound: [1,1],
-                    rotation: 0,
-                    pts: [x,y],
-					tPos: [x,y]
-                };    
-				isDragging = true;
-                createTextBalloon(dObj);
                 break;
             case "dropper":
                 isDragging = true;
@@ -506,15 +289,20 @@ function pointerDown(e) {
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
             case "zoom":
-//				if (zoomCount < 8){
-					isDragging = true;
-					zoomType = 'in';
-//					zoomCount += 1;
-//					applyZoom(x, y, zoomCount, zoomCount-1);
-//				}
+				prevZoom = curZoom;
+				curZoom = curZoom*1.5;
+                applyZoom(curZoom, prevZoom, e);
                 break;
         }
     }
+}
+
+function applyZoom(newZoom, oldZoom, event){
+	startx = event.clientX;
+	starty = event.clientY;
+	var mouse = transformCoordinates(event);
+	originx = -1*(mouse[0]*newZoom - startx);
+	originy = -1*(mouse[1]*newZoom - starty);
 }
 
 function pointerMove(e) {
@@ -536,19 +324,8 @@ function pointerMove(e) {
                     eraseObject(id);
                 }
                 break;
-			case "zoom":
-				dragZoom(x,y);
-				break;
-			case "shape":
-				contShape(x,y,e);
-				break;
             case "select":
-				if(selectedId != -1){
-					applyTransform(selectedId, x, y, dragMode, e);
-				}
-			//	else{
-			//		placeTextArea(x,y);
-			//	}
+                applyTransform(selectedId, x, y, dragMode, e);
                 break;
             case "dropper":
                 var id = ctx.getImageData(x, y, 1, 1);
@@ -556,9 +333,6 @@ function pointerMove(e) {
                 myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
-			case "textbox":
-				placeTextArea(x,y);
-				break;
         }
     }
 }
@@ -574,39 +348,14 @@ function pointerEnd(e) {
         obj.rCorner[0] += 32;
         obj.rCorner[1] += 32;
     }
-	else if(curTool == 'zoom'){
-		if(isZoom == true){
-			if (zoomType == 'in'){
-				if (zoomCount < 8){
-					zoomCount += 1;
-					applyZoom(x, y, zoomCount, zoomCount-1);
-				}
-			}
-			else{
-				if(zoomCount > 0){
-					zoomCount -= 1;
-					applyZoom(x, y, zoomCount, zoomCount+1);
-				}
-			}
-		}
-		isZoom = true;
-	}
-	
+
     if(isDragging && (curTool == 'select')) {
-		selectEnd = [x,y];
-		if(selectedId != -1){
-			endTransform(selectedId, x, y, dragMode);
-		}
-		else{
-//			groupSelection();
-		}
-		selectStart = [];
-		selectEnd = [];
+        endTransform(selectedId, x, y, dragMode);
     }
     
     isDragging = false;
 }
-// moves selected object up in the layerList
+
 function layerUp (selectedId) {
 	if (selectedId != -1){
 		var currentId = objectList[selectedId].id;
@@ -632,7 +381,7 @@ function layerUp (selectedId) {
 	}
 	return false;
 }
-// moves the selected object down in the layerList	
+	
 function layerDown(selectedId) {
 	if (selectedId != -1){
 		var currentId = objectList[selectedId].id;
@@ -710,7 +459,7 @@ function updateThick(slideAmount) {        // gets thickness from slider and set
 }
 function updateOpac(slideAmount) {        // gets opacity from slider and sets the global opacity
     alpha = slideAmount/100;
-    myCP.updateColor();
+    myCP.Refresh();
 }
 
 function updateTint(slideAmount) {        // gets tint from slider and sets the light setting in the color picker
@@ -743,22 +492,6 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 			document.body.style.cursor="url(img/stamper.png)14 28, default";
 			curTool = toolName;
 			break;
-		case 'circle':
-            curTool = 'shape';
-            shapeType = 'circle';
-            break;
-		case 'square':
-            curTool = 'shape';
-            shapeType = 'square';
-            break;
-		case 'line':
-            curTool = 'shape';
-            shapeType = 'line';
-            break;
-		case 'triangle':
-            curTool = 'shape';
-            shapeType = 'triangle';
-            break;
         default:
             curTool = toolName;
             break;
@@ -767,12 +500,16 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
-	document.onselectstart = function () { return false; };
     document.body.style.cursor="url(img/paintbrush.png) 0 28, default"; // sets the default cursor to the paintbrush
     //Ceate Color picker
     myCP = new ColorPicker();
     myCP.setHSL(0,90,50);
-    
+
+    // Prevent default actions for touch events
+    document.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
+    document.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
+    document.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
+
     //Refresh on orientation changes
     window.addEventListener( 'resize', refreshCanvas );
     window.addEventListener( 'orientationchange', refreshCanvas );
@@ -781,9 +518,23 @@ $().ready( function() {
     canvas = document.getElementById('drawing_canvas');
 	toolbar = document.getElementById('toolbar');
 	
-	canvas.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
-    canvas.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
-    canvas.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
+	var icnsize = 32;
+	var toolbar=canvas.getContext("2d");
+	var brushImg = new Image();
+    brushImg.onload = function() { toolbar.drawImage(brushImg, 10, 10); };
+    brushImg.src = "img/paintbrush.png";
+	canvas.addEventListener("click", onToolbarClick, false);
+	function onToolbarClick(e) {
+		x = e.pageX - canvas.offsetLeft;
+        y = e.pageY - canvas.offsetTop;
+		
+		// BRUSH
+		if (x > 10 && x < (10+icnsize) && y > 10 && y < (10+icnsize)) {
+			alert("brush!");
+		}
+	}
+
+
     
 
     // Bind an action.
@@ -817,34 +568,9 @@ $().ready( function() {
     $('#redo_button').attr('disabled', true);
     $('button').button().attr("autocomplete", "off");
 
-	
-	$('#download').click( function() {
-        downloadImage();
-    });
-	
-    $('#brush').click( function() {
+    $('brush').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('draw');
-    });
-
-	$('#line').click( function() {
-        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
-        SelectTool('line');
-    });
-	
-	$('#circle').click( function() {
-        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
-        SelectTool('circle');
-    });
-	
-	$('#square').click( function() {
-        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
-        SelectTool('square');
-    });
-	
-	$('#triangle').click( function() {
-        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
-        SelectTool('triangle');
     });
 
     $('#spraycan').click( function() {
@@ -866,6 +592,10 @@ $().ready( function() {
         SelectTool('pencil');
     });
     
+    $('#fill').click( function() {
+        SelectTool('fill');
+    });
+    
     $('#erase').click( function() {
         document.body.style.cursor="url(img/eraser.png)0 28, default";
         SelectTool('erase');
@@ -882,51 +612,26 @@ $().ready( function() {
     });
     
     $('#fill').click( function() {
-        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        document.body.style.cursor="url(img/paintbucket.png)0 28, default";
         SelectTool('fill');
     });
-	
-	$('#balloon').click( function() {
-		document.body.style.cursor="default";
-         SelectTool('textbox');
-		 textMode = "balloon";
-    });
-	
-	$('#textbox').click( function() {
-		document.body.style.cursor="default";
-         SelectTool('textbox');
-		 textMode = "box";
-    });
-	
+    
     $('#butterfly').click( function() {
          SelectTool('stamp');
          curStamp = 'butterfly'
     });
-	
     $('#mickey_button').click( function() {
         SelectTool('stamp');
         curStamp = 'mickey'
     });
-	
     $('#bnl').click( function() {
         SelectTool('stamp');
         curStamp = 'bnl'
     });
-	
     $('#stamp').click( function() {
         SelectTool('stamp');
     });
 
-	$('#copy').click( function() {
-        copy();
-    });
-	
-	$('#paste').click( function() {
-		if(copiedObj){
-			paste(copiedObj);
-		}
-    });
-	
     $('#clear').click( function() {
         objectList = {};
         layerList = [];
@@ -978,58 +683,9 @@ $().ready( function() {
         }
     });
     
-    $(document).keydown(function(e) {
+    $(document).keypress(function(e) {
         var key = e.which;
-		var id = layerList[layerList.length-1];
-		if(selectedId != -1 && objectList[selectedId].theText){ //short circuiting works in JS
-			id = selectedId;
-		}
 
-		if(id != -1 && objectList[id].theText){
-			var num_lines = objectList[id].theText.length;
-			var num_words = objectList[id].theText[num_lines-1].length;
-			
-			if(key == 13){	//enter pressed
-				objectList[id].theText.push([new String()]);
-			}
-			else if(key == 8 || key == 46){	//backspace or delete pressed
-				var s = objectList[id].theText[num_lines-1][num_words-1];
-				var l = objectList[id].theText[num_lines-1];
-
-				if(s && s.length > 0)
-					objectList[id].theText[num_lines-1][num_words-1] = s.substring(0,s.length-1);
-				else if(l.length > 0)
-					objectList[id].theText[num_lines-1].pop();
-				else if(l.length == 0 && objectList[id].theText.length > 1)
-					objectList[id].theText.pop();
-			}
-			else if(key == 32){	//space pressed
-				objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key);
-				objectList[id].theText[num_lines-1].push(new String());
-			}
-			else{ //alphanumeric
-				if(e.shiftKey)
-					objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key);
-				else{
-					objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key+32);
-					}
-			}
-			num_lines = objectList[id].theText.length;
-			num_words = objectList[id].theText[num_lines-1].length;
-			var max = objectList[id].strpixel;
-			for(var i=0; objectList[id].theText && i< num_lines; i++){
-				var t = 0;
-				for(var j=0; objectList[id].theText[num_lines-1] && j<num_words ; j++){
-					t += objectList[id].theText[i][j].length;
-				}
-				if(t > max){
-					objectList[id].strpixel = max = t;
-					objectList[id].max = i;
-				}
-			}
-		    return;
-		}
-		
         // Ctrl-Z or CMD-Z for Undo   Shift-* for Redo
         if ((e.ctrlKey) && ((key == 122 || key == 90))) {  // CTRL-Z
             if (key == 122 || key == 90){            // UNDO and REDO
@@ -1062,9 +718,6 @@ $().ready( function() {
 			case 112: // P=PENCIL
               document.body.style.cursor="url(img/pencil.png)0 28, default";
 			  SelectTool('pencil');
-              break;
-			case 113: // Q=SHAPE
-			  SelectTool('square');
               break;
             case 115: // S=SELECT
               document.body.style.cursor="url(img/hand-tool.png)14 6, default";
