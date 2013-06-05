@@ -1,0 +1,14 @@
+html,
+body,
+iframe {
+	margin:0;
+	padding:0;
+	height:100%;	
+}
+#itools {
+	width:20%;
+	float:left;
+}
+#icanvas {
+	width:80%;
+}

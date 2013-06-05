@@ -12,18 +12,12 @@
 <script type="text/javascript" src="js/kiwilines.js"></script>
 <script type="text/javascript" src="js/kiwibrush.js"></script>
 <script type="text/javascript" src="js/kiwitransform.js"></script>
-<script type="text/javascript" src="js/kiwifill.js"></script>
-<script type="text/javascript" src="js/kiwishapes.js"></script>
 
 <script type="text/javascript" src="js/raphael-min.js"></script>
 <script type="text/javascript" src="js/color_picker.js"></script>
 
-<!-- Canvas to Image -->
-<script type="text/javascript" src="js/base64.js"></script>
-<script type="text/javascript" src="js/canvas2image.js"></script>
-
 <!-- SVG conversion library -->
-<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script>
+<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script> 
 <script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
 
 <!-- Sliders -->
@@ -32,18 +26,15 @@
 </head>
 <body>
 <div id="table">
-    <div id="toolbar">
+	<div id="toolbar">
     	<span>
             <a id="save"><img src="img/save.png" /></a>
             <a id="open"><img src="img/folder-open.png" /></a>
-			<a id="download"><img src="img/download.png" /></a>
-			<a id="copy"><img src="img/copy.png" /></a>
         </span>
         <span>
             <a id="undo"><img src="img/arrow-undo.png" /></a>
             <a id="redo"><img src="img/arrow-redo.png" /></a>
             <a id="clear"><img src="img/trash-can.png" /></a>
-			<a id="paste"><img src="img/paste.png" /></a>
         </span>
 		<div class="cp_canvas"><canvas id="colorpicker_canvas"></canvas></div>
         <div id="sliders">
@@ -67,23 +58,15 @@
             <a class="icon" id="dropper"><img src="img/dropper.png" alt="Dropper" title="Dropper" /></a>
         </span>
         <span>
-            <a href="#" class="icon" id="brush"><img src="img/paintbrush.png" alt="Brush" title="Brush" /></a>
-            <a href="#" class="icon" id="pencil"><img src="img/pencil.png" alt="Pencil" title="Pencil" /></a>
+            <a class="icon" id="brush"><img src="img/paintbrush.png" alt="Brush" title="Brush" /></a>
+            <a class="icon" id="pencil"><img src="img/pencil.png" alt="Pencil" title="Pencil" /></a>
             <a class="icon" id="spraycan"><img src="img/spraycan.png" alt="Spraycan" title="Spraycan" /></a>
             <a class="icon" id="fill"><img src="img/paintbucket.png" alt="Paintbucket" title="Paintbucket" /></a>
         </span>
-		<span>
-			<a class="icon" id="circle"><img src="img/circle.png"  /></a>
-			<a class="icon" id="line"><img src="img/line.png"  /></a>
-			<a class="icon" id="square"><img src="img/square.png"  /></a>
-			<a class="icon" id="triangle"><img src="img/triangle.png"  /></a>
-		</span>
         <span>
             <a class="icon" id="mickey_button"><img src="img/mickey_icon.png" /></a>
             <a class="icon" id="bnl"><img src="img/bnl_icon.png" /></a>
             <a class="icon" id="butterfly"><img src="img/butterfly_icon.png" /></a>
-			<a class="icon" id="balloon"><img src="img/balloon_icon.png"  /></a>
-			<a class="icon" id="textbox"><img src="img/simpleballoon_icon.png"  /></a>
         </span>
     </div>
     <div id="canvaswrapp">
@@ -92,7 +75,5 @@
 </div>
 <img id="resize_icon" style="display:none;" src="img/resize_icon.png" />
 <img id="rotate_icon" style="display:none;" src="img/rotate_icon.png" />
-<img id="arrow_up" style="display:none;" src="img/arrowup.png" />
-<img id="arrow_down" style="display:none;" src="img/arrowdown.png" />
 </body>
 </html>

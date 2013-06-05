@@ -674,6 +674,7 @@ function createFill(dObj){
     var newAct = {
         undo: function() {
             layerList.splice(layerList.length-1,1);
+			selectedId = -1;
         },
         redo: function() {
             layerList[layerList.length] = dObj.id;
