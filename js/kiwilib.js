@@ -480,6 +480,7 @@ function pointerDown(e) {
                     opacity: alpha,
 					color: curColor,
 					type: textMode,
+					strpixel: 0,
                     xScale: 1, 
                     yScale: 1,
 					lCorner: [x,y],
@@ -727,6 +728,10 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
             curTool = 'draw';
             brushMode = 'graphite';
             break;
+		case 'calligraphy':
+            curTool = 'draw';
+            brushMode = 'calligraphy';
+            break;
         case 'fill':
             curTool = 'fill';
             break;
@@ -821,6 +826,10 @@ $().ready( function() {
 	$('#line').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('line');
+    });
+	$('#calligraphy').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('calligraphy');
     });
 	
 	$('#circle').click( function() {
@@ -971,30 +980,28 @@ $().ready( function() {
     
     $(document).keydown(function(e) {
         var key = e.which;
-	
 		var id = layerList[layerList.length-1];
 		if(selectedId != -1 && objectList[selectedId].theText){ //short circuiting works in JS
 			id = selectedId;
 		}
 
-		console.log(id);
 		if(id != -1 && objectList[id].theText){
 			var num_lines = objectList[id].theText.length;
 			var num_words = objectList[id].theText[num_lines-1].length;
 			
 			if(key == 13){	//enter pressed
 				objectList[id].theText.push([new String()]);
-				console.log("enter");
 			}
-			else if(key == 8){	//backspace pressed
-				var num_words = objectList[id].theText[length-1].length;
-				var s = objectList[id].theText[length-1];
-				if(s.length > 0){
-					objectList[id].theText[length-1] = s.substring(0,s.length-1);
-				}
-				else if(s.length == 0 && objectList[id].theText.length > 1)
+			else if(key == 8 || key == 46){	//backspace or delete pressed
+				var s = objectList[id].theText[num_lines-1][num_words-1];
+				var l = objectList[id].theText[num_lines-1];
+
+				if(s && s.length > 0)
+					objectList[id].theText[num_lines-1][num_words-1] = s.substring(0,s.length-1);
+				else if(l.length > 0)
+					objectList[id].theText[num_lines-1].pop();
+				else if(l.length == 0 && objectList[id].theText.length > 1)
 					objectList[id].theText.pop();
-				console.log("back");
 			}
 			else if(key == 32){	//space pressed
 				objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key);
@@ -1007,23 +1014,18 @@ $().ready( function() {
 					objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key+32);
 					}
 			}
-			var max = 0;
-			for(var i=0; i< num_lines; i++){
-				var n = objectList[id].theText[num_lines-1].length;
+			num_lines = objectList[id].theText.length;
+			num_words = objectList[id].theText[num_lines-1].length;
+			var max = objectList[id].strpixel;
+			for(var i=0; objectList[id].theText && i< num_lines; i++){
 				var t = 0;
-				for(var j=0; j<n ; j++){
+				for(var j=0; objectList[id].theText[num_lines-1] && j<num_words ; j++){
 					t += objectList[id].theText[i][j].length;
 				}
 				if(t > max){
-					max = t;
+					objectList[id].strpixel = max = t;
 					objectList[id].max = i;
 				}
-				/*
-				if(objectList[id].theText[i] && objectList[id].theText[i].length > max){
-					max = objectList[id].theText[i].length;
-					objectList[id].max = i;
-				}
-				*/
 			}
 		    return;
 		}

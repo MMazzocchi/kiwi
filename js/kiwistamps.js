@@ -168,20 +168,17 @@ function createStamp(dObj) {
 
     addAction(newAct);
 }
-
-function drawBalloon(ctx, x, y, w, h, radius)
-{
+function drawBalloon2(ctx, x, y, w, h, radius,lw){
 	var r = x + w;
-	var b = y + h;
+	var b = y + h
+	ctx.save();
 	ctx.beginPath();
 	ctx.strokeStyle="#000000";
-	ctx.lineWidth="4";
+	ctx.lineWidth=lw;
 	ctx.moveTo(x+radius, y);
-	ctx.lineTo(x+radius/2, y-10);
-	ctx.lineTo(x+radius * 2, y);
 	ctx.lineTo(r-radius, y);
 	ctx.quadraticCurveTo(r, y, r, y+radius);
-	ctx.lineTo(r, y+h-radius);
+	ctx.lineTo(r, b-radius);
 	ctx.quadraticCurveTo(r, b, r-radius, b);
 	ctx.lineTo(x+radius, b);
 	ctx.quadraticCurveTo(x, b, x, b-radius);
@@ -189,6 +186,55 @@ function drawBalloon(ctx, x, y, w, h, radius)
 	ctx.quadraticCurveTo(x, y, x+radius, y);
 	ctx.stroke();
 	ctx.fill();
+	
+	var cx = x+w/2;
+	var cy = y+h/2;
+	ctx.beginPath();
+	ctx.moveTo(cx + radius, cy);
+	ctx.lineTo(0,0);
+	ctx.lineTo(cx - radius, cy);
+	ctx.stroke();
+	ctx.fill();
+	ctx.restore();
+}
+
+function drawBalloon(ctx, x, y, tx, ty, w, h, radius)
+{
+	var r = x + w;
+	var b = y + h;
+	ctx.beginPath();
+	ctx.strokeStyle="#000000";
+	ctx.lineWidth="4";
+	if(ty <= y){
+		ctx.moveTo(x+radius, y);
+		ctx.lineTo(tx, ty);
+		ctx.lineTo(x+radius * 2, y);
+		ctx.lineTo(r-radius, y);
+		ctx.quadraticCurveTo(r, y, r, y+radius);
+		ctx.lineTo(r, b-radius);
+		ctx.quadraticCurveTo(r, b, r-radius, b);
+		ctx.lineTo(x+radius, b);
+		ctx.quadraticCurveTo(x, b, x, b-radius);
+		ctx.lineTo(x, y+radius);
+		ctx.quadraticCurveTo(x, y, x+radius, y);
+		ctx.stroke();
+		ctx.fill();
+	}
+	else{
+		ctx.moveTo(x+radius, y);
+		ctx.lineTo(r-radius, y);
+		ctx.quadraticCurveTo(r, y, r, y+radius);
+		ctx.lineTo(r, b-radius);
+		ctx.quadraticCurveTo(r, b, r-radius, b);
+		ctx.lineTo(x+radius * 2, b);
+		ctx.lineTo(tx, ty);
+		ctx.lineTo(x+radius, b);
+		ctx.quadraticCurveTo(x, b, x, b-radius);
+		ctx.lineTo(x, y+radius);
+		ctx.quadraticCurveTo(x, y, x+radius, y);
+		ctx.stroke();
+		ctx.fill();
+	}
 }
 
 function placeTextArea(x,y){
@@ -217,21 +263,30 @@ function createTextBalloon(dObj) {
 			ctx.font="normal "+this.fontSize+"px Comic Sans MS";
 			
 			if(this.type == "balloon"){
-				var max_length = 20;
+
+				var max_length = 30;
 				for(var i=0; this.theText[this.max] && i< this.theText[this.max].length; i++){
 					var metrics = ctx.measureText(this.theText[this.max][i]);
 					max_length += metrics.width;
 				}
 				this.width = max_length;
 				this.height = this.fontSize*this.theText.length+10;
+				var tx = this.tPos[0]-this.pts[0] ;
+				var ty = this.tPos[1]-this.pts[1] ;
+				//drawBalloon(ctx,tx,ty, 0,0,this.width, this.height, 15);
+
 				this.mx = this.pts[0] + this.width/2;
 				this.my = this.pts[1] + this.height/2;
-				ctx.translate(this.mx, this.my);
+				ctx.translate(this.pts[0], this.pts[1]);
 				ctx.rotate(this.rotation);
 				ctx.scale(xScale,yScale);
+				ctx.save();
+					drawBalloon2(ctx,tx,ty,this.width, this.height, 15,8);
+					ctx.globalCompositeOperation = "lighter";
+					drawBalloon2(ctx,tx,ty,this.width, this.height, 15,1);
+				ctx.restore();
 				this.rCorner[0] = this.pts[0] + this.width;
 				this.rCorner[1] = this.pts[1] + this.height;
-				drawBalloon(ctx, -this.width/2,-this.height/2,this.width, this.height, 15);
 				ctx.fillStyle = this.color;
 				for(var i=0; i<this.theText.length; i++){
 					for(var j=0; j<this.theText[i].length; j++){
@@ -240,8 +295,10 @@ function createTextBalloon(dObj) {
 							var met = ctx.measureText(this.theText[i][k]);
 							line_length += met.width;
 						}
+						
+						ctx.fillText(this.theText[i][j],tx+15 + line_length,ty+(i+1)*this.fontSize+2);
 					
-						ctx.fillText(this.theText[i][j],-this.width/2+10 + line_length,-this.height/2+(i+1)*this.fontSize+2);
+						//ctx.fillText(this.theText[i][j],-this.width/2+10 + line_length,-this.height/2+(i+1)*this.fontSize+2);
 					}
 				}
 			}

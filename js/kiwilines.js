@@ -41,19 +41,39 @@ function createSpraytex(dObj){
     ctx.fillRect(0,0,w,w);
     dObj.scanvas = scanvas;
 }
+function createTextureBrush(dObj){
+	var scanvas = document.createElement('canvas');
+    scanvas.height = scanvas.width = dObj.width;
+    var ctx = scanvas.getContext('2d');
+    var w = dObj.width;
+	ctx.save();
+	ctx.beginPath();
+	ctx.strokeStyle=dObj.color;
+	ctx.fillStyle = dObj.color;
+	ctx.moveTo(0, 0);
+	ctx.quadraticCurveTo(3*w/4, w/4, w, w);
+	ctx.quadraticCurveTo(w/4, 3*w/4, 0, 0);
+	ctx.stroke();
+	ctx.fill();
+	ctx.restore();
+    dObj.scanvas = scanvas;
 
+}
 
 
 // Create a line
 function startLine(dObj) {
     assignID(dObj);
     if(dObj.type == 'spray'){
-        createSpraytex(dObj);
+        createSprayTex(dObj);
     }
     // create brush pattern
-    if(dObj.type == 'graphite'){
+    else if(dObj.type == 'graphite'){
         createPencilTex(dObj);
     }
+	else if(dObj.type == 'calligraphy'){
+		createTextureBrush(dObj);
+	}
 
     // Create a brush for this line
     createBrush(dObj, brushMode);
