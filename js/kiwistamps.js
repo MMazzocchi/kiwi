@@ -276,19 +276,45 @@ function createTextBalloon(dObj) {
 				var ty = this.tPos[1]-this.pts[1] ;
 				
 				//drawBalloon(ctx,tx,ty, 0,0,this.width, this.height, 15);
-
-				this.mx = this.pts[0] + this.width/2;
-				this.my = this.pts[1] + this.height/2;
-				ctx.translate(this.pts[0], this.pts[1]);
+				var bw = this.bw = max_length;
+				var bh = this.bh = this.fontSize*this.theText.length+10;
+				var w = this.width = this.tPos[0]-this.pts[0];
+				if(this.tPos[0]<this.pts[0] && this.tPos[0]+bw > this.pts[0]){
+					this.width = bw;
+					this.rCorner[0] = this.tPos[0]+bw;
+				}
+				else if(this.tPos[0]>this.pts[0]){
+					this.width = w+bw;
+					this.rCorner[0] = this.pts[0]+this.width;
+				}
+				else if(this.tPos[0]<this.pts[0]){
+					this.width = w;
+					this.rCorner[0] = this.pts[0];
+				}
+				var h = this.height =this.tPos[1]- this.pts[1];
+				if(this.tPos[1]<this.pts[1] && this.tPos[1]+bh > this.pts[1]){
+					this.height = bh;
+					this.rCorner[1] = this.tPos[1]+bh;
+				}
+				else if(this.tPos[1]>this.pts[1]){
+					this.height = h+bh;
+					this.rCorner[1] = this.pts[1]+this.height;
+				}
+				else if(this.tPos[1]<this.pts[1]){
+					this.height = h;
+					this.rCorner[1] = this.pts[1];
+				}
+				this.mx = this.lCorner[0]+(this.lCorner[0]-this.rCorner[0])/2;
+				this.my = this.lCorner[1]+(this.lCorner[1]-this.rCorner[1])/2;
+				ctx.translate(this.mx, this.my);
 				ctx.rotate(this.rotation);
 				ctx.scale(xScale,yScale);
 				ctx.save();
-					drawBalloon2(ctx,tx,ty,this.width, this.height, 15,8);
+					drawBalloon2(ctx,tx,ty,bw, bh, 15,8);
 					ctx.globalCompositeOperation = "lighter";
-					drawBalloon2(ctx,tx,ty,this.width, this.height, 15,1);
+					drawBalloon2(ctx,tx,ty,bw, bh, 15,1);
 				ctx.restore();
-				this.rCorner[0] = this.pts[0] + this.width;
-				this.rCorner[1] = this.pts[1] + this.height;
+
 				ctx.fillStyle = this.color;
 				for(var i=0; i<this.theText.length; i++){
 					for(var j=0; j<this.theText[i].length; j++){
@@ -342,16 +368,18 @@ function createTextBalloon(dObj) {
     };
 
     dObj.select = function(x,y) {
-	/*	if(dObj.type == "balloon"){
+		if(this.type == "balloon"){
 			var bw = this.bw*this.xScale;
 			var bh = this.bh*this.yScale;
 			var pts = this.pts;
-			var tPos = this.tPos;
-			var d = [pts[0]+(tPos[0]-pts[0])*this.xScale, pts[1]+(tPos[1]-pts[1])*this.yScale];
-			var s = [this.xScale, this.yScale];
-			return (x >= d[0] && y >= d[1] && x <= d[0]+bw && y <= d[1]+bh);
+			var t = this.tPos;
+			var d = [pts[0]+(t[0]-pts[0])*this.xScale,pts[1]+(t[1]-pts[1])*this.yScale];
+			var s = [this.xScale,this.yScale];
+			return x >= d[0] && y >= d[1] && x < d[0]+bw && y < d[1]+bh;
 		}
-	*/	return (x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]);
+		else{
+			return (x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]);
+		}
     };
 
     // Move this stamp by dx, dy

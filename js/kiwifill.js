@@ -31,20 +31,16 @@ function hslToRgb(h, s, l) {
 }
 
 function matchColor(c1, c2) {
-   var r = c1[0]/c2[0];
+   var r = c2[0]/c1[0];
 
    for(var i=0; i<3; i++) {
-       if((Math.abs(c1[i] - c2[i]) > 100) || 
-         (Math.abs((c2[i]/c1[i]) - r)/r) > .8) {
+       if((Math.abs(c1[i] - c2[i]) > 50) || 
+         (Math.abs((c2[i]/c1[i]) - r)/r) > .95) {
              return false;
          }
+
    } 
    return true;
-}
-
-function beenChecked(x,y,checked) {
-    console.log(checked);
-    return (checked[""+x+","+y] == 1);
 }
 
 function validPoint(x,y, color, checked, ctx, cData, width, height) {
@@ -149,17 +145,29 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
     return data;
 } 
 
+function slope(pt1, pt2) {
+    var m = (pt2[1]-pt1[1])/(pt2[0]-pt1[0]);
+    return m;
+}
+
+function smoothEnds(pts) {
+    if(pts.length > 3) {
+        //Slope check
+        if(slope(pts[pts.length-1], pts[pts.length-2]) ==
+            slope(pts[pts.length-2], pts[pts.length-3])) {
+            pts[pts.length-2] = pts.pop();
+        }
+    }
+}
+
 function findSectors(dObj, x, y, sectors, width, height, ctx) {
     console.log("Initial point: ("+x+","+y+")");
     x = Math.round(x); y = Math.round(y);
-    var nPtr = 0;
-    var sPtr = 0;
+
     var ptr = 0;
     var color = ctx.getImageData(x,y,1,1).data;
     var checked = {};
     var queue = [[x,y]];
-    var nQueue = [];
-    var sQueue = [];
 
     var cData = ctx.getImageData(0,0,width,height).data;
 
@@ -204,6 +212,9 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
                 }
                 nQueue = nData.nQueue;
                 queue = queue.concat(nData.sQueue);
+
+                smoothEnds(lPts);
+                smoothEnds(rPts);
             }
             if(nQueue.length > 0) {
                 lPts[lPts.length-1][1] += 1;
@@ -237,6 +248,9 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
                 }
                 sQueue = sData.sQueue;
                 queue = queue.concat(sData.nQueue);
+
+                smoothEnds(lPts);
+                smoothEnds(rPts);
             }
             if(sQueue.length > 0) {
                 lPts[0][1] -= 1;
@@ -245,10 +259,10 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
             queue = queue.concat(sQueue);
         }
 
-        lPts[0][1] -= .0625;
-        rPts[rPts.length-1][1] -= .0625;
-        lPts[lPts.length-1][1] += .0625;
-        rPts[0][1] += .0625;
+        lPts[0][1] -= .5;
+        rPts[rPts.length-1][1] -= .5;
+        lPts[lPts.length-1][1] += .5;
+        rPts[0][1] += .5;
 
         //Close up this sector
         var sector = lPts.concat(rPts);
@@ -287,11 +301,13 @@ function createFill(dObj){
         ctx.save();
         ctx.fillStyle = this.color;
         ctx.globalAlpha = this.opacity;
-        ctx.strokeStyle = "black";//this.color;
+        ctx.strokeStyle = this.color;
 
         ctx.translate(Math.round(this.mx), Math.round(this.my));
         ctx.rotate(this.rotation);
         ctx.scale(this.xScale, this.yScale);
+
+        ctx.beginPath();
 
         for(var i=0; i<this.sectors.length; i++) {
             if(i == this.highlight) { 
@@ -300,10 +316,10 @@ function createFill(dObj){
                 ctx.fillStyle = this.color;
             }
             var sector = this.sectors[i];
-            ctx.beginPath();
+//            ctx.beginPath();
             ctx.moveTo(sector[0][0]-this.mx, sector[0][1]-this.my);
             if(sector.length == 2) {
-                console.log("Filling sector length 2...");
+//                console.log("Filling sector length 2...");
                 ctx.lineTo(sector[0][0]-this.mx, sector[0][1]-this.my-1);
                 ctx.lineTo(sector[1][0]-this.mx, sector[0][1]-this.my-1);
                 ctx.lineTo(sector[1][0]-this.mx, sector[1][1]-this.my+1);
@@ -313,9 +329,12 @@ function createFill(dObj){
                     ctx.lineTo(sector[j][0]-this.mx, sector[j][1]-this.my);
                 }
             }
-            ctx.closePath();
-            ctx.fill();
+//            ctx.closePath();
+//            ctx.fill();
         }
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
         ctx.restore();
     };
     dObj.select = function(x,y) {

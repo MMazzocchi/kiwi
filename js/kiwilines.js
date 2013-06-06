@@ -21,7 +21,7 @@ function createPencilTex(dObj){
 }
 
 // Create a spray can texture for this object
-function createSpraytex(dObj){
+function createSprayTex(dObj){
     var scanvas = document.createElement('canvas');
     scanvas.height = scanvas.width = dObj.width;
     var ctx = scanvas.getContext('2d');
@@ -143,6 +143,37 @@ function startLine(dObj) {
         this.lCorner[1]+=dy;
         this.rCorner[1]+=dy;
     };
+	dObj.smoothLine = function(){
+		for(var i=0; i<this.pts.length; i+=3) {
+			if(this.pts.length > i+4 && i>0) {
+				var x1 = this.pts[i-1][0];
+				var y1 = this.pts[i-1][1];
+				
+				var x2 = this.pts[i][0];
+				var y2 = this.pts[i][1];
+				
+				var x3 = this.pts[i+1][0];
+				var y3 = this.pts[i+1][1];
+				
+				var x4 = this.pts[i+2][0];
+				var y4 = this.pts[i+2][1];
+				//https://en.wikipedia.org/wiki/Line-line_intersection
+				//forms continuous bezier curves
+				var den = ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
+				var intersectx = ((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4))
+				/den;
+				var intersecty =((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4))
+				/den;
+			
+				if(Math.abs(den) >= 20){
+					//console.log(intersectx + " " +intersecty);
+					this.pts[i+1][0] = intersectx;
+					this.pts[i+1][1] = intersecty;
+				}
+			}	
+        }
+	};
+	
     dObj.rotate = function(dr) {
         this.rotation += dr;
     };
