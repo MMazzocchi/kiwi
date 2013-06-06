@@ -245,6 +245,11 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
             queue = queue.concat(sQueue);
         }
 
+        lPts[0][1] -= .0625;
+        rPts[rPts.length-1][1] -= .0625;
+        lPts[lPts.length-1][1] += .0625;
+        rPts[0][1] += .0625;
+
         //Close up this sector
         var sector = lPts.concat(rPts);
 //        sector[0][1] -= 1;
