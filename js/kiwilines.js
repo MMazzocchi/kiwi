@@ -71,7 +71,7 @@ function startLine(dObj) {
     else if(dObj.type == 'graphite'){
         createPencilTex(dObj);
     }
-	else if(dObj.type == 'pen'){
+	else if(dObj.type == 'calligraphy'){
 		createTextureBrush(dObj);
 	}
 

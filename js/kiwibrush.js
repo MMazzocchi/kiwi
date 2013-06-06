@@ -132,7 +132,7 @@ function createBrush(dObj, brushMode) {
         ctx.restore();
         }
     }
-	else if(brushMode == 'pen'){
+	else if(brushMode == 'calligraphy'){
 
         //Create a spray can brush
         dObj.draw = function(ctx) {

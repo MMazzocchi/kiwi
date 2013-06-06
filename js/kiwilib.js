@@ -737,9 +737,9 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
             curTool = 'draw';
             brushMode = 'graphite';
             break;
-		case 'pen':
+		case 'calligraphy':
             curTool = 'draw';
-            brushMode = 'pen';
+            brushMode = 'calligraphy';
             break;
         case 'fill':
             curTool = 'fill';
@@ -836,9 +836,9 @@ $().ready( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('line');
     });
-	$('#pen').click( function() {
+	$('#calligraphy').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
-        SelectTool('pen');
+        SelectTool('calligraphy');
     });
 	
 	$('#circle').click( function() {
