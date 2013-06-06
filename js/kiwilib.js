@@ -20,6 +20,8 @@ var factor = 1.2;		// base multiplier for zoom value
 var zoom = 1;			// cumulative zoom (factor^zoomCount)
 var originx = 0;
 var originy = 0;
+var zoomposx = 0;
+var zoomposy = 0;
 var textMode;
 var scratch;
 var copiedObj;
@@ -63,8 +65,8 @@ function transformCoordinates(e) {
         }
     }
 
-    x = x/zoom;
-    y = y/zoom;
+    //x = x/zoom;
+    //y = y/zoom;
     return [x,y];
 }
 
@@ -125,21 +127,12 @@ function refreshCanvas() {
 //    ctx.translate(.5,.5);
 	
     // Redraw every object at the current zoom
-//	z0 = Math.pow(factor,zoomCount-1);
-	zoom = Math.pow(factor,zoomCount);
-//	var L1 = drawing_canvas.width*z0;
-//	var L2 = L1*zoom;
-	var x1 = originx;
-	var x2 = x1*zoom;
-//	var x2 = x1*L2/L1;
+
+	//console.log(x1+ " " + y1);
 	
-//	var L3 = drawing_canvas.height*z0;
-//	var L4 = L3*zoom;
-	var y1 = originy;
-	var y2 = y1*zoom;
-//	var y2 = y1*L4/L3;
-	
-	ctx.translate(x1-x2, y1-y2);
+	//console.log(ctx.canvas.width);
+	ctx.translate(originx, originy);
+	//ctx.save();
 	ctx.scale(zoom, zoom);
 
     // For each id in layerList, call this function:
@@ -255,20 +248,38 @@ function eraseObject(id) {
 
 //Set coordinates for the translations due to the zoom
 function applyZoom(x, y, curZoom, prevZoom){
-	var prevx = originx; 
-	var prevy = originy;
-	originx = (x*zoom);
-	originy = (y*zoom);
+	var z0 = Math.pow(factor,prevZoom);
+	zoom = Math.pow(factor,curZoom);
+	var prevx = zoomposx; 
+	var prevy = zoomposy;
+	var globalx = originx + x/zoom;
+	var globaly = originy + y/zoom;
+	zoomposx = (globalx);
+	zoomposy = (globaly);
+	console.log(x+" "+y);
+	
+
+	var L1 = drawing_canvas.width*z0;
+	var L2 = L1*zoom;
+	var x1 = zoomposx;
+	var x2 = x1*L2/L1;
+	originx= x1-x2;
+	var L3 = drawing_canvas.height*z0;
+	var L4 = L3*zoom;
+	var y1 = zoomposy;
+	var y2 = y1*L4/L3;
+	originy = y1-y2;
+	
 
 	var newAct = {
 		undo: function() {
-			originx = prevx;
-			originy = prevy;
+			zoomposx = prevx;
+			zoomposy = prevy;
 			zoomCount = prevZoom;
 		},
 		redo: function() {
-			originx = x;
-			originy = y;
+			zoomposx = x;
+			zoomposy = y;
 			zoomCount = curZoom;
 		}
 	};
@@ -280,8 +291,8 @@ function applyZoom(x, y, curZoom, prevZoom){
 // allows you to move translate the canvas while zoomed in
 function dragZoom(x, y){
 	isZoom = false;
-	originx = x*zoom;
-	originy = y*zoom;
+	zoomposx = x;
+	zoomposy = y;
 }
 
 /*
@@ -565,6 +576,7 @@ function pointerEnd(e) {
         obj.lCorner[1] -= 32;
         obj.rCorner[0] += 32;
         obj.rCorner[1] += 32;
+		obj.smoothLine();
     }
 	else if(curTool == 'zoom'){
 		if(isZoom == true){
