@@ -368,6 +368,9 @@ function createTextBalloon(dObj) {
     };
 
     dObj.select = function(x,y) {
+		var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,this.xScale,this.yScale,this.rotation);
+		x=pt[0]; y=pt[1];
+		
 		if(this.type == "balloon"){
 			var bw = this.bw*this.xScale;
 			var bh = this.bh*this.yScale;

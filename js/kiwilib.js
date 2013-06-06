@@ -25,7 +25,6 @@ var zoomposy = 0;
 var textMode;
 var scratch;
 var copiedObj;
-var selectList = [];
 var tx=0;
 var ty=0;
 var orientation = orienting() ? window.orientation : 0;
@@ -368,7 +367,6 @@ function pointerDown(e) {
                     lCorner: [x,y],
                     rCorner: [x,y],
                     mx: x, my: y,
-					bindMid: [],
                     width: thickness,
                     opacity: alpha,
                     color: curColor,
@@ -404,7 +402,7 @@ function pointerDown(e) {
                     if(selectedId != -1) {
                         dragMode = 'translate';
                     }
-				/*	else{
+					else{
 						ungroupSelection();
 						
 						var dObj = {
@@ -413,14 +411,14 @@ function pointerDown(e) {
 							lCorner: [x,y],
 							rCorner: [x,y],
 							mx: x, my: y,
-							bindList: selectList,
+							bindList: [],
 							type: "bind",
 							xScale: 1,
 							yScale: 1,
 							rotation: 0
 						};
 						startBind(dObj);
-					}*/
+					}
                 }
                 break;
 
@@ -437,7 +435,6 @@ function pointerDown(e) {
                     lCorner: [x,y],
                     rCorner: [x,y],
                     mx: x, my: y,
-					bindMid: [],
                     width: thickness,
                     opacity: alpha,
                     color: curColor,
@@ -456,7 +453,6 @@ function pointerDown(e) {
                     lCorner: -1,
                     rCorner: -1,
                     mx: -1, my: -1,
-					bindMid: [],
                     rotation: 0,
                     xScale: 1,
                     yScale: 1,
@@ -473,7 +469,6 @@ function pointerDown(e) {
                     opacity: alpha,
                     xScale: 1, 
                     yScale: 1, 
-					bindMid: [],
                     bound: svgList[ curStamp ].bounds,
                     rotation: 0,
                     pts: [x, y]
@@ -496,7 +491,6 @@ function pointerDown(e) {
 					lCorner: [x,y],
                     rCorner: [x,y],
 					mx: x, my: y,
-					bindMid: [],
                     bound: [1,1],
                     rotation: 0,
                     pts: [x,y],
@@ -550,7 +544,7 @@ function pointerMove(e) {
 					applyTransform(selectedId, x, y, dragMode, e);
 				}
 				else{
-				//	placeBindArea(x,y);
+					placeBindArea(x,y);
 				}
                 break;
             case "dropper":
@@ -603,7 +597,7 @@ function pointerEnd(e) {
 			endTransform(selectedId, x, y, dragMode);
 		}
 		else{
-		//	groupSelection();
+			groupSelection();
 		}
     }
     

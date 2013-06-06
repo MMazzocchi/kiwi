@@ -15,19 +15,27 @@ function placeBindArea(x,y){
 
 function groupSelection(){
 	var curObj = objectList[layerList[layerList.length-1]];
+	var selectList = [];
 	
 	$.each(layerList, function(i, id) {
         var dObj = objectList[id];
 		var layerId = i;
-		
-        if(dObj.lCorner[0] > curObj.lCorner[0] && dObj.lCorner[1] > curObj.lCorner[1] && dObj.rCorner[0] < curObj.rCorner[0] && dObj.rCorner[1] < curObj.rCorner[1]) {
-			selectList.push(dObj);
-		//	layerList.splice[layerId, 1];
-		//	eraseObject(dObj.id);
-        }
+		if(dObj.lCorner){
+			if(dObj.lCorner[0] > curObj.lCorner[0] && dObj.lCorner[1] > curObj.lCorner[1] && dObj.rCorner[0] < curObj.rCorner[0] && dObj.rCorner[1] < curObj.rCorner[1]) {
+				curObj.bindList.push(dObj);
+				selectList.push(layerId);
+			}
+		}
+		else{
+			if(dObj.pts[0] > curObj.lCorner[0] && dObj.pts[0] < curObj.rCorner[0] && dObj.pts[1] > curObj.lCorner[1] && dObj.pts[1] < curObj.rCorner[1]){
+				curObj.bindList.push(dObj);
+				selectList.push(layerId);
+			}
+		}
     });
-	curObj.bindList = selectList;
-	selectList = [];
+	for(var i=selectList.length-1; i>=0; i--){
+		layerList.splice(selectList[i], 1);
+	}
 	if(curObj.bindList.length > 0){
 		selectedId = curObj.id;
 	}
@@ -42,8 +50,16 @@ function ungroupSelection(){
 		if(dObj.type == "bind") {
 			for(var j=0; j<dObj.bindList.length; j++){
 				dObj.bindList[j].bindMid = [];
-			//	layerList[layerList.length] = dObj.id;
-			//	assignID(dObj.bindList[j]);
+				layerList[layerList.length] = dObj.bindList[j].id;
+				var curObj = objectList[dObj.bindList[j].id];
+				// Rotating the object to match what it was when binded
+				curObj.rotate(dObj.rotation);
+				var d = distance([curObj.midX(), curObj.midY()], [dObj.mx, dObj.my]);
+				var theta = Math.atan2((curObj.midY() - dObj.my), (curObj.midX() - dObj.mx));
+				var dx = d*(Math.cos(theta)-Math.cos(theta+dObj.rotation));
+				var dy = d*(Math.sin(theta)-Math.sin(theta+dObj.rotation));
+				curObj.move(-dx,-dy);
+				// Scaling the object to match what it was when binded
 			}
 		eraseObject(dObj.id);
 		}
@@ -95,6 +111,9 @@ function startBind(dObj){
 
     }
     dObj.select = function(x,y) {
+		var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,this.xScale,this.yScale,this.rotation);
+		x=pt[0]; y=pt[1];
+	
         if(x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]){
 			return true;
 		}
@@ -190,9 +209,6 @@ function createBind(dObj){
 		if(layerList[layerList.length-1] == this.id || selectedId == this.id){
 			ctx.strokeRect(-this.width/2,-this.height/2,this.width,this.height);
 		}
-	//	ctx.restore();
-	
-//		ctx.translate(-this.width/2, -this.height/2);
 
 		ctx.translate(-this.mx,-this.my);
 		
