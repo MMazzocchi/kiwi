@@ -396,7 +396,7 @@ function pointerDown(e) {
 				/*	else{
 						$.each(layerList, function(i, id) {
 							var dObj = objectList[id];
-							if(dObj.type == "bound") {
+							if(dObj.type == "bind") {
 								eraseObject(dObj.id);
 							}
 						});
@@ -406,13 +406,13 @@ function pointerDown(e) {
 							lCorner: [x,y],
 							rCorner: [x,y],
 							mx: x, my: y,
-							boundList: selectList,
-							type: "bound",
+							bindList: selectList,
+							type: "bind",
 							xScale: 1,
 							yScale: 1,
 							rotation: 0
 						};
-						startBound(dObj);
+						startBind(dObj);
 					}*/
                 }
                 break;
@@ -538,9 +538,9 @@ function pointerMove(e) {
 				if(selectedId != -1){
 					applyTransform(selectedId, x, y, dragMode, e);
 				}
-			//	else{
-			//		placeTextArea(x,y);
-			//	}
+				else{
+					placeBindArea(x,y);
+				}
                 break;
             case "dropper":
                 var id = ctx.getImageData(x, y, 1, 1);
@@ -828,7 +828,7 @@ $().ready( function() {
         SelectTool('line');
     });
 	$('#calligraphy').click( function() {
-        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        document.body.style.cursor="url(img/calligraphy.png)0 28, default";
         SelectTool('calligraphy');
     });
 	

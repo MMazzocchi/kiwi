@@ -1,31 +1,38 @@
+function placeBindArea(x,y){
+	var dObj = objectList[layerList[layerList.length-1]];
+	if(dObj.type == 'bind'){
+		dObj.tPos = [x,y];
+
+		dObj.lCorner[0] = dObj.pts[0] < dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
+		dObj.lCorner[1] = dObj.pts[1] < dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
+		dObj.rCorner[0] = dObj.pts[0] > dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
+		dObj.rCorner[1] = dObj.pts[1] > dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
+		
+		dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
+		dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
+	}
+}
+
 function groupSelection(){
 	var curObj = objectList[layerList[layerList.length-1]];
 	
 	$.each(layerList, function(i, id) {
         var dObj = objectList[id];
 
-        if(dObj.pts.length > 1) {
-			for(var j = 0; j < dObj.pts.length; j++){
-				if(dObj.pts[j][0] > curObj.lCorner[0] && dObj.pts[j][0] < curObj.rCorner[0] && dObj.pts[j][1] > curObj.lCorner[1] && dObj.pts[j][1] < curObj.rCorner[1]){
-					selectList.push(dObj);
-					break;
-				}
-			}
+        if(dObj.lCorner[0] > curObj.lCorner[0] && dObj.lCorner[1] > curObj.lCorner[1] && dObj.rCorner[0] < curObj.rCorner[0] && dObj.rCorner[1] > curObj.rCorner[1]) {
+			selectList.push(dObj);
         }
-		else{
-			if(dObj.pts[0] > curObj.lCorner[0] && dObj.pts[0] < curObj.rCorner[0] && dObj.pts[1] > curObj.lCorner[1] && dObj.pts[1] < curObj.rCorner[1]){
-				selectList.push(dObj);
-			}
-		}
     });
-	curObj.boundList = selectList;
-	selectedId = curObj.id;
+	curObj.bindList = selectList;
+	if(curObj.bindList > 0){
+		selectedId = curObj.id;
+	}
 }
 
-function startBound(dObj){
+function startBind(dObj){
 	assignID(dObj);
 	
-	createBound(dObj);
+	createBind(dObj);
 	
 	dObj.drawIcons = function(ctx) {
 		
@@ -90,14 +97,14 @@ function startBound(dObj){
         this.rCorner[0]+=dx;
         this.lCorner[1]+=dy;
         this.rCorner[1]+=dy;
-		for(var i=0; i<dObj.boundList.length; i++){
-			dObj.boundList[i].move(dx, dy);
+		for(var i=0; i<dObj.bindList.length; i++){
+			dObj.bindList[i].move(dx, dy);
 		}
     };
     dObj.rotate = function(dr) {
         this.rotation += dr;
-		for(var i=0; i<dObj.boundList.length; i++){
-			dObj.boundList[i].rotate(dr);
+		for(var i=0; i<dObj.bindList.length; i++){
+			dObj.bindList[i].rotate(dr);
 		}
     };
     dObj.scale = function(dx, dy) {
@@ -105,8 +112,8 @@ function startBound(dObj){
         else { this.xScale -= (dx/((this.rCorner[0]-this.lCorner[0])/2)); }
         if((this.rCorner[1] == this.lCorner[1])) { this.yScale -= dy/this.width; }
         else { this.yScale -= (dy/((this.rCorner[1]-this.lCorner[1])/2)); }
-		for(var i=0; i<dObj.boundList.length; i++){
-			dObj.boundList[i].scale(dx, dy);
+		for(var i=0; i<dObj.bindList.length; i++){
+			dObj.bindList[i].scale(dx, dy);
 		}
     };
     dObj.iconClicked = function(x,y) {
@@ -157,32 +164,27 @@ function startBound(dObj){
     addAction(newAct);
 }
 
-function createBound(dObj){
+function createBind(dObj){
 	dObj.draw = function(ctx) {
 		var xScale = this.xScale;
         var yScale = this.yScale;
+		
         ctx.save();
-            ctx.globalAlpha = this.opacity;
-            ctx.beginPath();
-				this.width = Math.abs(this.tPos[0]-this.pts[0]);
-				this.height = Math.abs(this.tPos[1]-this.pts[1]);
-				ctx.translate(this.pts[0]+this.width/2, this.pts[1]+this.height/2);
-				ctx.rotate(this.rotation);
-				ctx.scale(xScale,yScale);
-				ctx.fillStyle = curColor;				
-				this.rCorner[0] = this.pts[0] + this.width;
-				this.rCorner[1] = this.pts[1] + this.height;
-				this.mx = this.pts[0] + this.width/2;
-				this.my = this.pts[1] + this.height/2;
-				if(layerList[layerList.length-1] == this.id || selectedId == this.id)
-					ctx.strokeRect(-this.width/2,-this.height/2,this.tPos[0]-this.pts[0],this.tPos[1]-this.pts[1]);//
-				if(this.tPos[1] < this.pts[1])
-					ctx.translate(0,this.tPos[1]-this.pts[1]);
-				if(this.tPos[0] < this.pts[0])
-					ctx.translate(this.tPos[0]-this.pts[0],0);
+        ctx.globalAlpha = this.opacity;
+        ctx.beginPath();
+		this.width = Math.abs(this.rCorner[0]-this.lCorner[0]);
+		this.height = Math.abs(this.rCorner[1]-this.lCorner[1]);
+		ctx.translate(this.mx, this.my);
+		ctx.rotate(this.rotation);
+		ctx.scale(xScale,yScale);
+		ctx.fillStyle = curColor;				
+		if(layerList[layerList.length-1] == this.id || selectedId == this.id){
+			ctx.strokeRect(-this.width/2,-this.height/2,this.tPos[0]-this.pts[0],this.tPos[1]-this.pts[1]);
+		}
 		ctx.restore();
-		for(var i=0; i<dObj.boundList.length; i++){
-			dObj.boundList[i].draw(ctx);
+		
+		for(var i=0; i<dObj.bindList.length; i++){
+			dObj.bindList[i].draw(ctx);
 		}
 	}
 }
