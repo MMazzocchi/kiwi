@@ -302,9 +302,9 @@ function createTextBalloon(dObj) {
 					this.height = h;
 					this.rCorner[1] = this.pts[1];
 				}
-				this.mx = (this.lCorner[0]+this.rCorner[0])/2;
-				this.my = (this.lCorner[1]+this.rCorner[1])/2;
-				ctx.translate(this.pts[0], this.pts[1]);
+				this.mx = this.lCorner[0]+(this.lCorner[0]-this.rCorner[0])/2;
+				this.my = this.lCorner[1]+(this.lCorner[1]-this.rCorner[1])/2;
+				ctx.translate(this.mx, this.my);
 				ctx.rotate(this.rotation);
 				ctx.scale(xScale,yScale);
 				ctx.save();

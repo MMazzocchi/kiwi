@@ -248,23 +248,21 @@ function eraseObject(id) {
 
 //Set coordinates for the translations due to the zoom
 function applyZoom(x, y, curZoom, prevZoom){
-	var z0 = Math.pow(factor,prevZoom);
+	var z2 = Math.pow(factor,curZoom-1);
 	zoom = Math.pow(factor,curZoom);
 	var prevx = zoomposx; 
 	var prevy = zoomposy;
-	var globalx = originx + x/zoom;
-	var globaly = originy + y/zoom;
-	zoomposx = (globalx);
-	zoomposy = (globaly);
+	zoomposx = (x);
+	zoomposy = (y);
 	console.log(x+" "+y);
 	
 
-	var L1 = drawing_canvas.width*z0;
+	var L1 = drawing_canvas.width;//*z0;
 	var L2 = L1*zoom;
 	var x1 = zoomposx;
 	var x2 = x1*L2/L1;
 	originx= x1-x2;
-	var L3 = drawing_canvas.height*z0;
+	var L3 = drawing_canvas.height;//*z0;
 	var L4 = L3*zoom;
 	var y1 = zoomposy;
 	var y2 = y1*L4/L3;
@@ -576,7 +574,9 @@ function pointerEnd(e) {
         obj.lCorner[1] -= 32;
         obj.rCorner[0] += 32;
         obj.rCorner[1] += 32;
-		obj.smoothLine();
+		if(obj.type != "spray"){
+			obj.smoothLine();
+		}
     }
 	else if(curTool == 'zoom'){
 		if(isZoom == true){
