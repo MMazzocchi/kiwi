@@ -245,10 +245,10 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
             queue = queue.concat(sQueue);
         }
 
-        lPts[0][1] -= .0625;
-        rPts[rPts.length-1][1] -= .0625;
-        lPts[lPts.length-1][1] += .0625;
-        rPts[0][1] += .0625;
+        lPts[0][1] -= .5;
+        rPts[rPts.length-1][1] -= .5;
+        lPts[lPts.length-1][1] += .5;
+        rPts[0][1] += .5;
 
         //Close up this sector
         var sector = lPts.concat(rPts);
@@ -293,6 +293,8 @@ function createFill(dObj){
         ctx.rotate(this.rotation);
         ctx.scale(this.xScale, this.yScale);
 
+        ctx.beginPath();
+
         for(var i=0; i<this.sectors.length; i++) {
             if(i == this.highlight) { 
                 ctx.fillStyle = "red";
@@ -300,10 +302,10 @@ function createFill(dObj){
                 ctx.fillStyle = this.color;
             }
             var sector = this.sectors[i];
-            ctx.beginPath();
+//            ctx.beginPath();
             ctx.moveTo(sector[0][0]-this.mx, sector[0][1]-this.my);
             if(sector.length == 2) {
-                console.log("Filling sector length 2...");
+//                console.log("Filling sector length 2...");
                 ctx.lineTo(sector[0][0]-this.mx, sector[0][1]-this.my-1);
                 ctx.lineTo(sector[1][0]-this.mx, sector[0][1]-this.my-1);
                 ctx.lineTo(sector[1][0]-this.mx, sector[1][1]-this.my+1);
@@ -313,9 +315,11 @@ function createFill(dObj){
                     ctx.lineTo(sector[j][0]-this.mx, sector[j][1]-this.my);
                 }
             }
-            ctx.closePath();
-            ctx.fill();
+//            ctx.closePath();
+//            ctx.fill();
         }
+        ctx.closePath();
+        ctx.fill();
         ctx.restore();
     };
     dObj.select = function(x,y) {
