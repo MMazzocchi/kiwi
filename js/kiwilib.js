@@ -125,25 +125,22 @@ function refreshCanvas() {
 //    ctx.translate(.5,.5);
 	
     // Redraw every object at the current zoom
-	z0 = Math.pow(factor,zoomCount-1);
+//	z0 = Math.pow(factor,zoomCount-1);
 	zoom = Math.pow(factor,zoomCount);
-	var L1 = drawing_canvas.width*z0;
-	var L2 = L1*zoom;
+//	var L1 = drawing_canvas.width*z0;
+//	var L2 = L1*zoom;
 	var x1 = originx;
-	var x2 = x1*L2/L1;
+	var x2 = x1*zoom;
+//	var x2 = x1*L2/L1;
 	
-	var L3 = drawing_canvas.height*z0;
-	var L4 = L3*zoom;
+//	var L3 = drawing_canvas.height*z0;
+//	var L4 = L3*zoom;
 	var y1 = originy;
-	var y2 = y1*L4/L3;
-	//console.log(x1+ " " + y1);
+	var y2 = y1*zoom;
+//	var y2 = y1*L4/L3;
 	
-	//console.log(ctx.canvas.width);
 	ctx.translate(x1-x2, y1-y2);
-	//ctx.save();
 	ctx.scale(zoom, zoom);
-	//ctx.translate(originx, originy);
-	//ctx.restore();
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
@@ -350,8 +347,6 @@ function pointerDown(e) {
         if (curTool == "zoom"){
 			isDragging = true;
 			zoomType = 'out';
-//          zoomCount -= 1;
-//			applyZoom(x, y, zoomCount, zoomCount+1);
         }
     }
     else{
@@ -507,12 +502,8 @@ function pointerDown(e) {
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
             case "zoom":
-//				if (zoomCount < 8){
 					isDragging = true;
 					zoomType = 'in';
-//					zoomCount += 1;
-//					applyZoom(x, y, zoomCount, zoomCount-1);
-//				}
                 break;
         }
     }
