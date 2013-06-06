@@ -240,14 +240,15 @@ function drawBalloon(ctx, x, y, tx, ty, w, h, radius)
 function placeTextArea(x,y){
 	var dObj = objectList[layerList[layerList.length-1]];
 	dObj.tPos = [x,y];
-
-	dObj.lCorner[0] = dObj.pts[0] < dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
-	dObj.lCorner[1] = dObj.pts[1] < dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
-	dObj.rCorner[0] = dObj.pts[0] > dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
-	dObj.rCorner[1] = dObj.pts[1] > dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
-	
-	dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
-	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
+	if(dObj.type == "box"){
+		dObj.lCorner[0] = dObj.pts[0] < dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
+		dObj.lCorner[1] = dObj.pts[1] < dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
+		dObj.rCorner[0] = dObj.pts[0] > dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
+		dObj.rCorner[1] = dObj.pts[1] > dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
+		
+		dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
+		dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
+	}
 }
 
 function createTextBalloon(dObj) {
@@ -273,6 +274,7 @@ function createTextBalloon(dObj) {
 				this.height = this.fontSize*this.theText.length+10;
 				var tx = this.tPos[0]-this.pts[0] ;
 				var ty = this.tPos[1]-this.pts[1] ;
+				
 				//drawBalloon(ctx,tx,ty, 0,0,this.width, this.height, 15);
 				var bw = this.bw = max_length;
 				var bh = this.bh = this.fontSize*this.theText.length+10;

@@ -25,8 +25,6 @@ var zoomposy = 0;
 var textMode;
 var scratch;
 var copiedObj;
-var selectStart = [];
-var selectEnd = [];
 var selectList = [];
 var tx=0;
 var ty=0;
@@ -352,6 +350,9 @@ function pointerDown(e) {
     var c = transformCoordinates(e);
     var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
+/*	if (curTool != "select"){
+		ungroupSelection();
+	} */
     if (e.which == 3){
         if (curTool == "zoom"){
 			isDragging = true;
@@ -367,6 +368,7 @@ function pointerDown(e) {
                     lCorner: [x,y],
                     rCorner: [x,y],
                     mx: x, my: y,
+					bindMid: [],
                     width: thickness,
                     opacity: alpha,
                     color: curColor,
@@ -403,12 +405,8 @@ function pointerDown(e) {
                         dragMode = 'translate';
                     }
 				/*	else{
-						$.each(layerList, function(i, id) {
-							var dObj = objectList[id];
-							if(dObj.type == "bind") {
-								eraseObject(dObj.id);
-							}
-						});
+						ungroupSelection();
+						
 						var dObj = {
 							pts: [x, y],
 							tPos: [x, y],
@@ -439,6 +437,7 @@ function pointerDown(e) {
                     lCorner: [x,y],
                     rCorner: [x,y],
                     mx: x, my: y,
+					bindMid: [],
                     width: thickness,
                     opacity: alpha,
                     color: curColor,
@@ -457,6 +456,7 @@ function pointerDown(e) {
                     lCorner: -1,
                     rCorner: -1,
                     mx: -1, my: -1,
+					bindMid: [],
                     rotation: 0,
                     xScale: 1,
                     yScale: 1,
@@ -473,9 +473,10 @@ function pointerDown(e) {
                     opacity: alpha,
                     xScale: 1, 
                     yScale: 1, 
+					bindMid: [],
                     bound: svgList[ curStamp ].bounds,
                     rotation: 0,
-                    pts: [x, y],
+                    pts: [x, y]
                 };    
 
 
@@ -495,6 +496,7 @@ function pointerDown(e) {
 					lCorner: [x,y],
                     rCorner: [x,y],
 					mx: x, my: y,
+					bindMid: [],
                     bound: [1,1],
                     rotation: 0,
                     pts: [x,y],
@@ -548,7 +550,7 @@ function pointerMove(e) {
 					applyTransform(selectedId, x, y, dragMode, e);
 				}
 				else{
-					placeBindArea(x,y);
+				//	placeBindArea(x,y);
 				}
                 break;
             case "dropper":
@@ -597,15 +599,12 @@ function pointerEnd(e) {
 	}
 	
     if(isDragging && (curTool == 'select')) {
-		selectEnd = [x,y];
 		if(selectedId != -1){
 			endTransform(selectedId, x, y, dragMode);
 		}
 		else{
-//			groupSelection();
+		//	groupSelection();
 		}
-		selectStart = [];
-		selectEnd = [];
     }
     
     isDragging = false;
