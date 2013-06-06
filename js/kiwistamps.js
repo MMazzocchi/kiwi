@@ -240,14 +240,15 @@ function drawBalloon(ctx, x, y, tx, ty, w, h, radius)
 function placeTextArea(x,y){
 	var dObj = objectList[layerList[layerList.length-1]];
 	dObj.tPos = [x,y];
-
-	dObj.lCorner[0] = dObj.pts[0] < dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
-	dObj.lCorner[1] = dObj.pts[1] < dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
-	dObj.rCorner[0] = dObj.pts[0] > dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
-	dObj.rCorner[1] = dObj.pts[1] > dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
-	
-	dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
-	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
+	if(dObj.type == "box"){
+		dObj.lCorner[0] = dObj.pts[0] < dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
+		dObj.lCorner[1] = dObj.pts[1] < dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
+		dObj.rCorner[0] = dObj.pts[0] > dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
+		dObj.rCorner[1] = dObj.pts[1] > dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
+		
+		dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
+		dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
+	}
 }
 
 function createTextBalloon(dObj) {
@@ -273,6 +274,7 @@ function createTextBalloon(dObj) {
 				this.height = this.fontSize*this.theText.length+10;
 				var tx = this.tPos[0]-this.pts[0] ;
 				var ty = this.tPos[1]-this.pts[1] ;
+				
 				//drawBalloon(ctx,tx,ty, 0,0,this.width, this.height, 15);
 
 				this.mx = this.pts[0] + this.width/2;
@@ -340,11 +342,16 @@ function createTextBalloon(dObj) {
     };
 
     dObj.select = function(x,y) {
-		if(x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]){
-			return true;
+	/*	if(dObj.type == "balloon"){
+			var bw = this.bw*this.xScale;
+			var bh = this.bh*this.yScale;
+			var pts = this.pts;
+			var tPos = this.tPos;
+			var d = [pts[0]+(tPos[0]-pts[0])*this.xScale, pts[1]+(tPos[1]-pts[1])*this.yScale];
+			var s = [this.xScale, this.yScale];
+			return (x >= d[0] && y >= d[1] && x <= d[0]+bw && y <= d[1]+bh);
 		}
-		return false;
-
+	*/	return (x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]);
     };
 
     // Move this stamp by dx, dy
