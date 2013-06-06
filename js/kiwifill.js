@@ -1,6 +1,5 @@
-var highlight = -1;
-var gSectors;
 
+//Given an hsl value, convert it to rgb
 function hslToRgb(h, s, l) {
     var c = (1 - Math.abs((2*l)-1))*s;
     var h2 = h/60;
@@ -30,6 +29,7 @@ function hslToRgb(h, s, l) {
     return rgb;
 }
 
+//Return whether these two colors are close enough to match for a fill
 function matchColor(c1, c2) {
    var r = c2[0]/c1[0];
 
@@ -43,7 +43,8 @@ function matchColor(c1, c2) {
    return true;
 }
 
-function validPoint(x,y, color, checked, ctx, cData, width, height) {
+//Return if this point is a valid "fillable" point
+function validPoint(x,y, color, checked, cData, width, height) {
     if((x < 0) || (x > width) ||
        (y < 0) || (y > height)) {
         return false;
@@ -54,6 +55,7 @@ function validPoint(x,y, color, checked, ctx, cData, width, height) {
     return matchColor(color, getData(x,y,cData,width));
 }
 
+//Return the pixel data for this point
 function getData(x, y, cData, width) {
     var index = (x+(y*(width)))*4;
     var data = [
@@ -65,6 +67,7 @@ function getData(x, y, cData, width) {
     return data;
 }
 
+//Search the segment that contains pt and return data
 function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
     var segmentN = false;
     var segmentS = false;
@@ -75,9 +78,9 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
     //ex is East x; it'll be the farthest point east we can go in the current segment
     var ex = pt[0];
 
-    while(validPoint(ex,pt[1],color,checked,ctx,cData,width,height)) {
+    while(validPoint(ex,pt[1],color,checked,cData,width,height)) {
         checked[""+ex+","+pt[1]] = 1;
-        if(validPoint(ex,pt[1]+1,color,checked,ctx,cData,width,height)) {
+        if(validPoint(ex,pt[1]+1,color,checked,cData,width,height)) {
             if(!segmentN) {
                 nQueue.push([ex, pt[1]+1]);
                 segmentN = true;
@@ -87,7 +90,7 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
                 segmentN = false;
             }
         }
-        if(validPoint(ex,pt[1]-1,color,checked,ctx,cData,width,height)) {
+        if(validPoint(ex,pt[1]-1,color,checked,cData,width,height)) {
             if(!segmentS) {
                 sQueue.push([ex, pt[1]-1]);
                 segmentS = true;
@@ -106,13 +109,13 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
     var wx = pt[0]+1;
 
     //Eliminate duplicate segments
-    segmentN = validPoint(wx-1,pt[1]+1,color,checked,ctx,cData,width,height);
-    segmentS = validPoint(wx-1,pt[1]-1,color,checked,ctx,cData,width,height);
+    segmentN = validPoint(wx-1,pt[1]+1,color,checked,cData,width,height);
+    segmentS = validPoint(wx-1,pt[1]-1,color,checked,cData,width,height);
 
     //Start going west
-    while(validPoint(wx,pt[1],color,checked,ctx,cData,width,height)) {
+    while(validPoint(wx,pt[1],color,checked,cData,width,height)) {
         checked[""+wx+","+pt[1]] = 1;
-        if(validPoint(wx,pt[1]+1,color,checked,ctx,cData,width,height)) {
+        if(validPoint(wx,pt[1]+1,color,checked,cData,width,height)) {
             if(!segmentN) {
                 nQueue.push([wx, pt[1]+1]);
                 segmentN = true;
@@ -123,7 +126,7 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
             }
         }
 
-        if(validPoint(wx,pt[1]-1,color,checked,ctx,cData,width,height)) {
+        if(validPoint(wx,pt[1]-1,color,checked,cData,width,height)) {
             if(!segmentS) {
                 sQueue.push([wx, pt[1]-1]);
                 segmentS = true;
@@ -316,7 +319,6 @@ function createFill(dObj){
                 ctx.fillStyle = this.color;
             }
             var sector = this.sectors[i];
-//            ctx.beginPath();
             ctx.moveTo(sector[0][0]-this.mx, sector[0][1]-this.my);
             if(sector.length == 2) {
 //                console.log("Filling sector length 2...");
@@ -329,12 +331,10 @@ function createFill(dObj){
                     ctx.lineTo(sector[j][0]-this.mx, sector[j][1]-this.my);
                 }
             }
-//            ctx.closePath();
-//            ctx.fill();
         }
         ctx.closePath();
         ctx.fill();
-        ctx.stroke();
+//        ctx.stroke();
         ctx.restore();
     };
     dObj.select = function(x,y) {
@@ -355,12 +355,6 @@ function createFill(dObj){
                 this.sectors[i][j][1]+=dy;
             }
         }
-/*
-        for(var i=0; i<this.pts.length; i++) {
-            this.pts[i][0]+=dx;
-            this.pts[i][1]+=dy;
-        }
-*/
         this.lCorner[0]+=dx;
         this.rCorner[0]+=dx;
         this.lCorner[1]+=dy;
