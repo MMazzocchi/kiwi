@@ -264,7 +264,7 @@ function createTextBalloon(dObj) {
 			
 			if(this.type == "balloon"){
 
-				var max_length = 20;
+				var max_length = 30;
 				for(var i=0; this.theText[this.max] && i< this.theText[this.max].length; i++){
 					var metrics = ctx.measureText(this.theText[this.max][i]);
 					max_length += metrics.width;
@@ -274,16 +274,17 @@ function createTextBalloon(dObj) {
 				var tx = this.tPos[0]-this.pts[0] ;
 				var ty = this.tPos[1]-this.pts[1] ;
 				//drawBalloon(ctx,tx,ty, 0,0,this.width, this.height, 15);
+
+				this.mx = this.pts[0] + this.width/2;
+				this.my = this.pts[1] + this.height/2;
+				ctx.translate(this.pts[0], this.pts[1]);
+				ctx.rotate(this.rotation);
+				ctx.scale(xScale,yScale);
 				ctx.save();
 					drawBalloon2(ctx,tx,ty,this.width, this.height, 15,8);
 					ctx.globalCompositeOperation = "lighter";
 					drawBalloon2(ctx,tx,ty,this.width, this.height, 15,1);
 				ctx.restore();
-				this.mx = this.pts[0] + this.width/2;
-				this.my = this.pts[1] + this.height/2;
-				ctx.translate(this.mx, this.my);
-				ctx.rotate(this.rotation);
-				ctx.scale(xScale,yScale);
 				this.rCorner[0] = this.pts[0] + this.width;
 				this.rCorner[1] = this.pts[1] + this.height;
 				ctx.fillStyle = this.color;
@@ -295,9 +296,9 @@ function createTextBalloon(dObj) {
 							line_length += met.width;
 						}
 						
-						//ctx.fillText(this.theText[i][j],tx+15 + line_length,ty+(i+1)*this.fontSize+2);
+						ctx.fillText(this.theText[i][j],tx+15 + line_length,ty+(i+1)*this.fontSize+2);
 					
-						ctx.fillText(this.theText[i][j],-this.width/2+10 + line_length,-this.height/2+(i+1)*this.fontSize+2);
+						//ctx.fillText(this.theText[i][j],-this.width/2+10 + line_length,-this.height/2+(i+1)*this.fontSize+2);
 					}
 				}
 			}

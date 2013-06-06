@@ -737,6 +737,10 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
             curTool = 'draw';
             brushMode = 'graphite';
             break;
+		case 'pen':
+            curTool = 'draw';
+            brushMode = 'pen';
+            break;
         case 'fill':
             curTool = 'fill';
             break;
@@ -831,6 +835,10 @@ $().ready( function() {
 	$('#line').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('line');
+    });
+	$('#pen').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('pen');
     });
 	
 	$('#circle').click( function() {
