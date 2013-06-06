@@ -56,40 +56,10 @@ function createBrush(dObj, brushMode) {
                             ctx.lineTo(this.pts[j][0]-this.mx,this.pts[j][1]-this.my);
                         }
                     } else {
-					//quadraticCurveTo()
                         ctx.bezierCurveTo(this.pts[i+1][0]-this.mx, this.pts[i+1][1]-this.my,
                             this.pts[i+2][0]-this.mx, this.pts[i+2][1]-this.my,
                             this.pts[i+3][0]-this.mx, this.pts[i+3][1]-this.my);
-						/*
-							var p0 = [this.pts[i-1][0]-this.mx, this.pts[i-1][1]-this.my]
-							var p1 = [this.pts[i][0]-this.mx, this.pts[i][1]-this.my]
-							var p2 = [this.pts[i+1][0]-this.mx, this.pts[i+1][1]-this.my];
-							var p3 = [this.pts[i+2][0]-this.mx, this.pts[i+2][1]-this.my];
-							var p4 = [this.pts[i+3][0]-this.mx, this.pts[i+3][1]-this.my];
-							
-							var x1 = p0[0];
-							var y1 = p0[1];
-							
-							var x2 = p1[0];
-							var y2 = p1[1];
-							
-							var x3 = p2[0];
-							var y3 = p2[1];
-							
-							var x4 = p3[0];
-							var y4 = p3[1];
-							
-							var den = ((x1-x2)*(y3-y4)-(y1-y2)*(x3-x4));
-							console.log(den);
-							
-							var intersect = [((x1*y2-y1*x2)*(x3-x4)-(x1-x2)*(x3*y4-y3*x4))
-							/den,
-							((x1*y2-y1*x2)*(y3-y4)-(y1-y2)*(x3*y4-y3*x4))
-							/den]
-							if(den != 0)
-								ctx.bezierCurveTo(intersect[0],intersect[1],p3[0],p3[1],p4[0],p4[1]);
-							else
-							*/
+
                     }
                 };
                 ctx.stroke();
@@ -138,8 +108,9 @@ function createBrush(dObj, brushMode) {
         dObj.draw = function(ctx) {
         ctx.save();
             ctx.translate(this.mx,this.my);
+			ctx.rotate(this.rotation);
             ctx.scale(this.xScale, this.yScale);
-            ctx.rotate(-this.rotation);
+        
             ctx.lineWidth = 1;
 			ctx.fillStyle = this.color;
 			ctx.strokeStyle = this.color;
