@@ -134,8 +134,6 @@ function refreshCanvas() {
 	ctx.translate(originx, originy);
 	//ctx.save();
 	ctx.scale(zoom, zoom);
-	//ctx.translate(originx, originy);
-	//ctx.restore();
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
@@ -360,8 +358,6 @@ function pointerDown(e) {
         if (curTool == "zoom"){
 			isDragging = true;
 			zoomType = 'out';
-//          zoomCount -= 1;
-//			applyZoom(x, y, zoomCount, zoomCount+1);
         }
     }
     else{
@@ -411,7 +407,7 @@ function pointerDown(e) {
 				/*	else{
 						$.each(layerList, function(i, id) {
 							var dObj = objectList[id];
-							if(dObj.type == "bound") {
+							if(dObj.type == "bind") {
 								eraseObject(dObj.id);
 							}
 						});
@@ -421,13 +417,13 @@ function pointerDown(e) {
 							lCorner: [x,y],
 							rCorner: [x,y],
 							mx: x, my: y,
-							boundList: selectList,
-							type: "bound",
+							bindList: selectList,
+							type: "bind",
 							xScale: 1,
 							yScale: 1,
 							rotation: 0
 						};
-						startBound(dObj);
+						startBind(dObj);
 					}*/
                 }
                 break;
@@ -517,12 +513,8 @@ function pointerDown(e) {
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
             case "zoom":
-//				if (zoomCount < 8){
 					isDragging = true;
 					zoomType = 'in';
-//					zoomCount += 1;
-//					applyZoom(x, y, zoomCount, zoomCount-1);
-//				}
                 break;
         }
     }
@@ -557,9 +549,9 @@ function pointerMove(e) {
 				if(selectedId != -1){
 					applyTransform(selectedId, x, y, dragMode, e);
 				}
-			//	else{
-			//		placeTextArea(x,y);
-			//	}
+				else{
+					placeBindArea(x,y);
+				}
                 break;
             case "dropper":
                 var id = ctx.getImageData(x, y, 1, 1);

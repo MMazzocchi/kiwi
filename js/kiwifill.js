@@ -149,247 +149,6 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
     return data;
 } 
 
-function matchSeams(newSeam, oppSeams, seams) {
-    var match = false;
-    for(var i=0; i<oppSeams.length; i++) {
-        var oSeam = oppSeams[i];
-        console.log("Comparing "+newSeam+" and "+oSeam);
-        if((Math.abs(newSeam[0][1] - oSeam[0][1]) < 2) && 
-/*           ((newSeam[0][0] > oSeam[1][0]) || 
-            (newSeam[1][0] > oSeam[0][0]))) {
-*/          (!(newSeam[1][0] < oSeam[0][0]))) {
-            match = true;
-            console.log("Matched "+newSeam+" and "+oSeam);
-            return(oSeam);
-        }
-    }
-    if(!match) {
-        console.log("New seam added: "+newSeam);
-        seams.push(newSeam);
-        return [];
-    }
-}
-
-function findOneBigHugeFuckingSector(dObj, x, y, sector, width, height, ctx) {
-    console.log("Initial point: ("+x+","+y+")");
-    x = Math.round(x); y = Math.round(y);
-    var nPtr = 0;
-    var sPtr = 0;
-    var ptr = 0;
-    var color = ctx.getImageData(x,y,1,1).data;
-    var checked = {};
-    var queue = [];
-    var nQueue = [];
-    var sQueue = [];
-    var sectors = {};
-    var cData = ctx.getImageData(0,0,width,height).data;
-    var sectorPtr = 0;
-
-    function createSeed(seed) {
-        var sector = {
-            seed: seed,
-            id: sectorPtr,
-            lPts: [],
-            rPts: [],
-        };
-        sectors[sector.id] = sector;
-        queue.push(sector);
-        sectorPtr++;
-        return sector.id;
-    }
-
-    createSeed([x,y]);
-
-    while(ptr < queue.length) {
-
-        //queue holds "sector seeds"; these are hashes that hold their intitial seed point and will become sectors
-        var sector = queue[ptr];
-        var pt = sector.seed;
-
-        console.log("Expanding sector "+sector.id+".");
-
-        var data = searchSegment(pt, color, checked, ctx, cData, width, height, 'both');
-
-        //ex and wx now coorespond to the endpoints of this segment. nQueue and sQueue hold the seeds for the segments to the North and South of us
-        sector.lPts.push([data.ex,pt[1]]);
-        sector.rPts.push([data.wx,pt[1]]);
-
-        //If there are 2+ or no segments above us, the segment seeds of nQueue become sector seeds, and the children of the current sector
-        if(data.nQueue.length != 1) {
-            for(var i=0; i<data.nQueue.length; i++) {
-                var childId = createSeed(data.nQueue[i]);
-                sector.lPts.push(childId);
-                console.log("From initial N exploration, found sector "+childId+" seeded by "+data.nQueue[i]);
-            }
-        } else {
-            var nQueue = data.nQueue;
-            while(nQueue.length == 1) {
-                pt = nQueue[0];
-                var nData = searchSegment(pt, color, checked, ctx, cData, width, height, 'north');
-                nQueue = nData.nQueue;
-
-                // When you write code like this, it's time to take a good hard look at where your life is going.
-                var seChildren = [];
-
-                for(var i=0; i<nData.sQueue.length; i++) {
-                    var childId = createSeed(nData.sQueue[i]);
-
-                    console.log("From N->S, found sector "+childId+" seeded by "+nData.sQueue[i]);
-
-                    if(nData.sQueue[i][0] > pt[0]) { 
-                        sector.rPts.splice(0,0,childId);
-                    } else {
-                        seChildren.push(childId);
-                    }
-                }
-                sector.lPts = sector.lPts.concat(seChildren.reverse());
-                sector.rPts.splice(0,0,[nData.wx,pt[1]]);
-                sector.lPts.push([nData.ex,pt[1]]);
-
-            }
-            for(var i=0; i<nQueue.length; i++) {
-                var childId = createSeed(nQueue[i]);
-                sector.lPts.push(childId);
-                console.log("From N->N, found sector "+childId+" seeded by "+nQueue[i]);
-            }
-        }
-
-        //If there are 2+ or no segments below us, the segment seeds of sQueue become sector seeds
-        if(data.sQueue.length != 1) {
-            for(var i=0; i<data.sQueue.length; i++) {
-                var childId = createSeed(data.sQueue[i]);
-                sector.rPts.push(childId);
-                console.log("From initial S exploration, found sector "+childId+" seeded by "+data.sQueue[i]);
-            }
-        } else {
-            var sQueue = data.sQueue;
-            while(sQueue.length == 1) {
-                pt = sQueue[0];
-                var sData = searchSegment(pt, color, checked, ctx, cData, width, height, 'south');
-                sQueue = sData.sQueue;
-
-                var neChildren = [];
-
-                for(var i=0; i<sData.nQueue.length; i++) {
-                    var childId = createSeed(sData.nQueue[i]);
-
-                    console.log("From S->N, found sector "+childId+" seeded by "+sData.nQueue[i]);
-
-                    if(sData.nQueue[i][0] > pt[0]) {
-                        sector.rPts.push(childId);
-                    } else {
-                        neChildren.push(childId);
-                    }
-                }
-                sector.lPts = neChildren.reverse().concat(sector.lPts);
-                sector.rPts.push([sData.wx,pt[1]]);
-                sector.lPts.splice(0,0,[sData.ex,pt[1]]);
-
-            }
-            var sChildren = [];
-            for(var i=0; i<sQueue.length; i++) {
-                var childId = createSeed(sQueue[i]);
-                sChildren.push(childId);
-                console.log("From S->S, found sector "+childId+" seeded by "+sQueue[i]);
-            }
-            sector.rPts = sector.rPts.concat(sChildren.reverse());
-
-        }
-        ptr++;
-    }
-
-    // Now we have a bunch of sectors. Time to add them all together
-
-    gSectors = sectors;
-
-    var botSeams = [];
-    var topSeams = [];
-
-    //Process this set of points, calling processSector if needed
-    function processPoints(seed, points) {
-        var y = seed[1];
-        var pts = [];
-
-        for(var i=0; i<points.length; i++) {
-            if(typeof points[i] == "object") {
-                //This is a point. Add it to the list
-                pts.push(points[i]);
-                y = points[i][1];
-            } else {
-                console.log("Encountered sector "+points[i]+" after "+points[i-1]);
-                //This is a sector's id. Recusively get its points and add them to the list
-                var child = sectors[points[i]];
-
-                console.log("Comparing y: "+y+" and seed: "+child.seed[1]);
-                if(child.rPts[0][1] == y) { y = points[i+1][1]; }
-
-                if(child.rPts[0][1] < y) {
-                    //This sector was above us. Process its points in order
-                    console.log("New sector was above old");
-                    var childPts = processSector(child.id, 1);
-                    pts = pts.concat(childPts);
-                } else {
-                    console.log("New sector was below old");
-                    //This sector was below us. Process its points in reverse.
-                    var childPts = processSector(child.id, -1);
-                    pts = pts.concat(childPts);
-                }
-            }
-        }
-        return pts;
-    }
-
-    // Recursively find the list of points defining this sector and its children
-    function processSector(id, mode) {
-        //mode ==  1 : rPts, then lPts
-        //mode == -1 : lPts, then rPts
-
-        var sector = sectors[id];
-        var pts = [];
-
-        if(sector.rPts.length == 1) { return []; }
-
-        switch(mode) {
-            case 1:
-                console.log("Processing sector "+id+" rPts.");
-                pts = pts.concat(processPoints(sector.seed, sector.rPts));
-                var newSeam = [sector.lPts[0],pts[pts.length-1]];
-//                pts = pts.concat(matchSeams(newSeam, botSeams, topSeams));
-                console.log("Processing sector "+id+" lPts.");
-                pts = pts.concat(processPoints(sector.seed, sector.lPts));
-                break;
-            case -1:
-                console.log("Processing sector "+id+" lPts.");
-                pts = pts.concat(processPoints(sector.seed, sector.lPts));
-                var newSeam = [pts[pts.length-1], sector.rPts[0]];
-//                pts = pts.concat(matchSeams(newSeam, topSeams, botSeams));
-                console.log("Processing sector "+id+" rPts.");
-                pts = pts.concat(processPoints(sector.seed, sector.rPts));
-                break;
-
-        }
-        return pts;
-    }
-
-    var pts = processSector(0,1);
-
-    if(dObj.lCorner == -1) {
-        dObj.lCorner = [pts[0][0], pts[0][1]];
-        dObj.rCorner = [pts[0][0], pts[0][1]];
-    }
-    for(var i=0; i<pts.length; i++) {
-        var sPt = pts[i];
-        if(sPt[0] < dObj.lCorner[0]) { dObj.lCorner[0] = sPt[0]; }
-        if(sPt[0] > dObj.rCorner[0]) { dObj.rCorner[0] = sPt[0]; }
-        if(sPt[1] < dObj.lCorner[1]) { dObj.lCorner[1] = sPt[1]; }
-        if(sPt[1] > dObj.rCorner[1]) { dObj.rCorner[1] = sPt[1]; }
-    }
-    dObj.mx = Math.round((dObj.lCorner[0]+dObj.rCorner[0])/2);
-    dObj.my = Math.round((dObj.lCorner[1]+dObj.rCorner[1])/2);
-
-    dObj.pts = pts;
-}
-
 function findSectors(dObj, x, y, sectors, width, height, ctx) {
     console.log("Initial point: ("+x+","+y+")");
     x = Math.round(x); y = Math.round(y);
@@ -486,6 +245,11 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
             queue = queue.concat(sQueue);
         }
 
+        lPts[0][1] -= .5;
+        rPts[rPts.length-1][1] -= .5;
+        lPts[lPts.length-1][1] += .5;
+        rPts[0][1] += .5;
+
         //Close up this sector
         var sector = lPts.concat(rPts);
 //        sector[0][1] -= 1;
@@ -519,17 +283,17 @@ function createFill(dObj){
     var y = dObj.pts[0][1];
     dObj.sectors = [];
     findSectors(dObj,x,y,dObj.sectors,width,height,canvas.getContext('2d'));
-//    findOneBigHugeFuckingSector(dObj,x,y,[],width,height,canvas.getContext('2d'));
     dObj.draw = function(ctx) {
         ctx.save();
         ctx.fillStyle = this.color;
         ctx.globalAlpha = this.opacity;
         ctx.strokeStyle = "black";//this.color;
 
-//        ctx.translate(1,0);
         ctx.translate(Math.round(this.mx), Math.round(this.my));
         ctx.rotate(this.rotation);
         ctx.scale(this.xScale, this.yScale);
+
+        ctx.beginPath();
 
         for(var i=0; i<this.sectors.length; i++) {
             if(i == this.highlight) { 
@@ -538,26 +302,24 @@ function createFill(dObj){
                 ctx.fillStyle = this.color;
             }
             var sector = this.sectors[i];
-            ctx.beginPath();
+//            ctx.beginPath();
             ctx.moveTo(sector[0][0]-this.mx, sector[0][1]-this.my);
-            for(var j=1; j<sector.length; j++) {
-                ctx.lineTo(sector[j][0]-this.mx, sector[j][1]-this.my);
+            if(sector.length == 2) {
+//                console.log("Filling sector length 2...");
+                ctx.lineTo(sector[0][0]-this.mx, sector[0][1]-this.my-1);
+                ctx.lineTo(sector[1][0]-this.mx, sector[0][1]-this.my-1);
+                ctx.lineTo(sector[1][0]-this.mx, sector[1][1]-this.my+1);
+                ctx.lineTo(sector[0][0]-this.mx, sector[1][1]-this.my+1);
+            } else {
+                for(var j=1; j<sector.length; j++) {
+                    ctx.lineTo(sector[j][0]-this.mx, sector[j][1]-this.my);
+                }
             }
-            ctx.closePath();
-            if(sector.length == 2) { ctx.stroke(); }
-            else { ctx.fill(); }
-        }
-
-/*
-        ctx.beginPath();
-        ctx.moveTo(this.pts[0][0]-this.mx, this.pts[0][1]-this.my);
-        for(var i=1; i<this.pts.length; i++) {
-            ctx.lineTo(this.pts[i][0]-this.mx, this.pts[i][1]-this.my);
+//            ctx.closePath();
+//            ctx.fill();
         }
         ctx.closePath();
         ctx.fill();
-//        ctx.stroke();
-*/
         ctx.restore();
     };
     dObj.select = function(x,y) {
