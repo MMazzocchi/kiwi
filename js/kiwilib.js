@@ -298,11 +298,7 @@ function downloadImage(){
 	window.open(img,"","width=700,height=700");
 }
 */
-// save canvas to server
-function saveImage(){
-	var scanvas = document.getElementById("drawing_canvas");
-	var img = Canvas2Image.saveAsPNG(scanvas, true);    
-}
+
 
 // http://www.nihilogic.dk/labs/canvas2image/
 function downloadImage() {
@@ -818,6 +814,9 @@ $().ready( function() {
     $('#redo_button').attr('disabled', true);
     $('button').button().attr("autocomplete", "off");
 
+	$('#save').click( function() {
+		var serial = canvas.toDataURL();	
+	});
 	
 	$('#download').click( function() {
         downloadImage();
