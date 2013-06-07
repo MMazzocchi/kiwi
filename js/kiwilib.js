@@ -815,11 +815,12 @@ $().ready( function() {
     $('button').button().attr("autocomplete", "off");
 
 	$('#save').click( function() {
-		var serial = canvas.toDataURL();	
+		var serial = canvas.toDataURL();
 	});
 	
 	$('#download').click( function() {
-        downloadImage();
+        //downloadImage();
+		window.open(canvas.toDataURL(), "Drawing", canvas.width, canvas.height);
     });
 	
     $('#brush').click( function() {
