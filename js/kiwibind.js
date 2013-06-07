@@ -64,12 +64,14 @@ function ungroupSelection(){
 				// Scaling the object to match what it was when binded
 				curObj.xScale *= dObj.scaling[0];
 				curObj.yScale *= dObj.scaling[1];
-				d = distance([curObj.midX(), curObj.midY()], [dObj.mx, dObj.my]);
-				dx = d*dObj.scaling[0];
-				dy = d*dObj.scaling[1];
-				console.log("("+dx+", "+dy+")");
-				curObj.move(-d, -d);
-				curObj.move(dx, dy);
+		//		dx = d*dObj.scaling[0];
+		//		dy = d*dObj.scaling[1];
+				dx = curObj.midX() - dObj.mx;
+				dy = curObj.midY() - dObj.my;
+	
+	
+				curObj.move((dx*dObj.scaling[0] - dx), (dy*dObj.scaling[0] - dy));
+		//		curObj.move((d-dx), (d-dy));
 				
 			}
 		eraseObject(dObj.id);
@@ -123,7 +125,7 @@ function startBind(dObj){
 
     }
     dObj.select = function(x,y) {
-		var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,this.xScale,this.yScale,this.rotation);
+		var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,1/this.xScale,1/this.yScale,this.rotation);
 		x=pt[0]; y=pt[1];
 	
         if(x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]){
