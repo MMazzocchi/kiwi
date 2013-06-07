@@ -25,6 +25,7 @@ var zoomposy = 0;
 var textMode;
 var scratch;
 var copiedObj;
+var bindStamp = false;
 var tx=0;
 var ty=0;
 var orientation = orienting() ? window.orientation : 0;
@@ -349,9 +350,9 @@ function pointerDown(e) {
     var c = transformCoordinates(e);
     var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
-/*	if (curTool != "select"){
+	if (curTool != "select"){
 		ungroupSelection();
-	} */
+	} 
     if (e.which == 3){
         if (curTool == "zoom"){
 			isDragging = true;
@@ -385,7 +386,6 @@ function pointerDown(e) {
                 xFirst = x;
                 yFirst = y;
 				isDragging  = true;
-				selectStart = [x,y];
                 if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
                     dragMode = objectList[selectedId].iconClicked(x, y);
                     if(dragMode == 'scale') {
@@ -415,7 +415,8 @@ function pointerDown(e) {
 							type: "bind",
 							xScale: 1,
 							yScale: 1,
-							rotation: 0
+							rotation: 0,
+							scaling: [1,1],
 						};
 						startBind(dObj);
 					}

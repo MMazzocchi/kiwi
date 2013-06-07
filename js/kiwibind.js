@@ -30,6 +30,7 @@ function groupSelection(){
 			if(dObj.pts[0] > curObj.lCorner[0] && dObj.pts[0] < curObj.rCorner[0] && dObj.pts[1] > curObj.lCorner[1] && dObj.pts[1] < curObj.rCorner[1]){
 				curObj.bindList.push(dObj);
 				selectList.push(layerId);
+				bindStamp = true;
 			}
 		}
     });
@@ -59,11 +60,22 @@ function ungroupSelection(){
 				var dx = d*(Math.cos(theta)-Math.cos(theta+dObj.rotation));
 				var dy = d*(Math.sin(theta)-Math.sin(theta+dObj.rotation));
 				curObj.move(-dx,-dy);
+		
 				// Scaling the object to match what it was when binded
+				curObj.xScale *= dObj.scaling[0];
+				curObj.yScale *= dObj.scaling[1];
+				d = distance([curObj.midX(), curObj.midY()], [dObj.mx, dObj.my]);
+				dx = d*dObj.scaling[0];
+				dy = d*dObj.scaling[1];
+				console.log("("+dx+", "+dy+")");
+				curObj.move(-d, -d);
+				curObj.move(dx, dy);
+				
 			}
 		eraseObject(dObj.id);
 		}
 	});
+	bindStamp = false;
 }
 
 function startBind(dObj){
@@ -143,6 +155,8 @@ function startBind(dObj){
         else { this.xScale -= (dx/((this.rCorner[0]-this.lCorner[0])/2)); }
         if((this.rCorner[1] == this.lCorner[1])) { this.yScale -= dy/this.width; }
         else { this.yScale -= (dy/((this.rCorner[1]-this.lCorner[1])/2)); }
+		
+		this.scaling = [this.xScale, this.yScale];
     };
     dObj.iconClicked = function(x,y) {
         var leftCorner = transformPoint(
@@ -204,17 +218,17 @@ function createBind(dObj){
 		this.height = Math.abs(this.rCorner[1]-this.lCorner[1]);
 		ctx.translate(this.mx, this.my);
 		ctx.rotate(this.rotation);
-		ctx.scale(xScale,yScale);
-		ctx.fillStyle = curColor;				
+		ctx.scale(xScale,yScale);				
 		if(layerList[layerList.length-1] == this.id || selectedId == this.id){
 			ctx.strokeRect(-this.width/2,-this.height/2,this.width,this.height);
 		}
 
 		ctx.translate(-this.mx,-this.my);
-		
+
 		for(var i=0; i<dObj.bindList.length; i++){
 			dObj.bindList[i].draw(ctx);
 		}
+
 		ctx.restore();
 	}
 }
