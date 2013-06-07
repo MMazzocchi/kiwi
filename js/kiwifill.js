@@ -1,3 +1,5 @@
+var colorRates = {};
+var alias = false;
 
 //Given an hsl value, convert it to rgb
 function hslToRgb(h, s, l) {
@@ -34,11 +36,7 @@ function matchColor(c1, c2) {
    var r = c2[0]/c1[0];
 
    for(var i=0; i<3; i++) {
-       if((Math.abs(c1[i] - c2[i]) > 50) || 
-         (Math.abs((c2[i]/c1[i]) - r)/r) > .95) {
-             return false;
-         }
-
+       if(c1[i] != c2[i]) { return false; }
    } 
    return true;
 }
@@ -53,6 +51,53 @@ function validPoint(x,y, color, checked, cData, width, height) {
         return false;
     }
     return matchColor(color, getData(x,y,cData,width));
+}
+
+function changeRate(c1, c2) {
+    var avg = 0;
+    for(var i=0; i<4; i++) {
+        if(c2[i] != c1[i]) { // Prevents 0/0 errors
+            avg += (Math.abs(c2[i] - c1[i])/c2[i]);
+        }
+    }
+    avg /= 4;
+    return avg;
+}
+
+function validAlias(x,y,color,checked,cData,width,height,dx,dy) {
+    if((x < 0) || (x > width) ||
+       (y < 0) || (y > height)) {
+        return false;
+    }
+    if(checked[""+x+","+y] == 1) {
+        return false;
+    }
+    var rate = 0;
+    if(colorRates[y] === undefined) {
+        colorRates[y] = {};
+    } else {
+        rate = changeRate(
+            getData(x,y,cData,width),
+            getData(x-dx,y-dy,cData,width));
+    }
+    colorRates[y][x]=rate;
+//    return true;
+/*    return !(matchColor(
+               getData(x,y,cData,width),
+               getData(x+direc,y,cData,width))
+            && 
+            (!matchColor(color, 
+                getData(x,y,cData,width))));
+*/
+    
+    if(alias && (rate == 0)) {
+        return false;
+    } else {
+        if((!alias) && (rate != 0)) {
+            alias = true;
+        }
+        return true;
+    }
 }
 
 //Return the pixel data for this point
@@ -75,10 +120,14 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
     var nQueue = [];
     var sQueue = [];
 
+    alias = false;
+    colorRates[pt[1]] = undefined;
+
     //ex is East x; it'll be the farthest point east we can go in the current segment
     var ex = pt[0];
 
-    while(validPoint(ex,pt[1],color,checked,cData,width,height)) {
+//    while(validPoint(ex,pt[1],color,checked,cData,width,height)) {
+    while(validAlias(ex,pt[1],color,checked,cData,width,height,-1,0)) {
         checked[""+ex+","+pt[1]] = 1;
         if(validPoint(ex,pt[1]+1,color,checked,cData,width,height)) {
             if(!segmentN) {
@@ -105,6 +154,8 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
     nQueue = nQueue.reverse();
     sQueue = sQueue.reverse();
 
+    alias = false;
+
     //Reset the point so we can start looking west
     var wx = pt[0]+1;
 
@@ -113,7 +164,8 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
     segmentS = validPoint(wx-1,pt[1]-1,color,checked,cData,width,height);
 
     //Start going west
-    while(validPoint(wx,pt[1],color,checked,cData,width,height)) {
+//    while(validPoint(wx,pt[1],color,checked,cData,width,height)) {
+    while(validAlias(wx,pt[1],color,checked,cData,width,height,1,0)) {
         checked[""+wx+","+pt[1]] = 1;
         if(validPoint(wx,pt[1]+1,color,checked,cData,width,height)) {
             if(!segmentN) {
@@ -262,10 +314,10 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
             queue = queue.concat(sQueue);
         }
 
-        lPts[0][1] -= .5;
-        rPts[rPts.length-1][1] -= .5;
-        lPts[lPts.length-1][1] += .5;
-        rPts[0][1] += .5;
+        lPts[0][1] -= 1;
+        rPts[rPts.length-1][1] -= 1;
+        lPts[lPts.length-1][1] += 1;
+        rPts[0][1] += 1;
 
         //Close up this sector
         var sector = lPts.concat(rPts);
@@ -364,9 +416,6 @@ function createFill(dObj){
         this.my += dy;
     };
     dObj.drawIcons = function(ctx) {
-        var mobileX = (orienting() ? 32 : 0);
-        var mobileY = mobileX;
-
         var leftCorner = transformPoint(
             this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
             this.mx, this.my,
