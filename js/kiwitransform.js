@@ -41,7 +41,7 @@ function rotate(id, x, y) {
 function scale(id, x, y) {
     var dx = x-xOld;
     var dy = y-yOld;
-    if(shift) {
+    if(shift || bindStamp) {
         var obj = objectList[id];
         var ratio = (yFirst-obj.midY())/(xFirst-obj.midX());
         obj.xScale=xScaleOld;
@@ -140,7 +140,7 @@ function endTransform(id, x, y, dragMode) {
 
             var dx = x-xFirst;
             var dy = y-yFirst;
-            if(shift) {
+            if(shift || bindStamp) {
                 var ratio = (yFirst-obj.midY())/(xFirst-obj.midX());
                 if(Math.abs(x-xFirst) < Math.abs(y-yFirst)) {
                     dx = x-xFirst;
