@@ -365,13 +365,14 @@ function createFill(dObj){
     var width = canvas.width;
     var x = dObj.pts[0][0];
     var y = dObj.pts[0][1];
-    dObj.sectors = [];
-
-    if(bgFill) {
-        dObj.sectors = [[[0,0], [width,0],
-                        [width,height], [0,height]]];
-    } else {
-        findSectors(dObj,x,y,dObj.sectors,width,height,ctx);
+    if(!dObj.sectors) {
+        if(bgFill) {
+            dObj.sectors = [[[0,0], [width,0],
+                             [width,height], [0,height]]];
+        } else {
+            dObj.sectors = [];
+            findSectors(dObj,x,y,dObj.sectors,width,height,ctx);
+        }
     }
 
     dObj.draw = function(ctx) {
@@ -509,7 +510,26 @@ function createFill(dObj){
     }
     dObj.midX = function() { return this.mx; }
     dObj.midY = function() { return this.my; }
-
+    dObj.compress = function() {
+        var obj = {
+            objType: 'fill',
+            color: this.color,
+            opacity: this.opacity,
+            lCorner: this.lCorner,
+            rCorner: this.rCorner,
+            mx: this.mx,
+            my: this.my,
+            rotation: this.rotation,
+            xScale: this.xScale,
+            yScale: this.yScale,
+            pts: this.pts,
+            sectors: this.sectors 
+        };
+        if(this.pattern) {
+            obj.pattern = this.pattern;
+        }
+        return obj;
+    }
 
     var newAct = {
         undo: function() {
