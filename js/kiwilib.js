@@ -29,6 +29,10 @@ var bindStamp = false;
 var tx=0;
 var ty=0;
 var orientation = orienting() ? window.orientation : 0;
+var curFillId = "";
+var bgFill = false;
+var background = undefined;
+
 
 function orienting() {
     return (typeof window.orientation != "undefined");
@@ -122,8 +126,6 @@ function refreshCanvas() {
         else // landscape
             ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
-//    ctx.translate(.5,.5);
-	
     // Redraw every object at the current zoom
 
 	//console.log(x1+ " " + y1);
@@ -132,6 +134,10 @@ function refreshCanvas() {
 	ctx.translate(originx, originy);
 	//ctx.save();
 	ctx.scale(zoom, zoom);
+
+    if(background) {
+        background.draw(ctx);
+    }
 
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
@@ -455,6 +461,9 @@ function pointerDown(e) {
                     yScale: 1,
                     pts: [[x, y]]
                 };
+                if(curFillId != "") {
+                    dObj.pattern = makePattern(curFillId);
+                }
                 createFill(dObj);
                 break;
 
@@ -737,23 +746,23 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
         case 'fill':
             curTool = 'fill';
             break;
-		case 'stamp':
-			document.body.style.cursor="url(img/stamper.png)14 28, default";
-			curTool = toolName;
-			break;
-		case 'circle':
+        case 'stamp':
+            document.body.style.cursor="url(img/stamper.png)14 28, default";
+            curTool = toolName;
+            break;
+        case 'circle':
             curTool = 'shape';
             shapeType = 'circle';
             break;
-		case 'square':
+        case 'square':
             curTool = 'shape';
             shapeType = 'square';
             break;
-		case 'line':
+        case 'line':
             curTool = 'shape';
             shapeType = 'line';
             break;
-		case 'triangle':
+        case 'triangle':
             curTool = 'shape';
             shapeType = 'triangle';
             break;
@@ -889,8 +898,24 @@ $().ready( function() {
     
     $('#fill').click( function() {
         document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = "";
+        bgFill = false;
         SelectTool('fill');
     });
+
+    $('#stonefill').click( function() {
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = 'stone';
+        bgFill = false;
+        SelectTool('fill');
+    });
+
+    $('#bgfill').click( function() {
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        SelectTool('fill');
+        bgFill = true;
+    });
+
 	
 	$('#balloon').click( function() {
 		document.body.style.cursor="default";

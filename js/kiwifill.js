@@ -81,15 +81,6 @@ function validAlias(x,y,color,checked,cData,width,height,dx,dy) {
             getData(x-dx,y-dy,cData,width));
     }
     colorRates[y][x]=rate;
-//    return true;
-/*    return !(matchColor(
-               getData(x,y,cData,width),
-               getData(x+direc,y,cData,width))
-            && 
-            (!matchColor(color, 
-                getData(x,y,cData,width))));
-*/
-    
     if(alias && (rate == 0)) {
         return false;
     } else {
@@ -223,7 +214,6 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
     var color = ctx.getImageData(x,y,1,1).data;
     var checked = {};
     var queue = [[x,y]];
-
     var cData = ctx.getImageData(0,0,width,height).data;
 
     while(ptr < queue.length) {
@@ -342,21 +332,56 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
     dObj.my = Math.round((dObj.lCorner[1]+dObj.rCorner[1])/2);
 }
 
+function makePattern(id) {
+    var pic = document.getElementById(id);
+
+    var tCanvas = document.createElement('canvas');
+    tCanvas.width  = pic.width;
+    tCanvas.height = pic.height;
+    var tCtx = tCanvas.getContext('2d');
+    tCtx.drawImage(pic, 0, 0);
+
+    var pattern = tCtx.createPattern(tCanvas, "repeat");
+    return pattern;
+}
 
 function createFill(dObj){
-    assignID(dObj);
+    var ctx;
+
+    if(bgFill) {
+        //Background fill
+        background = dObj;
+        var c = document.createElement('canvas');
+        c.width = canvas.width;
+        c.height = canvas.height;
+        ctx = c.getContext('2d');
+    } else {
+        //Regular Fill
+        ctx = canvas.getContext('2d');
+        assignID(dObj);
+    }
 
     var height = canvas.height;
     var width = canvas.width;
     var x = dObj.pts[0][0];
     var y = dObj.pts[0][1];
     dObj.sectors = [];
-    findSectors(dObj,x,y,dObj.sectors,width,height,canvas.getContext('2d'));
+
+    if(bgFill) {
+        dObj.sectors = [[[0,0], [width,0],
+                        [width,height], [0,height]]];
+    } else {
+        findSectors(dObj,x,y,dObj.sectors,width,height,ctx);
+    }
+
     dObj.draw = function(ctx) {
         ctx.save();
-        ctx.fillStyle = this.color;
+        if(this.pattern) {
+            ctx.fillStyle = this.pattern;
+        } else {
+            ctx.fillStyle = this.color;
+        }
         ctx.globalAlpha = this.opacity;
-        ctx.strokeStyle = this.color;
 
         ctx.translate(Math.round(this.mx), Math.round(this.my));
         ctx.rotate(this.rotation);
@@ -365,15 +390,9 @@ function createFill(dObj){
         ctx.beginPath();
 
         for(var i=0; i<this.sectors.length; i++) {
-            if(i == this.highlight) { 
-                ctx.fillStyle = "red";
-            } else {
-                ctx.fillStyle = this.color;
-            }
             var sector = this.sectors[i];
             ctx.moveTo(sector[0][0]-this.mx, sector[0][1]-this.my);
             if(sector.length == 2) {
-//                console.log("Filling sector length 2...");
                 ctx.lineTo(sector[0][0]-this.mx, sector[0][1]-this.my-1);
                 ctx.lineTo(sector[1][0]-this.mx, sector[0][1]-this.my-1);
                 ctx.lineTo(sector[1][0]-this.mx, sector[1][1]-this.my+1);
@@ -386,7 +405,6 @@ function createFill(dObj){
         }
         ctx.closePath();
         ctx.fill();
-//        ctx.stroke();
         ctx.restore();
     };
     dObj.select = function(x,y) {
