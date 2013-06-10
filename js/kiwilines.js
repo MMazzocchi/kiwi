@@ -76,7 +76,7 @@ function startLine(dObj) {
 	}
 
     // Create a brush for this line
-    createBrush(dObj, brushMode);
+    createBrush(dObj);
 
     // Draw the rotate/scale icons
     dObj.drawIcons = function(ctx) {

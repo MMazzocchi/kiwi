@@ -1,7 +1,7 @@
-function createBrush(dObj, brushMode) {
+function createBrush(dObj) {
 
     //If this brush is a simple or graphite brush
-    if(brushMode == 'simple' || brushMode == 'graphite'){
+    if(dObj.type == 'simple' || dObj.type == 'graphite'){
         dObj.draw = function(ctx) {
 
             //Rotate and scale the canvas
@@ -67,7 +67,7 @@ function createBrush(dObj, brushMode) {
             ctx.restore();
         };
 
-    } else if(brushMode == 'spray'){
+    } else if(dObj.type == 'spray'){
 
         //Create a spray can brush
         dObj.draw = function(ctx) {
@@ -102,7 +102,7 @@ function createBrush(dObj, brushMode) {
         ctx.restore();
         }
     }
-	else if(brushMode == 'calligraphy'){
+	else if(dObj.type == 'calligraphy'){
 
         //Create a spray can brush
         dObj.draw = function(ctx) {
