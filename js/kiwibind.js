@@ -20,18 +20,10 @@ function groupSelection(){
 	$.each(layerList, function(i, id) {
         var dObj = objectList[id];
 		var layerId = i;
-		if(dObj.lCorner){
-			if(dObj.lCorner[0] > curObj.lCorner[0] && dObj.lCorner[1] > curObj.lCorner[1] && dObj.rCorner[0] < curObj.rCorner[0] && dObj.rCorner[1] < curObj.rCorner[1]) {
-				curObj.bindList.push(dObj);
-				selectList.push(layerId);
-			}
-		}
-		else{
-			if(dObj.pts[0] > curObj.lCorner[0] && dObj.pts[0] < curObj.rCorner[0] && dObj.pts[1] > curObj.lCorner[1] && dObj.pts[1] < curObj.rCorner[1]){
-				curObj.bindList.push(dObj);
-				selectList.push(layerId);
-				bindStamp = true;
-			}
+		
+		if(dObj.midX() > curObj.lCorner[0] && dObj.midY() > curObj.lCorner[1] && dObj.midX() < curObj.rCorner[0] && dObj.midY() < curObj.rCorner[1] && dObj.type != "bind") {
+			curObj.bindList.push(dObj);
+			selectList.push(layerId);
 		}
     });
 	for(var i=selectList.length-1; i>=0; i--){
@@ -39,6 +31,7 @@ function groupSelection(){
 	}
 	if(curObj.bindList.length > 0){
 		selectedId = curObj.id;
+		bindStamp = true;
 	}
 	else{
 		ungroupSelection();
@@ -64,13 +57,11 @@ function ungroupSelection(){
 				// Scaling the object to match what it was when binded
 				curObj.xScale *= dObj.scaling[0];
 				curObj.yScale *= dObj.scaling[1];
-				d = distance([curObj.midX(), curObj.midY()], [dObj.mx, dObj.my]);
-				dx = d*dObj.scaling[0];
-				dy = d*dObj.scaling[1];
-				console.log("("+dx+", "+dy+")");
-				curObj.move(-d, -d);
-				curObj.move(dx, dy);
-				
+				dx = curObj.midX() - dObj.mx;
+				dy = curObj.midY() - dObj.my;
+	
+	
+				curObj.move((dx*dObj.scaling[0] - dx), (dy*dObj.scaling[0] - dy));
 			}
 		eraseObject(dObj.id);
 		}
@@ -123,7 +114,7 @@ function startBind(dObj){
 
     }
     dObj.select = function(x,y) {
-		var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,this.xScale,this.yScale,this.rotation);
+		var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,1/this.xScale,1/this.yScale,-this.rotation);
 		x=pt[0]; y=pt[1];
 	
         if(x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]){
