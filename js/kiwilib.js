@@ -912,6 +912,7 @@ $().ready( function() {
 
     $('#bgfill').click( function() {
         document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = '';
         SelectTool('fill');
         bgFill = true;
     });
