@@ -25,6 +25,7 @@ var zoomposy = 0;
 var textMode;
 var scratch;
 var copiedObj;
+var copyList = [];
 var bindStamp = false;
 var tx=0;
 var ty=0;
@@ -126,10 +127,8 @@ function refreshCanvas() {
         else // landscape
             ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
-	//ctx.translate(.5,.5);
 	
     //Redraw every object at the current zoom
-    // Redraw every object at the current zoom
 
 	//console.log(x1+ " " + y1);
 	//console.log(ctx.canvas.width);
@@ -194,31 +193,73 @@ function getObjectID(x, y) {
 
 //Copy the selected object
 function copy(){
+	var dObj = objectList[selectedId];
 	if(selectedId != -1){
-		copiedObj = jQuery.extend(true, {}, objectList[selectedId]);
-		console.log("copy");
+		copiedObj = jQuery.extend(true, {}, dObj);
 	}
 }
 
 //Paste the copied object
 function paste(dObj){
+	copyList = [];
 	var newObject = jQuery.extend(true, {}, dObj);
-	assignID(newObject);
+	if(newObject.type == "bind"){
+		for(var i=0; i<newObject.bindList.length; i++){
+			assignID(newObject.bindList[i]);
+			layerList.splice(layerList.length-1,1);
+			copyList[i] = newObject.bindList[i];
+		}
+		var newObject = {
+			pts: dObj.pts,
+			tPos: dObj.tPos,
+			lCorner: dObj.lCorner,
+			rCorner: dObj.rCorner,
+			mx: dObj.mx, my: dObj.my,
+			bindList: copyList,
+			type: "bind",
+			xScale: dObj.xScale,
+			yScale: dObj.yScale,
+			rotation: dObj.rotation,
+			scaling: dObj.scaling,
+		};
+		startBind(newObject);
+	}
+	else{
+		assignID(newObject);
+	}
 	newObject.move(40,40);
-	console.log("paste");	
+	var curSel = selectedId;
+	
 	var newAct = {
 		undo: function() {
 			// Take the top layer off of layerList. The object still exists in the objects hash, but
 			// doesn't get drawn because ONLY the objects in layerList get drawn.
-			layerList.splice(layerList.length-1,1);
+			if(newObject.type == "bind"){
+				var layerIndex = $.inArray(newObject.id, layerList);
+				// if box is still selected and an object, just remove the box
+				if(layerIndex != -1){
+					layerList.splice(layerList.length-1,1);
+				}
+				// if the box has been removed and its items are now on the layerlist, remove them from the layerlist
+				else{
+					layerList.splice(layerList.length-newObject.bindList.length, newObject.bindList.length);
+				}
+			}
+			else{
+				layerList.splice(layerList.length-1,1);
+			}
+			selectedId = -1;
 		},
 		redo: function() {
 			// Put this object back in layerList.
 			layerList[layerList.length] = newObject.id;
+			selectedId = newObject.id;
 		}
 	};
 	// Add the new action and redraw.
+	
 	addAction(newAct);
+	selectedId = newObject.id;
 }
 
 //Erase object with given id
@@ -244,7 +285,6 @@ function eraseObject(id) {
             layerList.splice(layerId,1);
         }
     };
-
     addAction(newAct);
 }
 
@@ -448,7 +488,7 @@ function pointerDown(e) {
                     pts: [[x, y]]
                 };
                 if(curFillId != "") {
-                    dObj.pattern = makePattern(curFillId);
+                    dObj.patternId = curFillId;
                 }
                 createFill(dObj);
                 break;
@@ -547,9 +587,9 @@ function pointerMove(e) {
                 myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
-			case "textbox":
-				placeTextArea(x,y);
-				break;
+        case "textbox":
+            placeTextArea(x,y);
+            break;
         }
     }
 }
@@ -703,12 +743,6 @@ function updateOpac(slideAmount) {        // gets opacity from slider and sets t
     alpha = slideAmount/100;
     myCP.updateColor();
 }
-
-function updateTint(slideAmount) {        // gets tint from slider and sets the light setting in the color picker
-    myCP.curL = slideAmount;
-    myCP.updateColor();
-}
-
 function SelectTool(toolName) // selects proper tool based off of what user has clicked
 {
     switch (toolName) {
@@ -767,11 +801,12 @@ function clearAll() {
     idPtr = 0;
     actionPtr = 0;
     selectedId = -1;
+    background = undefined;
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
-	document.onselectstart = function () { return false; };
+    document.onselectstart = function () { return false; };
     document.body.style.cursor="url(img/paintbrush.png) 0 28, default"; // sets the default cursor to the paintbrush
     //Ceate Color picker
     myCP = new ColorPicker();
@@ -783,13 +818,13 @@ $().ready( function() {
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
-	toolbar = document.getElementById('toolbar');
+
+    toolbar = document.getElementById('toolbar');
 	
-	canvas.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
+    canvas.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
     canvas.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     canvas.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
     
-
     // Bind an action.
     $('#drawing_canvas').contextmenu(function() {    // takes right-clicks
         if (curTool == 'zoom'){
@@ -810,7 +845,7 @@ $().ready( function() {
 
     // Bind the undo function to the undo button.
     $('#undo').click( undo );
-	$('#undo').on('tap', undo);
+    $('#undo').on('tap', undo);
 
     // Bind the redo function to the redo button.
     $('#redo').click( redo );
@@ -824,7 +859,13 @@ $().ready( function() {
     $('#save').click( function() {
         createSaveFile();
     });
-	
+
+    document.getElementById('upload').addEventListener( 'change', handleUploadEvent );
+
+    $('#open').click( function() {
+        $('#upload').click();
+    });
+
     $('#download').click( function() {
         //downloadImage();
         window.open(canvas.toDataURL(), "Drawing", canvas.width, canvas.height);
@@ -959,22 +1000,7 @@ $().ready( function() {
 	
     $('#clear').click( function() {
         clearAll();
-    });
-    
-    $( '#tintSlider' ).slider({
-        orientation: "horizontal",
-        range: "min",
-        min: 0,
-        max: 100,
-        value: myCP.curL,
-        slide: function( event, ui ) {
-            updateTint( ui.value );
-        },
-        change: function( event, ui ) {
-            updateTint( ui.value );
-        }
-    });
-    
+    });   
     $( "#opacitySlider" ).slider({
         orientation: "horizontal",
         range: "min",
@@ -1072,6 +1098,8 @@ $().ready( function() {
 	}
     
     $(document).keydown(function(e) {
+        e.preventDefault();
+
         var key = e.which;
 		editText(key,e);
 		
