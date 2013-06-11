@@ -347,9 +347,11 @@ function makePattern(id) {
 
 function createFill(dObj){
     var ctx;
+    var oldBg
 
     if(bgFill) {
         //Background fill
+        if(background) { oldBg = background; }
         background = dObj;
         var c = document.createElement('canvas');
         c.width = canvas.width;
@@ -534,16 +536,26 @@ function createFill(dObj){
         }
         return obj;
     }
-
-    var newAct = {
-        undo: function() {
-            layerList.splice(layerList.length-1,1);
-			selectedId = -1;
-        },
-        redo: function() {
-            layerList[layerList.length] = dObj.id;
+    if(bgFill) {
+        newAct = {
+            undo: function() {
+                background = oldBg;
+            },
+            redo: function() {
+                backround = dObj;
+            }
         }
-    };
+    } else {
+        newAct = {
+            undo: function() {
+                layerList.splice(layerList.length-1,1);
+	    	selectedId = -1;
+            },
+            redo: function() {
+                layerList[layerList.length] = dObj.id;
+            }
+        };
+    }
 
     // Add the new action and redraw.
     addAction(newAct);
