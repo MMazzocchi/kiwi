@@ -127,10 +127,8 @@ function refreshCanvas() {
         else // landscape
             ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
-	//ctx.translate(.5,.5);
 	
     //Redraw every object at the current zoom
-    // Redraw every object at the current zoom
 
 	//console.log(x1+ " " + y1);
 	//console.log(ctx.canvas.width);
@@ -587,9 +585,9 @@ function pointerMove(e) {
                 myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
-			case "textbox":
-				placeTextArea(x,y);
-				break;
+        case "textbox":
+            placeTextArea(x,y);
+            break;
         }
     }
 }
@@ -1116,6 +1114,8 @@ $().ready( function() {
 	}
     
     $(document).keydown(function(e) {
+        e.preventDefault();
+
         var key = e.which;
 		editText(key,e);
 		
