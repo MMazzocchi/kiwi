@@ -1,3 +1,4 @@
+// Drawing the box around the area that the user wants selected
 function placeBindArea(x,y){
 	var dObj = objectList[layerList[layerList.length-1]];
 	if(dObj.type == 'bind'){
@@ -12,7 +13,7 @@ function placeBindArea(x,y){
 		dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
 	}
 }
-
+// adding any objects that are within the box to the box's list of items
 function groupSelection(){
 	var curObj = objectList[layerList[layerList.length-1]];
 	var selectList = [];
@@ -26,18 +27,19 @@ function groupSelection(){
 			selectList.push(layerId);
 		}
     });
+	// removing all of the items in the box's item list from the layerlist
 	for(var i=selectList.length-1; i>=0; i--){
 		layerList.splice(selectList[i], 1);
 	}
 	if(curObj.bindList.length > 0){
-		selectedId = curObj.id;
-		bindStamp = true;
+		selectedId = curObj.id;	// makes box the selected item
+		bindStamp = true;		// fixed ratio scaling for the box
 	}
 	else{
 		ungroupSelection();
 	}
 }
-
+// removes the box from layerlist and puts items in item list back in the layerlist
 function ungroupSelection(){
 	$.each(layerList, function(i, id) {
 		var dObj = objectList[id];

@@ -238,9 +238,11 @@ function paste(dObj){
 			// doesn't get drawn because ONLY the objects in layerList get drawn.
 			if(newObject.type == "bind"){
 				var layerIndex = $.inArray(newObject.id, layerList);
+				// if box is still selected and an object, just remove the box
 				if(layerIndex != -1){
 					layerList.splice(layerList.length-1,1);
 				}
+				// if the box has been removed and its items are now on the layerlist, remove them from the layerlist
 				else{
 					layerList.splice(layerList.length-newObject.bindList.length, newObject.bindList.length);
 				}
