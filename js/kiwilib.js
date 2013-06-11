@@ -431,8 +431,8 @@ function pointerDown(e) {
                 if(id != -1) { eraseObject(id); }
                 break;
 
-			case "shape":
-				isDragging = true;
+            case "shape":
+                isDragging = true;
                 var dObj = {
                     pts: [[x, y]],
                     lCorner: [x,y],
@@ -442,13 +442,13 @@ function pointerDown(e) {
                     opacity: alpha,
                     color: curColor,
                     type: shapeType,
-					radius: 0,
+                    radius: 0,
                     xScale: 1,
                     yScale: 1,
                     rotation: 0
                 };
                 startShape(dObj);
-				break;
+                break;
             case "fill":
                 var dObj = {
                     color: curColor,
@@ -484,25 +484,25 @@ function pointerDown(e) {
                 createBMP(dObj);
                 createStamp(dObj);
                 break;
-			case "textbox":
+            case "textbox":
                 var dObj = {
-					theText: [[new String()]],
-					fontSize: thickness,
+                    theText: [[new String()]],
+                    fontSize: thickness,
                     opacity: alpha,
-					color: curColor,
-					type: textMode,
-					strpixel: 0,
+                    color: curColor,
+                    type: textMode,
+                    strpixel: 0,
                     xScale: 1, 
                     yScale: 1,
-					lCorner: [x,y],
+                    lCorner: [x,y],
                     rCorner: [x,y],
-					mx: x, my: y,
+                    mx: x, my: y,
                     bound: [1,1],
                     rotation: 0,
                     pts: [x,y],
-					tPos: [x,y]
+                    tPos: [x,y]
                 };    
-				isDragging = true;
+                isDragging = true;
                 createTextBalloon(dObj);
                 break;
             case "dropper":

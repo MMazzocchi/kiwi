@@ -155,6 +155,21 @@ function createStamp(dObj) {
     // Return the midpoint of this stamp
     dObj.midX = function() { return this.pts[0]; }
     dObj.midY = function() { return this.pts[1]; }
+    dObj.compress = function() {
+        var obj = {
+            objType: 'stamp',
+            url: this.url,
+            cx: this.cx,
+            cy: this.cy,
+            opacity: this.opacity,
+            xScale: this.xScale,
+            yScale: this.yScale,
+            bound: this.bound,
+            rotation: this.rotation,
+            pts: this.pts
+        };
+        return obj;
+    }
 
     var newAct = {
         undo: function() {
@@ -487,6 +502,29 @@ function createTextBalloon(dObj) {
     // Return the midpoint of this stamp
     dObj.midX = function() { return this.mx; }
     dObj.midY = function() { return this.my; }
+
+    dObj.compress = function() {
+        var obj = {
+            objType: 'textbox',
+            theText: this.theText,
+            fontSize: this.fontSize,
+            opacity: this.opacity,
+            color: this.color,
+            type: this.type,
+            strpixel: this.strpixel,
+            xScale: this.xScale,
+            yScale: this.yScale,
+            lCorner: this.lCorner,
+            rCorner: this.rCorner,
+            mx: this.mx,
+            my: this.my,
+            bound: this.bound,
+            rotation: this.rotation,
+            pts: this.pts,
+            tPos: this.tPos
+        };
+        return obj;
+    }
 
     var newAct = {
         undo: function() {
