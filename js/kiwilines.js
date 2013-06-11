@@ -50,9 +50,9 @@ function createTextureBrush(dObj){
 	ctx.beginPath();
 	ctx.strokeStyle=dObj.color;
 	ctx.fillStyle = dObj.color;
-	ctx.moveTo(0, 0);
-	ctx.quadraticCurveTo(3*w/4, w/4, w, w);
-	ctx.quadraticCurveTo(w/4, 3*w/4, 0, 0);
+	ctx.moveTo(w, 0);
+	ctx.quadraticCurveTo(w/4, w/4, 0, w);
+	ctx.quadraticCurveTo(3*w/4, 3*w/4, w, 0);
 	ctx.stroke();
 	ctx.fill();
 	ctx.restore();
