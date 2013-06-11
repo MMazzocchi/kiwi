@@ -24,8 +24,8 @@ var svgList = {
 // Create a bitmap from this object
 function createBMP(dObj){
     var scanvas = document.createElement('canvas');
-    scanvas.width = dObj.bound[2]*dObj.xScale;
-    scanvas.height = dObj.bound[3]*dObj.yScale;
+    scanvas.width = dObj.bound[2];
+    scanvas.height = dObj.bound[3];
     var sctx = scanvas.getContext('2d');
 	canvg(scanvas,dObj.url);
  //   sctx.drawSvg(dObj.url, 0, 0, 0, 0);

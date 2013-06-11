@@ -772,6 +772,15 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
     }
 }
 
+function clearAll() {
+    objectList = {};
+    layerList = [];
+    actionList = [];
+    idPtr = 0;
+    actionPtr = 0;
+    selectedId = -1;
+}
+
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
 	document.onselectstart = function () { return false; };
@@ -824,13 +833,13 @@ $().ready( function() {
     $('#redo_button').attr('disabled', true);
     $('button').button().attr("autocomplete", "off");
 
-	$('#save').click( function() {
-		var serial = canvas.toDataURL();
-	});
+    $('#save').click( function() {
+        createSaveFile();
+    });
 	
-	$('#download').click( function() {
+    $('#download').click( function() {
         //downloadImage();
-		window.open(canvas.toDataURL(), "Drawing", canvas.width, canvas.height);
+        window.open(canvas.toDataURL(), "Drawing", canvas.width, canvas.height);
     });
 	
     $('#brush').click( function() {
@@ -838,26 +847,27 @@ $().ready( function() {
         SelectTool('draw');
     });
 
-	$('#line').click( function() {
+    $('#line').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('line');
     });
-	$('#calligraphy').click( function() {
+
+    $('#calligraphy').click( function() {
         document.body.style.cursor="url(img/calligraphy.png)0 28, default";
         SelectTool('calligraphy');
     });
 	
-	$('#circle').click( function() {
+    $('#circle').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('circle');
     });
 	
-	$('#square').click( function() {
+    $('#square').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('square');
     });
 	
-	$('#triangle').click( function() {
+    $('#triangle').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('triangle');
     });
@@ -918,21 +928,21 @@ $().ready( function() {
     });
 
 	
-	$('#balloon').click( function() {
-		document.body.style.cursor="default";
-         SelectTool('textbox');
-		 textMode = "balloon";
+    $('#balloon').click( function() {
+        document.body.style.cursor="default";
+        SelectTool('textbox');
+        textMode = "balloon";
     });
 	
-	$('#textbox').click( function() {
-		document.body.style.cursor="default";
-         SelectTool('textbox');
-		 textMode = "box";
+    $('#textbox').click( function() {
+        document.body.style.cursor="default";
+        SelectTool('textbox');
+        textMode = "box";
     });
 	
     $('#butterfly').click( function() {
-         SelectTool('stamp');
-         curStamp = 'butterfly'
+        SelectTool('stamp');
+        curStamp = 'butterfly'
     });
 	
     $('#mickey_button').click( function() {
@@ -949,23 +959,18 @@ $().ready( function() {
         SelectTool('stamp');
     });
 
-	$('#copy').click( function() {
+    $('#copy').click( function() {
         copy();
     });
-	
-	$('#paste').click( function() {
-		if(copiedObj){
-			paste(copiedObj);
-		}
+
+    $('#paste').click( function() {
+        if(copiedObj){
+            paste(copiedObj);
+        }
     });
 	
     $('#clear').click( function() {
-        objectList = {};
-        layerList = [];
-        actionList = [];
-        idPtr = 0;
-        actionPtr = 0;
-        selectedId = -1;
+        clearAll();
     });
     
     $( '#tintSlider' ).slider({
