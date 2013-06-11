@@ -25,6 +25,7 @@ var zoomposy = 0;
 var textMode;
 var scratch;
 var copiedObj;
+var copyList = [];
 var bindStamp = false;
 var tx=0;
 var ty=0;
@@ -190,31 +191,71 @@ function getObjectID(x, y) {
 
 //Copy the selected object
 function copy(){
+	var dObj = objectList[selectedId];
 	if(selectedId != -1){
-		copiedObj = jQuery.extend(true, {}, objectList[selectedId]);
-		console.log("copy");
+		copiedObj = jQuery.extend(true, {}, dObj);
 	}
 }
 
 //Paste the copied object
 function paste(dObj){
+	copyList = [];
 	var newObject = jQuery.extend(true, {}, dObj);
-	assignID(newObject);
+	if(newObject.type == "bind"){
+		for(var i=0; i<newObject.bindList.length; i++){
+			assignID(newObject.bindList[i]);
+			layerList.splice(layerList.length-1,1);
+			copyList[i] = newObject.bindList[i];
+		}
+		var newObject = {
+			pts: dObj.pts,
+			tPos: dObj.tPos,
+			lCorner: dObj.lCorner,
+			rCorner: dObj.rCorner,
+			mx: dObj.mx, my: dObj.my,
+			bindList: copyList,
+			type: "bind",
+			xScale: dObj.xScale,
+			yScale: dObj.yScale,
+			rotation: dObj.rotation,
+			scaling: dObj.scaling,
+		};
+		startBind(newObject);
+	}
+	else{
+		assignID(newObject);
+	}
 	newObject.move(40,40);
-	console.log("paste");	
+	var curSel = selectedId;
+	
 	var newAct = {
 		undo: function() {
 			// Take the top layer off of layerList. The object still exists in the objects hash, but
 			// doesn't get drawn because ONLY the objects in layerList get drawn.
-			layerList.splice(layerList.length-1,1);
+			if(newObject.type == "bind"){
+				var layerIndex = $.inArray(newObject.id, layerList);
+				if(layerIndex != -1){
+					layerList.splice(layerList.length-1,1);
+				}
+				else{
+					layerList.splice(layerList.length-newObject.bindList.length, newObject.bindList.length);
+				}
+			}
+			else{
+				layerList.splice(layerList.length-1,1);
+			}
+			selectedId = -1;
 		},
 		redo: function() {
 			// Put this object back in layerList.
 			layerList[layerList.length] = newObject.id;
+			selectedId = newObject.id;
 		}
 	};
 	// Add the new action and redraw.
+	
 	addAction(newAct);
+	selectedId = newObject.id;
 }
 
 //Erase object with given id
@@ -240,7 +281,6 @@ function eraseObject(id) {
             layerList.splice(layerId,1);
         }
     };
-
     addAction(newAct);
 }
 

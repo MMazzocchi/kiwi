@@ -63,10 +63,19 @@ function ungroupSelection(){
 	
 				curObj.move((dx*dObj.scaling[0] - dx), (dy*dObj.scaling[0] - dy));
 			}
-		eraseObject(dObj.id);
+			var layerId = -1;
+			for(var i=0; i<layerList.length; i++) {
+				if(layerList[i] == dObj.id) {
+					layerId = i;
+					break;
+				}
+			}
+			//Take out the layer
+			layerList.splice(layerId, 1);
 		}
 	});
 	bindStamp = false;
+	selectedId = -1;
 }
 
 function startBind(dObj){
@@ -185,16 +194,18 @@ function startBind(dObj){
         undo: function() {
             // Take the top layer off of layerList. The object still exists in the objects hash, but
             // doesn't get drawn because ONLY the objects in layerList get drawn.
-            layerList.splice(layerList.length-1,1);
-			selectedId = -1;
+            ungroupSelection();
         },
         redo: function() {
             // Put this object back in layerList.
+			dObj.bindList = [];
             layerList[layerList.length] = dObj.id;
+			groupSelection();
         }
     };
     // Add the new action and redraw.
     addAction(newAct);
+
 }
 
 function createBind(dObj){
