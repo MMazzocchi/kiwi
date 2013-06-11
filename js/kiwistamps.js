@@ -24,8 +24,8 @@ var svgList = {
 // Create a bitmap from this object
 function createBMP(dObj){
     var scanvas = document.createElement('canvas');
-    scanvas.width = dObj.bound[2]*dObj.xScale;
-    scanvas.height = dObj.bound[3]*dObj.yScale;
+    scanvas.width = dObj.bound[2];
+    scanvas.height = dObj.bound[3];
     var sctx = scanvas.getContext('2d');
 	canvg(scanvas,dObj.url);
  //   sctx.drawSvg(dObj.url, 0, 0, 0, 0);
@@ -155,6 +155,21 @@ function createStamp(dObj) {
     // Return the midpoint of this stamp
     dObj.midX = function() { return this.pts[0]; }
     dObj.midY = function() { return this.pts[1]; }
+    dObj.compress = function() {
+        var obj = {
+            objType: 'stamp',
+            url: this.url,
+            cx: this.cx,
+            cy: this.cy,
+            opacity: this.opacity,
+            xScale: this.xScale,
+            yScale: this.yScale,
+            bound: this.bound,
+            rotation: this.rotation,
+            pts: this.pts
+        };
+        return obj;
+    }
 
     var newAct = {
         undo: function() {
@@ -172,69 +187,30 @@ function drawBalloon2(ctx, x, y, w, h, radius,lw){
 	var r = x + w;
 	var b = y + h
 	ctx.save();
-	ctx.beginPath();
-	ctx.strokeStyle="#000000";
-	ctx.lineWidth=lw;
-	ctx.moveTo(x+radius, y);
-	ctx.lineTo(r-radius, y);
-	ctx.quadraticCurveTo(r, y, r, y+radius);
-	ctx.lineTo(r, b-radius);
-	ctx.quadraticCurveTo(r, b, r-radius, b);
-	ctx.lineTo(x+radius, b);
-	ctx.quadraticCurveTo(x, b, x, b-radius);
-	ctx.lineTo(x, y+radius);
-	ctx.quadraticCurveTo(x, y, x+radius, y);
-	ctx.stroke();
-	ctx.fill();
-	
-	var cx = x+w/2;
-	var cy = y+h/2;
-	ctx.beginPath();
-	ctx.moveTo(cx + radius, cy);
-	ctx.lineTo(0,0);
-	ctx.lineTo(cx - radius, cy);
-	ctx.stroke();
-	ctx.fill();
+		ctx.beginPath();
+		ctx.strokeStyle="#000000";
+		ctx.lineWidth=lw;
+		ctx.moveTo(x+radius, y);
+		ctx.lineTo(r-radius, y);
+		ctx.quadraticCurveTo(r, y, r, y+radius);
+		ctx.lineTo(r, b-radius);
+		ctx.quadraticCurveTo(r, b, r-radius, b);
+		ctx.lineTo(x+radius, b);
+		ctx.quadraticCurveTo(x, b, x, b-radius);
+		ctx.lineTo(x, y+radius);
+		ctx.quadraticCurveTo(x, y, x+radius, y);
+		ctx.stroke();
+		ctx.fill();
+		
+		var cx = x+w/2;
+		var cy = y+h/2;
+		ctx.beginPath();
+		ctx.moveTo(cx + radius, cy);
+		ctx.lineTo(0,0);
+		ctx.lineTo(cx - radius, cy);
+		ctx.stroke();
+		ctx.fill();
 	ctx.restore();
-}
-
-function drawBalloon(ctx, x, y, tx, ty, w, h, radius)
-{
-	var r = x + w;
-	var b = y + h;
-	ctx.beginPath();
-	ctx.strokeStyle="#000000";
-	ctx.lineWidth="4";
-	if(ty <= y){
-		ctx.moveTo(x+radius, y);
-		ctx.lineTo(tx, ty);
-		ctx.lineTo(x+radius * 2, y);
-		ctx.lineTo(r-radius, y);
-		ctx.quadraticCurveTo(r, y, r, y+radius);
-		ctx.lineTo(r, b-radius);
-		ctx.quadraticCurveTo(r, b, r-radius, b);
-		ctx.lineTo(x+radius, b);
-		ctx.quadraticCurveTo(x, b, x, b-radius);
-		ctx.lineTo(x, y+radius);
-		ctx.quadraticCurveTo(x, y, x+radius, y);
-		ctx.stroke();
-		ctx.fill();
-	}
-	else{
-		ctx.moveTo(x+radius, y);
-		ctx.lineTo(r-radius, y);
-		ctx.quadraticCurveTo(r, y, r, y+radius);
-		ctx.lineTo(r, b-radius);
-		ctx.quadraticCurveTo(r, b, r-radius, b);
-		ctx.lineTo(x+radius * 2, b);
-		ctx.lineTo(tx, ty);
-		ctx.lineTo(x+radius, b);
-		ctx.quadraticCurveTo(x, b, x, b-radius);
-		ctx.lineTo(x, y+radius);
-		ctx.quadraticCurveTo(x, y, x+radius, y);
-		ctx.stroke();
-		ctx.fill();
-	}
 }
 
 function placeTextArea(x,y){
@@ -253,6 +229,93 @@ function placeTextArea(x,y){
 
 function createTextBalloon(dObj) {
     assignID(dObj);
+	
+	dObj.findBounds = function(ctx){
+		var max_length = 30;
+		var tx = this.tx = this.tPos[0]-this.pts[0] ;
+		var ty = this.ty = this.tPos[1]-this.pts[1] ;
+		for(var i=0; this.theText[this.max] && i< this.theText[this.max].length; i++){
+			var metrics = ctx.measureText(this.theText[this.max][i]);
+			max_length += metrics.width;
+		}
+		this.width = max_length;
+		this.height = this.fontSize*this.theText.length+10;
+		//drawBalloon(ctx,tx,ty, 0,0,this.width, this.height, 15);
+		var bw = this.bw = max_length;
+		var bh = this.bh = this.fontSize*this.theText.length+10;
+		var w = this.width = this.tPos[0]-this.pts[0];
+		if(this.tPos[0]<this.pts[0] && this.tPos[0]+bw > this.pts[0]){
+			this.width = bw;
+			this.rCorner[0] = this.tPos[0]+bw;
+		}
+		else if(this.tPos[0]>this.pts[0]){
+			this.width = w+bw;
+			this.rCorner[0] = this.pts[0]+this.width;
+		}
+		else if(this.tPos[0]<this.pts[0]){
+			this.width = w;
+			this.rCorner[0] = this.pts[0];
+		}
+		var h = this.height =this.tPos[1]- this.pts[1];
+		if(this.tPos[1]<this.pts[1] && this.tPos[1]+bh > this.pts[1]){
+			this.height = bh;
+			this.rCorner[1] = this.tPos[1]+bh;
+		}
+		else if(this.tPos[1]>this.pts[1]){
+			this.height = h+bh;
+			this.rCorner[1] = this.pts[1]+this.height;
+		}
+		else if(this.tPos[1]<this.pts[1]){
+			this.height = h;
+			this.rCorner[1] = this.pts[1];
+		}
+		
+		this.mx = this.lCorner[0]+(this.lCorner[0]-this.rCorner[0])/2;
+		this.my = this.lCorner[1]+(this.lCorner[1]-this.rCorner[1])/2;
+	}
+	
+	dObj.drawBalloonText = function(ctx){
+		ctx.fillStyle = this.color;
+		for(var i=0; i<this.theText.length; i++){
+			for(var j=0; j<this.theText[i].length; j++){
+				var line_length = 0;
+				for(k=0; k<j; k++){
+					var met = ctx.measureText(this.theText[i][k]);
+					line_length += met.width;
+				}
+				ctx.fillText(this.theText[i][j],this.tx+15 + line_length,this.ty+(i+1)*this.fontSize+2);
+			
+				//ctx.fillText(this.theText[i][j],-this.width/2+10 + line_length,-this.height/2+(i+1)*this.fontSize+2);
+			}
+		}
+	}
+	
+	dObj.drawBoxText = function(ctx){
+		var wraps = 0;
+		for(var i=0; i<this.theText.length; i++){
+			var line_length = 0; 
+			for(var j=0; j<this.theText[i].length; j++){
+				
+				var span = 0;
+				var nl = 0;
+				
+				if(j > 0){
+					var met = ctx.measureText(this.theText[i][j-1]);
+					line_length += met.width;
+				}
+				
+				var last = ctx.measureText(this.theText[i][j]);
+				span = last.width+line_length;
+					
+				if(span > this.width && this.theText[i].length > j){
+					nl= j;
+					wraps++;
+					line_length = 0;
+				}
+				ctx.fillText(this.theText[i][j],-this.width/2 + 10 + line_length,-this.height/2 + (i+wraps+1)*this.fontSize+2);
+			}
+		}
+	}
 
     // Draw the stamp
     dObj.draw = function(ctx) {
@@ -264,71 +327,16 @@ function createTextBalloon(dObj) {
 			ctx.font="normal "+this.fontSize+"px Comic Sans MS";
 			
 			if(this.type == "balloon"){
-
-				var max_length = 30;
-				for(var i=0; this.theText[this.max] && i< this.theText[this.max].length; i++){
-					var metrics = ctx.measureText(this.theText[this.max][i]);
-					max_length += metrics.width;
-				}
-				this.width = max_length;
-				this.height = this.fontSize*this.theText.length+10;
-				var tx = this.tPos[0]-this.pts[0] ;
-				var ty = this.tPos[1]-this.pts[1] ;
-				
-				//drawBalloon(ctx,tx,ty, 0,0,this.width, this.height, 15);
-				var bw = this.bw = max_length;
-				var bh = this.bh = this.fontSize*this.theText.length+10;
-				var w = this.width = this.tPos[0]-this.pts[0];
-				if(this.tPos[0]<this.pts[0] && this.tPos[0]+bw > this.pts[0]){
-					this.width = bw;
-					this.rCorner[0] = this.tPos[0]+bw;
-				}
-				else if(this.tPos[0]>this.pts[0]){
-					this.width = w+bw;
-					this.rCorner[0] = this.pts[0]+this.width;
-				}
-				else if(this.tPos[0]<this.pts[0]){
-					this.width = w;
-					this.rCorner[0] = this.pts[0];
-				}
-				var h = this.height =this.tPos[1]- this.pts[1];
-				if(this.tPos[1]<this.pts[1] && this.tPos[1]+bh > this.pts[1]){
-					this.height = bh;
-					this.rCorner[1] = this.tPos[1]+bh;
-				}
-				else if(this.tPos[1]>this.pts[1]){
-					this.height = h+bh;
-					this.rCorner[1] = this.pts[1]+this.height;
-				}
-				else if(this.tPos[1]<this.pts[1]){
-					this.height = h;
-					this.rCorner[1] = this.pts[1];
-				}
-				this.mx = this.lCorner[0]+(this.lCorner[0]-this.rCorner[0])/2;
-				this.my = this.lCorner[1]+(this.lCorner[1]-this.rCorner[1])/2;
-				ctx.translate(this.mx, this.my);
+				this.findBounds(ctx);
+				ctx.translate(this.pts[0], this.pts[1]);
 				ctx.rotate(this.rotation);
 				ctx.scale(xScale,yScale);
 				ctx.save();
-					drawBalloon2(ctx,tx,ty,bw, bh, 15,8);
+					drawBalloon2(ctx,this.tx,this.ty,this.bw, this.bh, 15,8);
 					ctx.globalCompositeOperation = "lighter";
-					drawBalloon2(ctx,tx,ty,bw, bh, 15,1);
+					drawBalloon2(ctx,this.tx,this.ty,this.bw, this.bh, 15,1);
 				ctx.restore();
-
-				ctx.fillStyle = this.color;
-				for(var i=0; i<this.theText.length; i++){
-					for(var j=0; j<this.theText[i].length; j++){
-						var line_length = 0;
-						for(k=0; k<j; k++){
-							var met = ctx.measureText(this.theText[i][k]);
-							line_length += met.width;
-						}
-						
-						ctx.fillText(this.theText[i][j],tx+15 + line_length,ty+(i+1)*this.fontSize+2);
-					
-						//ctx.fillText(this.theText[i][j],-this.width/2+10 + line_length,-this.height/2+(i+1)*this.fontSize+2);
-					}
-				}
+				this.drawBalloonText(ctx);
 			}
 			else{
 				this.width = Math.abs(this.rCorner[0]-this.lCorner[0]);
@@ -339,30 +347,7 @@ function createTextBalloon(dObj) {
 				ctx.fillStyle = this.color;				
 				if(layerList[layerList.length-1] == this.id || selectedId == this.id)
 					ctx.strokeRect(-this.width/2,-this.height/2,this.width,this.height);//
-					var wraps = 0;
-				for(var i=0; i<this.theText.length; i++){
-					var line_length = 0; 
-					for(var j=0; j<this.theText[i].length; j++){
-						
-						var span = 0;
-						var nl = 0;
-						
-						if(j > 0){
-							var met = ctx.measureText(this.theText[i][j-1]);
-							line_length += met.width;
-						}
-						
-						var last = ctx.measureText(this.theText[i][j]);
-						span = last.width+line_length;
-							
-						if(span > this.width && this.theText[i].length > j){
-							nl= j;
-							wraps++;
-							line_length = 0;
-						}
-						ctx.fillText(this.theText[i][j],-this.width/2 + 10 + line_length,-this.height/2 + (i+wraps+1)*this.fontSize+2);
-					}
-				}
+				this.drawBoxText(ctx);
 			}
         ctx.restore();
     };
@@ -488,6 +473,29 @@ function createTextBalloon(dObj) {
     dObj.midX = function() { return this.mx; }
     dObj.midY = function() { return this.my; }
 
+    dObj.compress = function() {
+        var obj = {
+            objType: 'textbox',
+            theText: this.theText,
+            fontSize: this.fontSize,
+            opacity: this.opacity,
+            color: this.color,
+            type: this.type,
+            strpixel: this.strpixel,
+            xScale: this.xScale,
+            yScale: this.yScale,
+            lCorner: this.lCorner,
+            rCorner: this.rCorner,
+            mx: this.mx,
+            my: this.my,
+            bound: this.bound,
+            rotation: this.rotation,
+            pts: this.pts,
+            tPos: this.tPos
+        };
+        return obj;
+    }
+
     var newAct = {
         undo: function() {
             layerList.splice(layerList.length-1,1);
@@ -499,5 +507,8 @@ function createTextBalloon(dObj) {
     };
 
     addAction(newAct);
+}
+function createTextBox(dObj){
+
 }
 

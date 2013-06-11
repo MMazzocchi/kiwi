@@ -1,7 +1,7 @@
-function createBrush(dObj, brushMode) {
+function createBrush(dObj) {
 
     //If this brush is a simple or graphite brush
-    if(brushMode == 'simple' || brushMode == 'graphite'){
+    if(dObj.type == 'simple' || dObj.type == 'graphite'){
         dObj.draw = function(ctx) {
 
             //Rotate and scale the canvas
@@ -67,7 +67,7 @@ function createBrush(dObj, brushMode) {
             ctx.restore();
         };
 
-    } else if(brushMode == 'spray'){
+    } else if(dObj.type == 'spray'){
 
         //Create a spray can brush
         dObj.draw = function(ctx) {
@@ -102,7 +102,7 @@ function createBrush(dObj, brushMode) {
         ctx.restore();
         }
     }
-	else if(brushMode == 'calligraphy'){
+	else if(dObj.type == 'calligraphy'){
 
         //Create a spray can brush
         dObj.draw = function(ctx) {
@@ -120,25 +120,25 @@ function createBrush(dObj, brushMode) {
 			var length = this.pts.length;
 			for(var i=0; i<length; i+=3) {
 			    ctx.beginPath();
-				ctx.moveTo(this.pts[i][0]-this.mx-w/2, this.pts[i][1]-this.my-w/2);
+				ctx.moveTo(this.pts[i][0]-this.mx-w/2, this.pts[i][1]-this.my+w/2);
 				if(this.pts.length <= i+4) {
 					for(var j=i; j<length; j++) {
-						ctx.lineTo(this.pts[j][0]-this.mx-w/2,this.pts[j][1]-this.my-w/2);
+						ctx.lineTo(this.pts[j][0]-this.mx-w/2,this.pts[j][1]-this.my+w/2);
 					}
-					ctx.lineTo(this.pts[length-1][0]-this.mx+w/2, this.pts[length-1][1]-this.my+w/2);
+					ctx.lineTo(this.pts[length-1][0]-this.mx+w/2, this.pts[length-1][1]-this.my-w/2);
 					for(var j=this.pts.length-1; j>=i; j--) {
-						ctx.lineTo(this.pts[j][0]-this.mx+w/2,this.pts[j][1]-this.my+w/2);
+						ctx.lineTo(this.pts[j][0]-this.mx+w/2,this.pts[j][1]-this.my-w/2);
 					}
-					ctx.lineTo(this.pts[i][0]-this.mx-w/2, this.pts[i][1]-this.my-w/2);
+					ctx.lineTo(this.pts[i][0]-this.mx-w/2, this.pts[i][1]-this.my+w/2);
 				} else {
-					ctx.bezierCurveTo(this.pts[i+1][0]-this.mx-w/2, this.pts[i+1][1]-this.my-w/2,
-						this.pts[i+2][0]-this.mx-w/2, this.pts[i+2][1]-this.my-w/2,
-						this.pts[i+3][0]-this.mx-w/2, this.pts[i+3][1]-this.my-w/2);
-					ctx.lineTo(this.pts[i+3][0]-this.mx+w/2, this.pts[i+3][1]-this.my+w/2);
-					ctx.bezierCurveTo(this.pts[i+2][0]-this.mx+w/2, this.pts[i+2][1]-this.my+w/2,
-						this.pts[i+1][0]-this.mx+w/2, this.pts[i+1][1]-this.my+w/2,
-						this.pts[i][0]-this.mx+w/2, this.pts[i][1]-this.my+w/2);
-					ctx.lineTo(this.pts[i][0]-this.mx-w/2, this.pts[i][1]-this.my-w/2);
+					ctx.bezierCurveTo(this.pts[i+1][0]-this.mx-w/2, this.pts[i+1][1]-this.my+w/2,
+						this.pts[i+2][0]-this.mx-w/2, this.pts[i+2][1]-this.my+w/2,
+						this.pts[i+3][0]-this.mx-w/2, this.pts[i+3][1]-this.my+w/2);
+					ctx.lineTo(this.pts[i+3][0]-this.mx+w/2, this.pts[i+3][1]-this.my-w/2);
+					ctx.bezierCurveTo(this.pts[i+2][0]-this.mx+w/2, this.pts[i+2][1]-this.my-w/2,
+						this.pts[i+1][0]-this.mx+w/2, this.pts[i+1][1]-this.my-w/2,
+						this.pts[i][0]-this.mx+w/2, this.pts[i][1]-this.my-w/2);
+					ctx.lineTo(this.pts[i][0]-this.mx-w/2, this.pts[i][1]-this.my+w/2);
 				}
 				ctx.stroke();
 				ctx.fill();

@@ -108,9 +108,27 @@ function startShape(dObj){
     }
     dObj.midX = function() { return this.mx; }
     dObj.midY = function() { return this.my; }
-
+    dObj.compress = function() {
+        var obj = {
+            objType: 'shape',
+            pts: this.pts,
+            lCorner: this.lCorner,
+            rCorner: this.rCorner,
+            mx: this.mx,
+            my: this.my,
+            width: this.width,
+            opacity: this.opactiy,
+            color: this.color,
+            type: this.type,
+            radius: this.radius,
+            xScale: this.xScale,
+            yScale: this.yScale,
+            rotation: this.rotation
+        };
+    return obj;
+    }
 	
-	var newAct = {
+    var newAct = {
         undo: function() {
             // Take the top layer off of layerList. The object still exists in the objects hash, but
             // doesn't get drawn because ONLY the objects in layerList get drawn.

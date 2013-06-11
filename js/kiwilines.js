@@ -50,9 +50,9 @@ function createTextureBrush(dObj){
 	ctx.beginPath();
 	ctx.strokeStyle=dObj.color;
 	ctx.fillStyle = dObj.color;
-	ctx.moveTo(0, 0);
-	ctx.quadraticCurveTo(3*w/4, w/4, w, w);
-	ctx.quadraticCurveTo(w/4, 3*w/4, 0, 0);
+	ctx.moveTo(w, 0);
+	ctx.quadraticCurveTo(w/4, w/4, 0, w);
+	ctx.quadraticCurveTo(3*w/4, 3*w/4, w, 0);
 	ctx.stroke();
 	ctx.fill();
 	ctx.restore();
@@ -76,7 +76,7 @@ function startLine(dObj) {
 	}
 
     // Create a brush for this line
-    createBrush(dObj, brushMode);
+    createBrush(dObj);
 
     // Draw the rotate/scale icons
     dObj.drawIcons = function(ctx) {
@@ -213,6 +213,25 @@ function startLine(dObj) {
     }
     dObj.midX = function() { return this.mx; }
     dObj.midY = function() { return this.my; }
+    dObj.compress = function() {
+        var obj = {
+            objType: 'line',
+            pts: this.pts,
+            lCorner: this.lCorner,
+            rCorner: this.rCorner,
+            mx: this.mx,
+            my: this.my,
+            width: this.width,
+            opacity: this.opacity,
+            color: this.color,
+            bezier: true,
+            type: this.type,
+            xScale: this.xScale,
+            yScale: this.yScale,
+            rotation: this.rotation
+        };
+        return obj;
+    }
 
     var newAct = {
         undo: function() {

@@ -30,6 +30,10 @@ var bindStamp = false;
 var tx=0;
 var ty=0;
 var orientation = orienting() ? window.orientation : 0;
+var curFillId = "";
+var bgFill = false;
+var background = undefined;
+
 
 function orienting() {
     return (typeof window.orientation != "undefined");
@@ -77,6 +81,7 @@ function refreshCanvas() {
     }
 
     var ctx = canvas.getContext('2d');
+	ctx.save();
     var heightoffset = $("#toolbar").height();
     var widthoffset = $("#toolbar").width();
     
@@ -88,11 +93,10 @@ function refreshCanvas() {
         ctx.canvas.width  = window.innerWidth - widthoffset;
         ctx.canvas.height = window.innerHeight;
     }
-	
+
     if(orienting()) {
         orientation = window.orientation;
         ctx.rotate(-orientation*Math.PI/180);
-
         ctx.fillStyle="#FFFFFF";
 
         switch(orientation) {
@@ -123,29 +127,28 @@ function refreshCanvas() {
         else // landscape
             ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
-//    ctx.translate(.5,.5);
+	//ctx.translate(.5,.5);
 	
+    //Redraw every object at the current zoom
     // Redraw every object at the current zoom
 
 	//console.log(x1+ " " + y1);
-	
 	//console.log(ctx.canvas.width);
-	ctx.translate(originx, originy);
-	//ctx.save();
 	ctx.scale(zoom, zoom);
+	ctx.translate(originx, originy);
 
+    if(background) {
+        background.draw(ctx);
+    }
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
         // Get the object for this layer
         var dObj = objectList[id];
-
         //if(scratch){
         //    ctx.putImageData(scratch,0,0);
         //}
         //dObj.draw(ctx);
         //scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
-        
-
 
         if((!isDragging) || (id != selectedId)) {
             // Draw the object
@@ -160,6 +163,7 @@ function refreshCanvas() {
         }
         objectList[selectedId].drawIcons(ctx);
     }
+	ctx.restore();
 }
 
 // Assign a new ID to this object
@@ -286,26 +290,13 @@ function eraseObject(id) {
 
 //Set coordinates for the translations due to the zoom
 function applyZoom(x, y, curZoom, prevZoom){
-	var z2 = Math.pow(factor,curZoom-1);
-	zoom = Math.pow(factor,curZoom);
-	var prevx = zoomposx; 
-	var prevy = zoomposy;
-	zoomposx = (x);
-	zoomposy = (y);
-	console.log(x+" "+y);
-	
-
-	var L1 = drawing_canvas.width;//*z0;
-	var L2 = L1*zoom;
-	var x1 = zoomposx;
-	var x2 = x1*L2/L1;
-	originx= x1-x2;
-	var L3 = drawing_canvas.height;//*z0;
-	var L4 = L3*zoom;
-	var y1 = zoomposy;
-	var y2 = y1*L4/L3;
-	originy = y1-y2;
-	
+	var z1 = Math.pow(factor,prevZoom);
+	var z2 = zoom = Math.pow(factor,curZoom);
+	console.log(z1 + " " +z2);
+	var px = x-zoomposx;
+	var py = y-zoomposy;
+	originx = (x/z2-x)+(px/z2-px);
+	originy = (y/z2-y)+(py/z2-py);
 
 	var newAct = {
 		undo: function() {
@@ -319,7 +310,8 @@ function applyZoom(x, y, curZoom, prevZoom){
 			zoomCount = curZoom;
 		}
 	};
-
+	zoomposx = x;
+	zoomposy = y;
 	addAction(newAct);
 	return false;
 }
@@ -465,8 +457,8 @@ function pointerDown(e) {
                 if(id != -1) { eraseObject(id); }
                 break;
 
-			case "shape":
-				isDragging = true;
+            case "shape":
+                isDragging = true;
                 var dObj = {
                     pts: [[x, y]],
                     lCorner: [x,y],
@@ -476,13 +468,13 @@ function pointerDown(e) {
                     opacity: alpha,
                     color: curColor,
                     type: shapeType,
-					radius: 0,
+                    radius: 0,
                     xScale: 1,
                     yScale: 1,
                     rotation: 0
                 };
                 startShape(dObj);
-				break;
+                break;
             case "fill":
                 var dObj = {
                     color: curColor,
@@ -495,6 +487,9 @@ function pointerDown(e) {
                     yScale: 1,
                     pts: [[x, y]]
                 };
+                if(curFillId != "") {
+                    dObj.pattern = makePattern(curFillId);
+                }
                 createFill(dObj);
                 break;
 
@@ -515,25 +510,25 @@ function pointerDown(e) {
                 createBMP(dObj);
                 createStamp(dObj);
                 break;
-			case "textbox":
+            case "textbox":
                 var dObj = {
-					theText: [[new String()]],
-					fontSize: thickness,
+                    theText: [[new String()]],
+                    fontSize: thickness,
                     opacity: alpha,
-					color: curColor,
-					type: textMode,
-					strpixel: 0,
+                    color: curColor,
+                    type: textMode,
+                    strpixel: 0,
                     xScale: 1, 
                     yScale: 1,
-					lCorner: [x,y],
+                    lCorner: [x,y],
                     rCorner: [x,y],
-					mx: x, my: y,
+                    mx: x, my: y,
                     bound: [1,1],
                     rotation: 0,
                     pts: [x,y],
-					tPos: [x,y]
+                    tPos: [x,y]
                 };    
-				isDragging = true;
+                isDragging = true;
                 createTextBalloon(dObj);
                 break;
             case "dropper":
@@ -777,23 +772,23 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
         case 'fill':
             curTool = 'fill';
             break;
-		case 'stamp':
-			document.body.style.cursor="url(img/stamper.png)14 28, default";
-			curTool = toolName;
-			break;
-		case 'circle':
+        case 'stamp':
+            document.body.style.cursor="url(img/stamper.png)14 28, default";
+            curTool = toolName;
+            break;
+        case 'circle':
             curTool = 'shape';
             shapeType = 'circle';
             break;
-		case 'square':
+        case 'square':
             curTool = 'shape';
             shapeType = 'square';
             break;
-		case 'line':
+        case 'line':
             curTool = 'shape';
             shapeType = 'line';
             break;
-		case 'triangle':
+        case 'triangle':
             curTool = 'shape';
             shapeType = 'triangle';
             break;
@@ -801,6 +796,15 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
             curTool = toolName;
             break;
     }
+}
+
+function clearAll() {
+    objectList = {};
+    layerList = [];
+    actionList = [];
+    idPtr = 0;
+    actionPtr = 0;
+    selectedId = -1;
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
@@ -855,13 +859,13 @@ $().ready( function() {
     $('#redo_button').attr('disabled', true);
     $('button').button().attr("autocomplete", "off");
 
-	$('#save').click( function() {
-		var serial = canvas.toDataURL();
-	});
+    $('#save').click( function() {
+        createSaveFile();
+    });
 	
-	$('#download').click( function() {
+    $('#download').click( function() {
         //downloadImage();
-		window.open(canvas.toDataURL(), "Drawing", canvas.width, canvas.height);
+        window.open(canvas.toDataURL(), "Drawing", canvas.width, canvas.height);
     });
 	
     $('#brush').click( function() {
@@ -869,26 +873,27 @@ $().ready( function() {
         SelectTool('draw');
     });
 
-	$('#line').click( function() {
+    $('#line').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('line');
     });
-	$('#calligraphy').click( function() {
+
+    $('#calligraphy').click( function() {
         document.body.style.cursor="url(img/calligraphy.png)0 28, default";
         SelectTool('calligraphy');
     });
 	
-	$('#circle').click( function() {
+    $('#circle').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('circle');
     });
 	
-	$('#square').click( function() {
+    $('#square').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('square');
     });
 	
-	$('#triangle').click( function() {
+    $('#triangle').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('triangle');
     });
@@ -929,24 +934,41 @@ $().ready( function() {
     
     $('#fill').click( function() {
         document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = "";
+        bgFill = false;
         SelectTool('fill');
     });
+
+    $('#stonefill').click( function() {
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = 'stone';
+        bgFill = false;
+        SelectTool('fill');
+    });
+
+    $('#bgfill').click( function() {
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = '';
+        SelectTool('fill');
+        bgFill = true;
+    });
+
 	
-	$('#balloon').click( function() {
-		document.body.style.cursor="default";
-         SelectTool('textbox');
-		 textMode = "balloon";
+    $('#balloon').click( function() {
+        document.body.style.cursor="default";
+        SelectTool('textbox');
+        textMode = "balloon";
     });
 	
-	$('#textbox').click( function() {
-		document.body.style.cursor="default";
-         SelectTool('textbox');
-		 textMode = "box";
+    $('#textbox').click( function() {
+        document.body.style.cursor="default";
+        SelectTool('textbox');
+        textMode = "box";
     });
 	
     $('#butterfly').click( function() {
-         SelectTool('stamp');
-         curStamp = 'butterfly'
+        SelectTool('stamp');
+        curStamp = 'butterfly'
     });
 	
     $('#mickey_button').click( function() {
@@ -963,23 +985,18 @@ $().ready( function() {
         SelectTool('stamp');
     });
 
-	$('#copy').click( function() {
+    $('#copy').click( function() {
         copy();
     });
-	
-	$('#paste').click( function() {
-		if(copiedObj){
-			paste(copiedObj);
-		}
+
+    $('#paste').click( function() {
+        if(copiedObj){
+            paste(copiedObj);
+        }
     });
 	
     $('#clear').click( function() {
-        objectList = {};
-        layerList = [];
-        actionList = [];
-        idPtr = 0;
-        actionPtr = 0;
-        selectedId = -1;
+        clearAll();
     });
     
     $( '#tintSlider' ).slider({
@@ -1023,14 +1040,30 @@ $().ready( function() {
             updateThick( ui.value );
         }
     });
-    
-    $(document).keydown(function(e) {
-        var key = e.which;
+	
+	function jsKeyToChar(key,e){
+		if(key >=65 && key <= 90){ //alphanumeric
+			if(e.shiftKey)
+				return String.fromCharCode(key);
+			else{
+				return String.fromCharCode(key+32);
+			}
+		}
+		else if((key >=48 && key <= 57) || (key >=96 && key <= 105)){
+			return String.fromCharCode(key);
+		}
+		else if(key >= 189 && key <= 191){
+			return String.fromCharCode(key - 144);
+		}
+		else
+			return false;
+	}
+	
+	function editText(key,e){
 		var id = layerList[layerList.length-1];
 		if(selectedId != -1 && objectList[selectedId].theText){ //short circuiting works in JS
 			id = selectedId;
 		}
-
 		if(id != -1 && objectList[id].theText){
 			var num_lines = objectList[id].theText.length;
 			var num_words = objectList[id].theText[num_lines-1].length;
@@ -1053,19 +1086,15 @@ $().ready( function() {
 				objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key);
 				objectList[id].theText[num_lines-1].push(new String());
 			}
-			else{ //alphanumeric
-				if(e.shiftKey)
-					objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key);
-				else{
-					objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key+32);
-					}
-			}
+			var keychar = jsKeyToChar(key,e);
+			if(keychar)
+				objectList[id].theText[num_lines-1][num_words-1] += keychar;
 			num_lines = objectList[id].theText.length;
 			num_words = objectList[id].theText[num_lines-1].length;
 			var max = objectList[id].strpixel;
 			for(var i=0; objectList[id].theText && i< num_lines; i++){
 				var t = 0;
-				for(var j=0; objectList[id].theText[num_lines-1] && j<num_words ; j++){
+				for(var j=0; objectList[id].theText[i][j] && j<num_words ; j++){
 					t += objectList[id].theText[i][j].length;
 				}
 				if(t > max){
@@ -1075,6 +1104,11 @@ $().ready( function() {
 			}
 		    return;
 		}
+	}
+    
+    $(document).keydown(function(e) {
+        var key = e.which;
+		editText(key,e);
 		
         // Ctrl-Z or CMD-Z for Undo   Shift-* for Redo
         if ((e.ctrlKey) && ((key == 122 || key == 90))) {  // CTRL-Z
