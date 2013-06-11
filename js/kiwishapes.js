@@ -100,10 +100,10 @@ function startShape(dObj){
             this.xScale, this.yScale,
             -this.rotation );
 			
-        if(distance([x,y],[leftCorner[0]-32, leftCorner[1]-32]) < 32) { return 'scale'; }
-        else if(distance([x,y],[rightCorner[0]-32, rightCorner[1]-32]) < 32) { return 'rotate'; }
-		else if(distance([x,y],[rightBottom[0]-32, rightBottom[1]-32]) < 32) { return 'layerUp'; }
-		else if(distance([x,y],[leftBottom[0]-32, leftBottom[1]-32]) < 32) { return 'layerDown'; } 
+        if(distance([x,y],[leftCorner[0], leftCorner[1]]) < 32) { return 'scale'; }
+        else if(distance([x,y],[rightCorner[0], rightCorner[1]]) < 32) { return 'rotate'; }
+		else if(distance([x,y],[rightBottom[0], rightBottom[1]]) < 32) { return 'layerUp'; }
+		else if(distance([x,y],[leftBottom[0], leftBottom[1]]) < 32) { return 'layerDown'; } 
         else { return false; }
     }
     dObj.midX = function() { return this.mx; }
