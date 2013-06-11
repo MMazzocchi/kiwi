@@ -24,8 +24,8 @@ var svgList = {
 // Create a bitmap from this object
 function createBMP(dObj){
     var scanvas = document.createElement('canvas');
-    scanvas.width = dObj.bound[2]*dObj.xScale;
-    scanvas.height = dObj.bound[3]*dObj.yScale;
+    scanvas.width = dObj.bound[2];
+    scanvas.height = dObj.bound[3];
     var sctx = scanvas.getContext('2d');
 	canvg(scanvas,dObj.url);
  //   sctx.drawSvg(dObj.url, 0, 0, 0, 0);
@@ -155,6 +155,21 @@ function createStamp(dObj) {
     // Return the midpoint of this stamp
     dObj.midX = function() { return this.pts[0]; }
     dObj.midY = function() { return this.pts[1]; }
+    dObj.compress = function() {
+        var obj = {
+            objType: 'stamp',
+            url: this.url,
+            cx: this.cx,
+            cy: this.cy,
+            opacity: this.opacity,
+            xScale: this.xScale,
+            yScale: this.yScale,
+            bound: this.bound,
+            rotation: this.rotation,
+            pts: this.pts
+        };
+        return obj;
+    }
 
     var newAct = {
         undo: function() {
@@ -201,14 +216,15 @@ function drawBalloon2(ctx, x, y, w, h, radius,lw){
 function placeTextArea(x,y){
 	var dObj = objectList[layerList[layerList.length-1]];
 	dObj.tPos = [x,y];
-
-	dObj.lCorner[0] = dObj.pts[0] < dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
-	dObj.lCorner[1] = dObj.pts[1] < dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
-	dObj.rCorner[0] = dObj.pts[0] > dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
-	dObj.rCorner[1] = dObj.pts[1] > dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
-	
-	dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
-	dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
+	if(dObj.type == "box"){
+		dObj.lCorner[0] = dObj.pts[0] < dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
+		dObj.lCorner[1] = dObj.pts[1] < dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
+		dObj.rCorner[0] = dObj.pts[0] > dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
+		dObj.rCorner[1] = dObj.pts[1] > dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
+		
+		dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
+		dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
+	}
 }
 
 function createTextBalloon(dObj) {
@@ -337,6 +353,9 @@ function createTextBalloon(dObj) {
     };
 
     dObj.select = function(x,y) {
+		var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,1/this.xScale,1/this.yScale,-this.rotation);
+		x=pt[0]; y=pt[1];
+		
 		if(this.type == "balloon"){
 			var bw = this.bw*this.xScale;
 			var bh = this.bh*this.yScale;
@@ -453,6 +472,29 @@ function createTextBalloon(dObj) {
     // Return the midpoint of this stamp
     dObj.midX = function() { return this.mx; }
     dObj.midY = function() { return this.my; }
+
+    dObj.compress = function() {
+        var obj = {
+            objType: 'textbox',
+            theText: this.theText,
+            fontSize: this.fontSize,
+            opacity: this.opacity,
+            color: this.color,
+            type: this.type,
+            strpixel: this.strpixel,
+            xScale: this.xScale,
+            yScale: this.yScale,
+            lCorner: this.lCorner,
+            rCorner: this.rCorner,
+            mx: this.mx,
+            my: this.my,
+            bound: this.bound,
+            rotation: this.rotation,
+            pts: this.pts,
+            tPos: this.tPos
+        };
+        return obj;
+    }
 
     var newAct = {
         undo: function() {

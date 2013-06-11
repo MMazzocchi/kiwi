@@ -1,6 +1,7 @@
-var highlight = -1;
-var gSectors;
+var colorRates = {};
+var alias = false;
 
+//Given an hsl value, convert it to rgb
 function hslToRgb(h, s, l) {
     var c = (1 - Math.abs((2*l)-1))*s;
     var h2 = h/60;
@@ -30,20 +31,18 @@ function hslToRgb(h, s, l) {
     return rgb;
 }
 
+//Return whether these two colors are close enough to match for a fill
 function matchColor(c1, c2) {
    var r = c2[0]/c1[0];
 
    for(var i=0; i<3; i++) {
-       if((Math.abs(c1[i] - c2[i]) > 50) || 
-         (Math.abs((c2[i]/c1[i]) - r)/r) > .95) {
-             return false;
-         }
-
+       if(c1[i] != c2[i]) { return false; }
    } 
    return true;
 }
 
-function validPoint(x,y, color, checked, ctx, cData, width, height) {
+//Return if this point is a valid "fillable" point
+function validPoint(x,y, color, checked, cData, width, height) {
     if((x < 0) || (x > width) ||
        (y < 0) || (y > height)) {
         return false;
@@ -54,6 +53,45 @@ function validPoint(x,y, color, checked, ctx, cData, width, height) {
     return matchColor(color, getData(x,y,cData,width));
 }
 
+function changeRate(c1, c2) {
+    var avg = 0;
+    for(var i=0; i<4; i++) {
+        if(c2[i] != c1[i]) { // Prevents 0/0 errors
+            avg += (Math.abs(c2[i] - c1[i])/c2[i]);
+        }
+    }
+    avg /= 4;
+    return avg;
+}
+
+function validAlias(x,y,color,checked,cData,width,height,dx,dy) {
+    if((x < 0) || (x > width) ||
+       (y < 0) || (y > height)) {
+        return false;
+    }
+    if(checked[""+x+","+y] == 1) {
+        return false;
+    }
+    var rate = 0;
+    if(colorRates[y] === undefined) {
+        colorRates[y] = {};
+    } else {
+        rate = changeRate(
+            getData(x,y,cData,width),
+            getData(x-dx,y-dy,cData,width));
+    }
+    colorRates[y][x]=rate;
+    if(alias && (rate == 0)) {
+        return false;
+    } else {
+        if((!alias) && (rate != 0)) {
+            alias = true;
+        }
+        return true;
+    }
+}
+
+//Return the pixel data for this point
 function getData(x, y, cData, width) {
     var index = (x+(y*(width)))*4;
     var data = [
@@ -65,6 +103,7 @@ function getData(x, y, cData, width) {
     return data;
 }
 
+//Search the segment that contains pt and return data
 function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
     var segmentN = false;
     var segmentS = false;
@@ -72,12 +111,16 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
     var nQueue = [];
     var sQueue = [];
 
+    alias = false;
+    colorRates[pt[1]] = undefined;
+
     //ex is East x; it'll be the farthest point east we can go in the current segment
     var ex = pt[0];
 
-    while(validPoint(ex,pt[1],color,checked,ctx,cData,width,height)) {
+//    while(validPoint(ex,pt[1],color,checked,cData,width,height)) {
+    while(validAlias(ex,pt[1],color,checked,cData,width,height,-1,0)) {
         checked[""+ex+","+pt[1]] = 1;
-        if(validPoint(ex,pt[1]+1,color,checked,ctx,cData,width,height)) {
+        if(validPoint(ex,pt[1]+1,color,checked,cData,width,height)) {
             if(!segmentN) {
                 nQueue.push([ex, pt[1]+1]);
                 segmentN = true;
@@ -87,7 +130,7 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
                 segmentN = false;
             }
         }
-        if(validPoint(ex,pt[1]-1,color,checked,ctx,cData,width,height)) {
+        if(validPoint(ex,pt[1]-1,color,checked,cData,width,height)) {
             if(!segmentS) {
                 sQueue.push([ex, pt[1]-1]);
                 segmentS = true;
@@ -102,17 +145,20 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
     nQueue = nQueue.reverse();
     sQueue = sQueue.reverse();
 
+    alias = false;
+
     //Reset the point so we can start looking west
     var wx = pt[0]+1;
 
     //Eliminate duplicate segments
-    segmentN = validPoint(wx-1,pt[1]+1,color,checked,ctx,cData,width,height);
-    segmentS = validPoint(wx-1,pt[1]-1,color,checked,ctx,cData,width,height);
+    segmentN = validPoint(wx-1,pt[1]+1,color,checked,cData,width,height);
+    segmentS = validPoint(wx-1,pt[1]-1,color,checked,cData,width,height);
 
     //Start going west
-    while(validPoint(wx,pt[1],color,checked,ctx,cData,width,height)) {
+//    while(validPoint(wx,pt[1],color,checked,cData,width,height)) {
+    while(validAlias(wx,pt[1],color,checked,cData,width,height,1,0)) {
         checked[""+wx+","+pt[1]] = 1;
-        if(validPoint(wx,pt[1]+1,color,checked,ctx,cData,width,height)) {
+        if(validPoint(wx,pt[1]+1,color,checked,cData,width,height)) {
             if(!segmentN) {
                 nQueue.push([wx, pt[1]+1]);
                 segmentN = true;
@@ -123,7 +169,7 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
             }
         }
 
-        if(validPoint(wx,pt[1]-1,color,checked,ctx,cData,width,height)) {
+        if(validPoint(wx,pt[1]-1,color,checked,cData,width,height)) {
             if(!segmentS) {
                 sQueue.push([wx, pt[1]-1]);
                 segmentS = true;
@@ -168,7 +214,6 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
     var color = ctx.getImageData(x,y,1,1).data;
     var checked = {};
     var queue = [[x,y]];
-
     var cData = ctx.getImageData(0,0,width,height).data;
 
     while(ptr < queue.length) {
@@ -259,10 +304,10 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
             queue = queue.concat(sQueue);
         }
 
-        lPts[0][1] -= .5;
-        rPts[rPts.length-1][1] -= .5;
-        lPts[lPts.length-1][1] += .5;
-        rPts[0][1] += .5;
+        lPts[0][1] -= 1;
+        rPts[rPts.length-1][1] -= 1;
+        lPts[lPts.length-1][1] += 1;
+        rPts[0][1] += 1;
 
         //Close up this sector
         var sector = lPts.concat(rPts);
@@ -287,21 +332,57 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
     dObj.my = Math.round((dObj.lCorner[1]+dObj.rCorner[1])/2);
 }
 
+function makePattern(id) {
+    var pic = document.getElementById(id);
+
+    var tCanvas = document.createElement('canvas');
+    tCanvas.width  = pic.width;
+    tCanvas.height = pic.height;
+    var tCtx = tCanvas.getContext('2d');
+    tCtx.drawImage(pic, 0, 0);
+
+    var pattern = tCtx.createPattern(tCanvas, "repeat");
+    return pattern;
+}
 
 function createFill(dObj){
-    assignID(dObj);
+    var ctx;
+
+    if(bgFill) {
+        //Background fill
+        background = dObj;
+        var c = document.createElement('canvas');
+        c.width = canvas.width;
+        c.height = canvas.height;
+        ctx = c.getContext('2d');
+    } else {
+        //Regular Fill
+        ctx = canvas.getContext('2d');
+        assignID(dObj);
+    }
 
     var height = canvas.height;
     var width = canvas.width;
     var x = dObj.pts[0][0];
     var y = dObj.pts[0][1];
-    dObj.sectors = [];
-    findSectors(dObj,x,y,dObj.sectors,width,height,canvas.getContext('2d'));
+    if(!dObj.sectors) {
+        if(bgFill) {
+            dObj.sectors = [[[0,0], [width,0],
+                             [width,height], [0,height]]];
+        } else {
+            dObj.sectors = [];
+            findSectors(dObj,x,y,dObj.sectors,width,height,ctx);
+        }
+    }
+
     dObj.draw = function(ctx) {
         ctx.save();
-        ctx.fillStyle = this.color;
+        if(this.pattern) {
+            ctx.fillStyle = this.pattern;
+        } else {
+            ctx.fillStyle = this.color;
+        }
         ctx.globalAlpha = this.opacity;
-        ctx.strokeStyle = this.color;
 
         ctx.translate(Math.round(this.mx), Math.round(this.my));
         ctx.rotate(this.rotation);
@@ -310,16 +391,9 @@ function createFill(dObj){
         ctx.beginPath();
 
         for(var i=0; i<this.sectors.length; i++) {
-            if(i == this.highlight) { 
-                ctx.fillStyle = "red";
-            } else {
-                ctx.fillStyle = this.color;
-            }
             var sector = this.sectors[i];
-//            ctx.beginPath();
             ctx.moveTo(sector[0][0]-this.mx, sector[0][1]-this.my);
             if(sector.length == 2) {
-//                console.log("Filling sector length 2...");
                 ctx.lineTo(sector[0][0]-this.mx, sector[0][1]-this.my-1);
                 ctx.lineTo(sector[1][0]-this.mx, sector[0][1]-this.my-1);
                 ctx.lineTo(sector[1][0]-this.mx, sector[1][1]-this.my+1);
@@ -329,12 +403,9 @@ function createFill(dObj){
                     ctx.lineTo(sector[j][0]-this.mx, sector[j][1]-this.my);
                 }
             }
-//            ctx.closePath();
-//            ctx.fill();
         }
         ctx.closePath();
         ctx.fill();
-        ctx.stroke();
         ctx.restore();
     };
     dObj.select = function(x,y) {
@@ -355,12 +426,6 @@ function createFill(dObj){
                 this.sectors[i][j][1]+=dy;
             }
         }
-/*
-        for(var i=0; i<this.pts.length; i++) {
-            this.pts[i][0]+=dx;
-            this.pts[i][1]+=dy;
-        }
-*/
         this.lCorner[0]+=dx;
         this.rCorner[0]+=dx;
         this.lCorner[1]+=dy;
@@ -370,9 +435,6 @@ function createFill(dObj){
         this.my += dy;
     };
     dObj.drawIcons = function(ctx) {
-        var mobileX = (orienting() ? 32 : 0);
-        var mobileY = mobileX;
-
         var leftCorner = transformPoint(
             this.lCorner[0]-this.mx, this.lCorner[1]-this.my,
             this.mx, this.my,
@@ -448,7 +510,26 @@ function createFill(dObj){
     }
     dObj.midX = function() { return this.mx; }
     dObj.midY = function() { return this.my; }
-
+    dObj.compress = function() {
+        var obj = {
+            objType: 'fill',
+            color: this.color,
+            opacity: this.opacity,
+            lCorner: this.lCorner,
+            rCorner: this.rCorner,
+            mx: this.mx,
+            my: this.my,
+            rotation: this.rotation,
+            xScale: this.xScale,
+            yScale: this.yScale,
+            pts: this.pts,
+            sectors: this.sectors 
+        };
+        if(this.pattern) {
+            obj.pattern = this.pattern;
+        }
+        return obj;
+    }
 
     var newAct = {
         undo: function() {

@@ -25,12 +25,14 @@ var zoomposy = 0;
 var textMode;
 var scratch;
 var copiedObj;
-var selectStart = [];
-var selectEnd = [];
-var selectList = [];
+var bindStamp = false;
 var tx=0;
 var ty=0;
 var orientation = orienting() ? window.orientation : 0;
+var curFillId = "";
+var bgFill = false;
+var background = undefined;
+
 
 function orienting() {
     return (typeof window.orientation != "undefined");
@@ -127,12 +129,16 @@ function refreshCanvas() {
 	//ctx.translate(.5,.5);
 	
     //Redraw every object at the current zoom
+    // Redraw every object at the current zoom
+
 	//console.log(x1+ " " + y1);
 	//console.log(ctx.canvas.width);
 	ctx.scale(zoom, zoom);
 	ctx.translate(originx, originy);
-	
-	
+
+    if(background) {
+        background.draw(ctx);
+    }
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
         // Get the object for this layer
@@ -285,11 +291,7 @@ function downloadImage(){
 	window.open(img,"","width=700,height=700");
 }
 */
-// save canvas to server
-function saveImage(){
-	var scanvas = document.getElementById("drawing_canvas");
-	var img = Canvas2Image.saveAsPNG(scanvas, true);    
-}
+
 
 // http://www.nihilogic.dk/labs/canvas2image/
 function downloadImage() {
@@ -336,6 +338,9 @@ function pointerDown(e) {
     var c = transformCoordinates(e);
     var ctx = canvas.getContext('2d');
     var x = c[0]; var y = c[1];
+	if (curTool != "select"){
+		ungroupSelection();
+	} 
     if (e.which == 3){
         if (curTool == "zoom"){
 			isDragging = true;
@@ -369,7 +374,6 @@ function pointerDown(e) {
                 xFirst = x;
                 yFirst = y;
 				isDragging  = true;
-				selectStart = [x,y];
                 if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
                     dragMode = objectList[selectedId].iconClicked(x, y);
                     if(dragMode == 'scale') {
@@ -386,27 +390,24 @@ function pointerDown(e) {
                     if(selectedId != -1) {
                         dragMode = 'translate';
                     }
-				/*	else{
-						$.each(layerList, function(i, id) {
-							var dObj = objectList[id];
-							if(dObj.type == "bind") {
-								eraseObject(dObj.id);
-							}
-						});
+					else{
+						ungroupSelection();
+						
 						var dObj = {
 							pts: [x, y],
 							tPos: [x, y],
 							lCorner: [x,y],
 							rCorner: [x,y],
 							mx: x, my: y,
-							bindList: selectList,
+							bindList: [],
 							type: "bind",
 							xScale: 1,
 							yScale: 1,
-							rotation: 0
+							rotation: 0,
+							scaling: [1,1],
 						};
 						startBind(dObj);
-					}*/
+					}
                 }
                 break;
 
@@ -416,8 +417,8 @@ function pointerDown(e) {
                 if(id != -1) { eraseObject(id); }
                 break;
 
-			case "shape":
-				isDragging = true;
+            case "shape":
+                isDragging = true;
                 var dObj = {
                     pts: [[x, y]],
                     lCorner: [x,y],
@@ -427,13 +428,13 @@ function pointerDown(e) {
                     opacity: alpha,
                     color: curColor,
                     type: shapeType,
-					radius: 0,
+                    radius: 0,
                     xScale: 1,
                     yScale: 1,
                     rotation: 0
                 };
                 startShape(dObj);
-				break;
+                break;
             case "fill":
                 var dObj = {
                     color: curColor,
@@ -446,6 +447,9 @@ function pointerDown(e) {
                     yScale: 1,
                     pts: [[x, y]]
                 };
+                if(curFillId != "") {
+                    dObj.pattern = makePattern(curFillId);
+                }
                 createFill(dObj);
                 break;
 
@@ -459,32 +463,32 @@ function pointerDown(e) {
                     yScale: 1, 
                     bound: svgList[ curStamp ].bounds,
                     rotation: 0,
-                    pts: [x, y],
+                    pts: [x, y]
                 };    
 
 
                 createBMP(dObj);
                 createStamp(dObj);
                 break;
-			case "textbox":
+            case "textbox":
                 var dObj = {
-					theText: [[new String()]],
-					fontSize: thickness,
+                    theText: [[new String()]],
+                    fontSize: thickness,
                     opacity: alpha,
-					color: curColor,
-					type: textMode,
-					strpixel: 0,
+                    color: curColor,
+                    type: textMode,
+                    strpixel: 0,
                     xScale: 1, 
                     yScale: 1,
-					lCorner: [x,y],
+                    lCorner: [x,y],
                     rCorner: [x,y],
-					mx: x, my: y,
+                    mx: x, my: y,
                     bound: [1,1],
                     rotation: 0,
                     pts: [x,y],
-					tPos: [x,y]
+                    tPos: [x,y]
                 };    
-				isDragging = true;
+                isDragging = true;
                 createTextBalloon(dObj);
                 break;
             case "dropper":
@@ -581,15 +585,12 @@ function pointerEnd(e) {
 	}
 	
     if(isDragging && (curTool == 'select')) {
-		selectEnd = [x,y];
 		if(selectedId != -1){
 			endTransform(selectedId, x, y, dragMode);
 		}
 		else{
-//			groupSelection();
+			groupSelection();
 		}
-		selectStart = [];
-		selectEnd = [];
     }
     
     isDragging = false;
@@ -731,23 +732,23 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
         case 'fill':
             curTool = 'fill';
             break;
-		case 'stamp':
-			document.body.style.cursor="url(img/stamper.png)14 28, default";
-			curTool = toolName;
-			break;
-		case 'circle':
+        case 'stamp':
+            document.body.style.cursor="url(img/stamper.png)14 28, default";
+            curTool = toolName;
+            break;
+        case 'circle':
             curTool = 'shape';
             shapeType = 'circle';
             break;
-		case 'square':
+        case 'square':
             curTool = 'shape';
             shapeType = 'square';
             break;
-		case 'line':
+        case 'line':
             curTool = 'shape';
             shapeType = 'line';
             break;
-		case 'triangle':
+        case 'triangle':
             curTool = 'shape';
             shapeType = 'triangle';
             break;
@@ -755,6 +756,15 @@ function SelectTool(toolName) // selects proper tool based off of what user has 
             curTool = toolName;
             break;
     }
+}
+
+function clearAll() {
+    objectList = {};
+    layerList = [];
+    actionList = [];
+    idPtr = 0;
+    actionPtr = 0;
+    selectedId = -1;
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
@@ -809,9 +819,13 @@ $().ready( function() {
     $('#redo_button').attr('disabled', true);
     $('button').button().attr("autocomplete", "off");
 
+    $('#save').click( function() {
+        createSaveFile();
+    });
 	
-	$('#download').click( function() {
-        downloadImage();
+    $('#download').click( function() {
+        //downloadImage();
+        window.open(canvas.toDataURL(), "Drawing", canvas.width, canvas.height);
     });
 	
     $('#brush').click( function() {
@@ -819,26 +833,27 @@ $().ready( function() {
         SelectTool('draw');
     });
 
-	$('#line').click( function() {
+    $('#line').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('line');
     });
-	$('#calligraphy').click( function() {
+
+    $('#calligraphy').click( function() {
         document.body.style.cursor="url(img/calligraphy.png)0 28, default";
         SelectTool('calligraphy');
     });
 	
-	$('#circle').click( function() {
+    $('#circle').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('circle');
     });
 	
-	$('#square').click( function() {
+    $('#square').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('square');
     });
 	
-	$('#triangle').click( function() {
+    $('#triangle').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('triangle');
     });
@@ -879,24 +894,41 @@ $().ready( function() {
     
     $('#fill').click( function() {
         document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = "";
+        bgFill = false;
         SelectTool('fill');
     });
+
+    $('#stonefill').click( function() {
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = 'stone';
+        bgFill = false;
+        SelectTool('fill');
+    });
+
+    $('#bgfill').click( function() {
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = '';
+        SelectTool('fill');
+        bgFill = true;
+    });
+
 	
-	$('#balloon').click( function() {
-		document.body.style.cursor="default";
-         SelectTool('textbox');
-		 textMode = "balloon";
+    $('#balloon').click( function() {
+        document.body.style.cursor="default";
+        SelectTool('textbox');
+        textMode = "balloon";
     });
 	
-	$('#textbox').click( function() {
-		document.body.style.cursor="default";
-         SelectTool('textbox');
-		 textMode = "box";
+    $('#textbox').click( function() {
+        document.body.style.cursor="default";
+        SelectTool('textbox');
+        textMode = "box";
     });
 	
     $('#butterfly').click( function() {
-         SelectTool('stamp');
-         curStamp = 'butterfly'
+        SelectTool('stamp');
+        curStamp = 'butterfly'
     });
 	
     $('#mickey_button').click( function() {
@@ -913,23 +945,18 @@ $().ready( function() {
         SelectTool('stamp');
     });
 
-	$('#copy').click( function() {
+    $('#copy').click( function() {
         copy();
     });
-	
-	$('#paste').click( function() {
-		if(copiedObj){
-			paste(copiedObj);
-		}
+
+    $('#paste').click( function() {
+        if(copiedObj){
+            paste(copiedObj);
+        }
     });
 	
     $('#clear').click( function() {
-        objectList = {};
-        layerList = [];
-        actionList = [];
-        idPtr = 0;
-        actionPtr = 0;
-        selectedId = -1;
+        clearAll();
     });
     
     $( '#tintSlider' ).slider({
