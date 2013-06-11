@@ -501,9 +501,11 @@ function pointerDown(e) {
                     opacity: alpha,
                     xScale: 1, 
                     yScale: 1, 
-                    bound: svgList[ curStamp ].bounds,
+                    bound: [svgList[ curStamp ].bounds[2],svgList[ curStamp ].bounds[3]],
+					pbound: [svgList[ curStamp ].bounds[2],svgList[ curStamp ].bounds[3]],
                     rotation: 0,
-                    pts: [x, y]
+                    pts: [x, y],
+					type: "stamp"
                 };    
 
 
@@ -741,12 +743,6 @@ function updateOpac(slideAmount) {        // gets opacity from slider and sets t
     alpha = slideAmount/100;
     myCP.updateColor();
 }
-
-function updateTint(slideAmount) {        // gets tint from slider and sets the light setting in the color picker
-    myCP.curL = slideAmount;
-    myCP.updateColor();
-}
-
 function SelectTool(toolName) // selects proper tool based off of what user has clicked
 {
     switch (toolName) {
@@ -1004,22 +1000,7 @@ $().ready( function() {
 	
     $('#clear').click( function() {
         clearAll();
-    });
-    
-    $( '#tintSlider' ).slider({
-        orientation: "horizontal",
-        range: "min",
-        min: 0,
-        max: 100,
-        value: myCP.curL,
-        slide: function( event, ui ) {
-            updateTint( ui.value );
-        },
-        change: function( event, ui ) {
-            updateTint( ui.value );
-        }
-    });
-    
+    });   
     $( "#opacitySlider" ).slider({
         orientation: "horizontal",
         range: "min",
@@ -1065,6 +1046,21 @@ $().ready( function() {
 		else
 			return false;
 	}
+	function  findMaxLine(id){
+		var num_lines = objectList[id].theText.length;
+		var num_words = objectList[id].theText[num_lines-1].length;
+		var max = objectList[id].strpixel;
+		for(var i=0; objectList[id].theText && i< num_lines; i++){
+			var t = 0;
+			for(var j=0; objectList[id].theText[i][j] && j<num_words ; j++){
+				t += objectList[id].theText[i][j].length;
+			}
+			if(t > max){
+				objectList[id].strpixel = max = t;
+				objectList[id].max = i;
+			}
+		}
+	}
 	
 	function editText(key,e){
 		var id = layerList[layerList.length-1];
@@ -1096,20 +1092,8 @@ $().ready( function() {
 			var keychar = jsKeyToChar(key,e);
 			if(keychar)
 				objectList[id].theText[num_lines-1][num_words-1] += keychar;
-			num_lines = objectList[id].theText.length;
-			num_words = objectList[id].theText[num_lines-1].length;
-			var max = objectList[id].strpixel;
-			for(var i=0; objectList[id].theText && i< num_lines; i++){
-				var t = 0;
-				for(var j=0; objectList[id].theText[i][j] && j<num_words ; j++){
-					t += objectList[id].theText[i][j].length;
-				}
-				if(t > max){
-					objectList[id].strpixel = max = t;
-					objectList[id].max = i;
-				}
-			}
-		    return;
+		    findMaxLine(id);
+			return;
 		}
 	}
     

@@ -2,11 +2,9 @@
 
 function ColorPicker()
 {
-  var CPW = 135;
-  var CPH = 135;
-  var cx = CPW/2;
-  var cy = CPH/2;
-  var xm = 32;
+  var CPW = 80;
+  var CPH = 200;
+  var xm = 0;
   
   this.curH = 0;
   this.curS = 100;
@@ -22,20 +20,11 @@ function ColorPicker()
   var dc = cpdisc.getContext('2d');
   for (var py = 0; py < CPH; ++py) {
     for (var px = 0; px < CPW; ++px) {
-      var dx = px - cx;
-      var dy = py - cy;
-      var a = Math.atan2(dy,dx);
-      var d = Math.sqrt(dx*dx+dy*dy);
-      var h = a*180/Math.PI;
-      if (h < 0) {
-        h += 360;
-      }
-      var s = d * 100 / cx;
-      var l = this.curL;
-      if (d < cx-1) {
-        dc.fillStyle = getHSLA( Math.floor(h), Math.floor(s), 50, 1 );
+	var h = py/200*360;
+    var s = 100-(px/80*100);
+    var l = this.curL;
+        dc.fillStyle = getHSLA( Math.floor(h), this.curS, Math.floor(s), 1 );
         dc.fillRect(px,py,1,1);
-      }
     }
   }
 
@@ -67,15 +56,13 @@ function ColorPicker()
         dc.globalAlpha = (50-this.curL)/50;
         dc.fillStyle = '#000000';
         dc.beginPath();
-        dc.arc(cx, cy, cx-1, 0, 2 * Math.PI, false);
-        dc.fill();
+		dc.fillRect(0,0,CPW,CPH);
       }
       else if (this.curL > 50) {
         dc.globalAlpha = (this.curL-50)/50;
         dc.fillStyle = '#FFFFFF';
         dc.beginPath();
-        dc.arc(cx, cy, cx-1, 0, 2 * Math.PI, false);
-        dc.fill();
+		dc.fillRect(0,0,CPW, CPH);
       }
       dc.restore();
     }
@@ -90,7 +77,6 @@ function ColorPicker()
     dc.shadowOffsetX = 2;
     dc.shadowOffsetY = 2;
     dc.beginPath();
-    dc.arc(cx+xm, cy+xm, cx-1, 0, 2 * Math.PI, false);
     dc.stroke();
     dc.restore();
 
@@ -100,18 +86,18 @@ function ColorPicker()
     dc.beginPath();
     dc.lineWidth = 2;
     dc.beginPath();
-    dc.arc(cx+xm, cy+xm, cx-1, 0, 2 * Math.PI, false);
     dc.stroke();
     dc.restore();
 
-    px = xm+cx + Math.cos( this.curH * Math.PI/180 ) * this.curS * cx/100;
-    py = xm+cy + Math.sin( this.curH * Math.PI/180 ) * this.curS * cy/100;
+	py = this.curH*200/360+xm;
+	px = (100-this.curS)*80/100+xm;
+	h=py/200*360
     dc.save();
     dc.fillStyle = curColor;
     dc.lineWidth = 1;
     dc.strokeStyle = '#FFF';
     dc.beginPath();
-    dc.arc(px, py, thickness/2, 0, 2 * Math.PI, false);
+    dc.arc(px, py, 10, 0, 2 * Math.PI, false); // this is the selector circle
 
       dc.save();
       dc.shadowColor = '#000';
@@ -144,22 +130,12 @@ function ColorPicker()
   {
     if (px >= xm && py >= xm && px < CPW+xm && py < CPH+xm)
     {
-      var dx = px - (cx+xm);
-      var dy = py - (cy+xm);
-      var a = Math.atan2(dy,dx);
-      var d = Math.sqrt(dx*dx+dy*dy);
-      
-      if (d > cx+2)
-        return;
-      var h = a*180/Math.PI;
-      if (h < 0) {
-          h += 360;
-       }
-      var s = d * 100 / cx;
+      var h = (py-xm)/200*360;
+      var s = 100-((px-xm)/80*100);
       var l = this.curL;
       this.curH = Math.round(h);
       this.curS = Math.round(s);
-      curColor = getHSLA( this.curH, this.curS, this.curL, alpha );
+      curColor = getHSLA( this.curH, 255, Math.round(s), alpha );
 	  myCP.Refresh();
     }
   }
