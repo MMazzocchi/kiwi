@@ -490,7 +490,7 @@ function pointerDown(e) {
                     pts: [[x, y]]
                 };
                 if(curFillId != "") {
-                    dObj.pattern = makePattern(curFillId);
+                    dObj.patternId = curFillId;
                 }
                 createFill(dObj);
                 break;

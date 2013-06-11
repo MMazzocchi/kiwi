@@ -375,6 +375,10 @@ function createFill(dObj){
         }
     }
 
+    if(dObj.patternId) {
+        dObj.pattern = makePattern(dObj.patternId);
+    }
+
     dObj.draw = function(ctx) {
         ctx.save();
         if(this.pattern) {
@@ -525,8 +529,8 @@ function createFill(dObj){
             pts: this.pts,
             sectors: this.sectors 
         };
-        if(this.pattern) {
-            obj.pattern = this.pattern;
+        if(this.patternId) {
+            obj.patternId = this.patternId;
         }
         return obj;
     }
