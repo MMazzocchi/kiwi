@@ -25,6 +25,7 @@ var zoomposy = 0;
 var textMode;
 var scratch;
 var copiedObj;
+var copyList = [];
 var bindStamp = false;
 var tx=0;
 var ty=0;
@@ -80,6 +81,7 @@ function refreshCanvas() {
     }
 
     var ctx = canvas.getContext('2d');
+	ctx.save();
     var heightoffset = $("#toolbar").height();
     var widthoffset = $("#toolbar").width();
     
@@ -91,11 +93,10 @@ function refreshCanvas() {
         ctx.canvas.width  = window.innerWidth - widthoffset;
         ctx.canvas.height = window.innerHeight;
     }
-	
+
     if(orienting()) {
         orientation = window.orientation;
         ctx.rotate(-orientation*Math.PI/180);
-
         ctx.fillStyle="#FFFFFF";
 
         switch(orientation) {
@@ -126,31 +127,28 @@ function refreshCanvas() {
         else // landscape
             ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
+	//ctx.translate(.5,.5);
+	
+    //Redraw every object at the current zoom
     // Redraw every object at the current zoom
 
 	//console.log(x1+ " " + y1);
-	
 	//console.log(ctx.canvas.width);
-	ctx.translate(originx, originy);
-	//ctx.save();
 	ctx.scale(zoom, zoom);
+	ctx.translate(originx, originy);
 
     if(background) {
         background.draw(ctx);
     }
-
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
         // Get the object for this layer
         var dObj = objectList[id];
-
         //if(scratch){
         //    ctx.putImageData(scratch,0,0);
         //}
         //dObj.draw(ctx);
         //scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
-        
-
 
         if((!isDragging) || (id != selectedId)) {
             // Draw the object
@@ -165,6 +163,7 @@ function refreshCanvas() {
         }
         objectList[selectedId].drawIcons(ctx);
     }
+	ctx.restore();
 }
 
 // Assign a new ID to this object
@@ -196,31 +195,73 @@ function getObjectID(x, y) {
 
 //Copy the selected object
 function copy(){
+	var dObj = objectList[selectedId];
 	if(selectedId != -1){
-		copiedObj = jQuery.extend(true, {}, objectList[selectedId]);
-		console.log("copy");
+		copiedObj = jQuery.extend(true, {}, dObj);
 	}
 }
 
 //Paste the copied object
 function paste(dObj){
+	copyList = [];
 	var newObject = jQuery.extend(true, {}, dObj);
-	assignID(newObject);
+	if(newObject.type == "bind"){
+		for(var i=0; i<newObject.bindList.length; i++){
+			assignID(newObject.bindList[i]);
+			layerList.splice(layerList.length-1,1);
+			copyList[i] = newObject.bindList[i];
+		}
+		var newObject = {
+			pts: dObj.pts,
+			tPos: dObj.tPos,
+			lCorner: dObj.lCorner,
+			rCorner: dObj.rCorner,
+			mx: dObj.mx, my: dObj.my,
+			bindList: copyList,
+			type: "bind",
+			xScale: dObj.xScale,
+			yScale: dObj.yScale,
+			rotation: dObj.rotation,
+			scaling: dObj.scaling,
+		};
+		startBind(newObject);
+	}
+	else{
+		assignID(newObject);
+	}
 	newObject.move(40,40);
-	console.log("paste");	
+	var curSel = selectedId;
+	
 	var newAct = {
 		undo: function() {
 			// Take the top layer off of layerList. The object still exists in the objects hash, but
 			// doesn't get drawn because ONLY the objects in layerList get drawn.
-			layerList.splice(layerList.length-1,1);
+			if(newObject.type == "bind"){
+				var layerIndex = $.inArray(newObject.id, layerList);
+				// if box is still selected and an object, just remove the box
+				if(layerIndex != -1){
+					layerList.splice(layerList.length-1,1);
+				}
+				// if the box has been removed and its items are now on the layerlist, remove them from the layerlist
+				else{
+					layerList.splice(layerList.length-newObject.bindList.length, newObject.bindList.length);
+				}
+			}
+			else{
+				layerList.splice(layerList.length-1,1);
+			}
+			selectedId = -1;
 		},
 		redo: function() {
 			// Put this object back in layerList.
 			layerList[layerList.length] = newObject.id;
+			selectedId = newObject.id;
 		}
 	};
 	// Add the new action and redraw.
+	
 	addAction(newAct);
+	selectedId = newObject.id;
 }
 
 //Erase object with given id
@@ -246,32 +287,18 @@ function eraseObject(id) {
             layerList.splice(layerId,1);
         }
     };
-
     addAction(newAct);
 }
 
 //Set coordinates for the translations due to the zoom
 function applyZoom(x, y, curZoom, prevZoom){
-	var z2 = Math.pow(factor,curZoom-1);
-	zoom = Math.pow(factor,curZoom);
-	var prevx = zoomposx; 
-	var prevy = zoomposy;
-	zoomposx = (x);
-	zoomposy = (y);
-	console.log(x+" "+y);
-	
-
-	var L1 = drawing_canvas.width;//*z0;
-	var L2 = L1*zoom;
-	var x1 = zoomposx;
-	var x2 = x1*L2/L1;
-	originx= x1-x2;
-	var L3 = drawing_canvas.height;//*z0;
-	var L4 = L3*zoom;
-	var y1 = zoomposy;
-	var y2 = y1*L4/L3;
-	originy = y1-y2;
-	
+	var z1 = Math.pow(factor,prevZoom);
+	var z2 = zoom = Math.pow(factor,curZoom);
+	console.log(z1 + " " +z2);
+	var px = x-zoomposx;
+	var py = y-zoomposy;
+	originx = (x/z2-x)+(px/z2-px);
+	originy = (y/z2-y)+(py/z2-py);
 
 	var newAct = {
 		undo: function() {
@@ -285,7 +312,8 @@ function applyZoom(x, y, curZoom, prevZoom){
 			zoomCount = curZoom;
 		}
 	};
-
+	zoomposx = x;
+	zoomposy = y;
 	addAction(newAct);
 	return false;
 }
@@ -1021,14 +1049,30 @@ $().ready( function() {
             updateThick( ui.value );
         }
     });
-    
-    $(document).keydown(function(e) {
-        var key = e.which;
+	
+	function jsKeyToChar(key,e){
+		if(key >=65 && key <= 90){ //alphanumeric
+			if(e.shiftKey)
+				return String.fromCharCode(key);
+			else{
+				return String.fromCharCode(key+32);
+			}
+		}
+		else if((key >=48 && key <= 57) || (key >=96 && key <= 105)){
+			return String.fromCharCode(key);
+		}
+		else if(key >= 189 && key <= 191){
+			return String.fromCharCode(key - 144);
+		}
+		else
+			return false;
+	}
+	
+	function editText(key,e){
 		var id = layerList[layerList.length-1];
 		if(selectedId != -1 && objectList[selectedId].theText){ //short circuiting works in JS
 			id = selectedId;
 		}
-
 		if(id != -1 && objectList[id].theText){
 			var num_lines = objectList[id].theText.length;
 			var num_words = objectList[id].theText[num_lines-1].length;
@@ -1051,19 +1095,15 @@ $().ready( function() {
 				objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key);
 				objectList[id].theText[num_lines-1].push(new String());
 			}
-			else{ //alphanumeric
-				if(e.shiftKey)
-					objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key);
-				else{
-					objectList[id].theText[num_lines-1][num_words-1] += String.fromCharCode(key+32);
-					}
-			}
+			var keychar = jsKeyToChar(key,e);
+			if(keychar)
+				objectList[id].theText[num_lines-1][num_words-1] += keychar;
 			num_lines = objectList[id].theText.length;
 			num_words = objectList[id].theText[num_lines-1].length;
 			var max = objectList[id].strpixel;
 			for(var i=0; objectList[id].theText && i< num_lines; i++){
 				var t = 0;
-				for(var j=0; objectList[id].theText[num_lines-1] && j<num_words ; j++){
+				for(var j=0; objectList[id].theText[i][j] && j<num_words ; j++){
 					t += objectList[id].theText[i][j].length;
 				}
 				if(t > max){
@@ -1073,6 +1113,11 @@ $().ready( function() {
 			}
 		    return;
 		}
+	}
+    
+    $(document).keydown(function(e) {
+        var key = e.which;
+		editText(key,e);
 		
         // Ctrl-Z or CMD-Z for Undo   Shift-* for Redo
         if ((e.ctrlKey) && ((key == 122 || key == 90))) {  // CTRL-Z
