@@ -127,10 +127,8 @@ function refreshCanvas() {
         else // landscape
             ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
     }
-	//ctx.translate(.5,.5);
 	
     //Redraw every object at the current zoom
-    // Redraw every object at the current zoom
 
 	//console.log(x1+ " " + y1);
 	//console.log(ctx.canvas.width);
@@ -490,7 +488,7 @@ function pointerDown(e) {
                     pts: [[x, y]]
                 };
                 if(curFillId != "") {
-                    dObj.pattern = makePattern(curFillId);
+                    dObj.patternId = curFillId;
                 }
                 createFill(dObj);
                 break;
@@ -587,9 +585,9 @@ function pointerMove(e) {
                 myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
                 $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
-			case "textbox":
-				placeTextArea(x,y);
-				break;
+        case "textbox":
+            placeTextArea(x,y);
+            break;
         }
     }
 }
@@ -801,11 +799,12 @@ function clearAll() {
     idPtr = 0;
     actionPtr = 0;
     selectedId = -1;
+    background = undefined;
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
-	document.onselectstart = function () { return false; };
+    document.onselectstart = function () { return false; };
     document.body.style.cursor="url(img/paintbrush.png) 0 28, default"; // sets the default cursor to the paintbrush
     //Ceate Color picker
     myCP = new ColorPicker();
@@ -817,13 +816,13 @@ $().ready( function() {
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
-	toolbar = document.getElementById('toolbar');
+
+    toolbar = document.getElementById('toolbar');
 	
-	canvas.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
+    canvas.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
     canvas.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     canvas.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
     
-
     // Bind an action.
     $('#drawing_canvas').contextmenu(function() {    // takes right-clicks
         if (curTool == 'zoom'){
@@ -844,7 +843,7 @@ $().ready( function() {
 
     // Bind the undo function to the undo button.
     $('#undo').click( undo );
-	$('#undo').on('tap', undo);
+    $('#undo').on('tap', undo);
 
     // Bind the redo function to the redo button.
     $('#redo').click( redo );
@@ -858,7 +857,13 @@ $().ready( function() {
     $('#save').click( function() {
         createSaveFile();
     });
-	
+
+    document.getElementById('upload').addEventListener( 'change', handleUploadEvent );
+
+    $('#open').click( function() {
+        $('#upload').click();
+    });
+
     $('#download').click( function() {
         //downloadImage();
         window.open(canvas.toDataURL(), "Drawing", canvas.width, canvas.height);
@@ -1088,6 +1093,8 @@ $().ready( function() {
 	}
     
     $(document).keydown(function(e) {
+        e.preventDefault();
+
         var key = e.which;
 		editText(key,e);
 		
