@@ -779,11 +779,12 @@ function clearAll() {
     idPtr = 0;
     actionPtr = 0;
     selectedId = -1;
+    background = undefined;
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
-	document.onselectstart = function () { return false; };
+    document.onselectstart = function () { return false; };
     document.body.style.cursor="url(img/paintbrush.png) 0 28, default"; // sets the default cursor to the paintbrush
     //Ceate Color picker
     myCP = new ColorPicker();
@@ -795,13 +796,13 @@ $().ready( function() {
 
     // Get our canvas.
     canvas = document.getElementById('drawing_canvas');
-	toolbar = document.getElementById('toolbar');
+
+    toolbar = document.getElementById('toolbar');
 	
-	canvas.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
+    canvas.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
     canvas.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     canvas.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
     
-
     // Bind an action.
     $('#drawing_canvas').contextmenu(function() {    // takes right-clicks
         if (curTool == 'zoom'){
@@ -822,7 +823,7 @@ $().ready( function() {
 
     // Bind the undo function to the undo button.
     $('#undo').click( undo );
-	$('#undo').on('tap', undo);
+    $('#undo').on('tap', undo);
 
     // Bind the redo function to the redo button.
     $('#redo').click( redo );
@@ -836,7 +837,13 @@ $().ready( function() {
     $('#save').click( function() {
         createSaveFile();
     });
-	
+
+    document.getElementById('upload').addEventListener( 'change', handleUploadEvent );
+
+    $('#open').click( function() {
+        $('#upload').click();
+    });
+
     $('#download').click( function() {
         //downloadImage();
         window.open(canvas.toDataURL(), "Drawing", canvas.width, canvas.height);
