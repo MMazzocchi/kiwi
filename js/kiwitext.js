@@ -190,7 +190,7 @@ function createTextBalloon(dObj) {
             -this.rotation );
 
             var scaleIcon = document.getElementById('resize_icon');
-            ctx.drawImage(scaleIcon, leftCorner[0]-64, leftCorner[1]-64);
+            ctx.drawImage(scaleIcon, leftCorner[0]-32, leftCorner[1]-32);
 
         var rightCorner = transformPoint(
             this.rCorner[0]-this.mx, this.lCorner[1]-this.my,
@@ -199,7 +199,7 @@ function createTextBalloon(dObj) {
             -this.rotation );
 
             var rotateIcon = document.getElementById('rotate_icon');
-            ctx.drawImage(rotateIcon, rightCorner[0], rightCorner[1]-64);
+            ctx.drawImage(rotateIcon, rightCorner[0]-32, rightCorner[1]-32);
             
         var leftBottom = transformPoint(
             this.lCorner[0]-this.mx, this.rCorner[1]-this.my,
@@ -208,7 +208,7 @@ function createTextBalloon(dObj) {
             -this.rotation );
 
             var downIcon = document.getElementById('arrow_down');
-            ctx.drawImage(downIcon, leftBottom[0]-48, leftBottom[1]);
+            ctx.drawImage(downIcon, leftBottom[0]-32, leftBottom[1]-32);
 
         var rightBottom = transformPoint(
             this.rCorner[0]-this.mx, this.rCorner[1]-this.my,
@@ -217,7 +217,7 @@ function createTextBalloon(dObj) {
             -this.rotation );
 
             var upIcon = document.getElementById('arrow_up');
-            ctx.drawImage(upIcon, rightBottom[0]+16, rightBottom[1]);
+            ctx.drawImage(upIcon, rightBottom[0]-32, rightBottom[1]-32);
 
     }
 
@@ -258,9 +258,9 @@ function createTextBalloon(dObj) {
             -this.rotation );
 
         if(distance([x,y],[leftCorner[0]-32, leftCorner[1]-32]) < 32) { return 'scale'; }
-        else if(distance([x,y],[rightCorner[0]+32, rightCorner[1]-32]) < 32) { return 'rotate'; }
-        else if(distance([x,y],[rightBottom[0]+16, rightBottom[1]]) < 32) { return 'layerUp'; }
-        else if(distance([x,y],[leftBottom[0]-16, leftBottom[1]+16]) < 32) { return 'layerDown'; } 
+        else if(distance([x,y],[rightCorner[0]-32, rightCorner[1]-32]) < 32) { return 'rotate'; }
+        else if(distance([x,y],[rightBottom[0]-32, rightBottom[1]-32]) < 32) { return 'layerUp'; }
+        else if(distance([x,y],[leftBottom[0]-32, leftBottom[1]-32]) < 32) { return 'layerDown'; } 
         else { return false; }
     }
 
