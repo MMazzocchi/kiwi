@@ -743,12 +743,6 @@ function updateOpac(slideAmount) {        // gets opacity from slider and sets t
     alpha = slideAmount/100;
     myCP.updateColor();
 }
-
-function updateTint(slideAmount) {        // gets tint from slider and sets the light setting in the color picker
-    myCP.curL = slideAmount;
-    myCP.updateColor();
-}
-
 function SelectTool(toolName) // selects proper tool based off of what user has clicked
 {
     switch (toolName) {
@@ -999,22 +993,7 @@ $().ready( function() {
 	
     $('#clear').click( function() {
         clearAll();
-    });
-    
-    $( '#tintSlider' ).slider({
-        orientation: "horizontal",
-        range: "min",
-        min: 0,
-        max: 100,
-        value: myCP.curL,
-        slide: function( event, ui ) {
-            updateTint( ui.value );
-        },
-        change: function( event, ui ) {
-            updateTint( ui.value );
-        }
-    });
-    
+    });   
     $( "#opacitySlider" ).slider({
         orientation: "horizontal",
         range: "min",
