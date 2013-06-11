@@ -1,34 +1,4 @@
-function drawBalloon2(ctx, x, y, w, h, radius,lw){
-    var r = x + w;
-    var b = y + h
-    ctx.save();
-        ctx.beginPath();
-        ctx.strokeStyle="#000000";
-        ctx.lineWidth=lw;
-        ctx.moveTo(x+radius, y);
-        ctx.lineTo(r-radius, y);
-        ctx.quadraticCurveTo(r, y, r, y+radius);
-        ctx.lineTo(r, b-radius);
-        ctx.quadraticCurveTo(r, b, r-radius, b);
-        ctx.lineTo(x+radius, b);
-        ctx.quadraticCurveTo(x, b, x, b-radius);
-        ctx.lineTo(x, y+radius);
-        ctx.quadraticCurveTo(x, y, x+radius, y);
-        ctx.stroke();
-        ctx.fill();
-        
-        var cx = x+w/2;
-        var cy = y+h/2;
-        ctx.beginPath();
-        ctx.moveTo(cx + radius, cy);
-        ctx.lineTo(0,0);
-        ctx.lineTo(cx - radius, cy);
-        ctx.stroke();
-        ctx.fill();
-    ctx.restore();
-}
-
-function drawBalloon3(ctx, ptx, pty, lx, ly, bw, bh, radius, lw){
+function drawBalloon(ctx, ptx, pty, lx, ly, bw, bh, radius, lw){
 
     ctx.save();
         ctx.beginPath();
@@ -62,15 +32,13 @@ function drawBalloon3(ctx, ptx, pty, lx, ly, bw, bh, radius, lw){
 function placeTextArea(x,y){
     var dObj = objectList[layerList[layerList.length-1]];
     dObj.tPos = [x,y];
-//    if(dObj.type == "box"){
-        dObj.lCorner[0] = dObj.pts[0] < dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
-        dObj.lCorner[1] = dObj.pts[1] < dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
-        dObj.rCorner[0] = dObj.pts[0] > dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
-        dObj.rCorner[1] = dObj.pts[1] > dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
-        
-        dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
-        dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
-//    }
+    dObj.lCorner[0] = dObj.pts[0] < dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
+    dObj.lCorner[1] = dObj.pts[1] < dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
+    dObj.rCorner[0] = dObj.pts[0] > dObj.tPos[0] ? dObj.pts[0] : dObj.tPos[0];
+    dObj.rCorner[1] = dObj.pts[1] > dObj.tPos[1] ? dObj.pts[1] : dObj.tPos[1];
+    
+    dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
+    dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
 }
 
 function createTextBalloon(dObj) {
@@ -89,46 +57,14 @@ function createTextBalloon(dObj) {
         this.width = max_length;
         this.height = this.fontSize*this.theText.length+10;
 
-        var tx = this.tx = this.tPos[0]-this.pts[0] ;
-        var ty = this.ty = this.tPos[1]-this.pts[1] ;
+        this.tx = this.tPos[0]-this.pts[0] ;
+        this.ty = this.tPos[1]-this.pts[1] ;
 
-        var bw = this.bw = max_length;
-        var bh = this.bh = this.fontSize*this.theText.length+10;
+        this.bw = max_length;
+        this.bh = this.fontSize*this.theText.length+10;
 
-        var w = this.width = this.tPos[0]-this.pts[0];
-
-/*
-        if(this.tPos[0]<this.pts[0] && this.tPos[0]+bw > this.pts[0]){
-            this.width = bw;
-            this.rCorner[0] = this.tPos[0]+bw;
-        }
-        else if(this.tPos[0]>this.pts[0]){
-            this.width = w+bw;
-            this.rCorner[0] = this.pts[0]+this.width;
-        }
-        else if(this.tPos[0]<this.pts[0]){
-            this.width = w;
-            this.rCorner[0] = this.pts[0];
-        }
-*/
-        var h = this.height =this.tPos[1]- this.pts[1];
-/*
-        if(this.tPos[1]<this.pts[1] && this.tPos[1]+bh > this.pts[1]){
-            this.height = bh;
-            this.rCorner[1] = this.tPos[1]+bh;
-        }
-        else if(this.tPos[1]>this.pts[1]){
-            this.height = h+bh;
-            this.rCorner[1] = this.pts[1]+this.height;
-        }
-        else if(this.tPos[1]<this.pts[1]){
-            this.height = h;
-            this.rCorner[1] = this.pts[1];
-        }
-*/
-
-        this.rCorner[0] = this.pts[0] > this.tPos[0]+bw ? this.pts[0] : this.tPos[0]+bw;
-        this.rCorner[1] = this.pts[1] > this.tPos[1]+bh ? this.pts[1] : this.tPos[1]+bh;
+        this.rCorner[0] = this.pts[0] > this.tPos[0]+this.bw ? this.pts[0] : this.tPos[0]+this.bw;
+        this.rCorner[1] = this.pts[1] > this.tPos[1]+this.bh ? this.pts[1] : this.tPos[1]+this.bh;
         
         this.mx = (this.lCorner[0]+this.rCorner[0])/2;
         this.my = (this.lCorner[1]+this.rCorner[1])/2;
@@ -144,9 +80,7 @@ function createTextBalloon(dObj) {
                     var met = ctx.measureText(this.theText[i][k]);
                     line_length += met.width;
                 }
-//                ctx.fillText(this.theText[i][j],this.tx+15 + line_length,this.ty+(i+1)*this.fontSize+2);
                 ctx.fillText(this.theText[i][j], this.tPos[0]-this.mx+15 + line_length, this.tPos[1]-this.my+(i+1)*this.fontSize+2);
-                //ctx.fillText(this.theText[i][j],-this.width/2+10 + line_length,-this.height/2+(i+1)*this.fontSize+2);
             }
         }
     }
@@ -192,12 +126,9 @@ function createTextBalloon(dObj) {
                 ctx.rotate(this.rotation);
                 ctx.scale(xScale,yScale);
                 ctx.save();
-                drawBalloon3(ctx, this.pts[0]-this.mx, this.pts[1]-this.my, this.tPos[0]-this.mx, this.tPos[1]-this.my, this.bw, this.bh, 15, 8);
+                drawBalloon(ctx, this.pts[0]-this.mx, this.pts[1]-this.my, this.tPos[0]-this.mx, this.tPos[1]-this.my, this.bw, this.bh, 15, 8);
                 ctx.globalCompositeOperation = "lighter";
-                drawBalloon3(ctx, this.pts[0]-this.mx, this.pts[1]-this.my, this.tPos[0]-this.mx, this.tPos[1]-this.my, this.bw, this.bh, 15, 8);
-//                    drawBalloon2(ctx,this.tx,this.ty,this.bw, this.bh, 15,8);
-//                    ctx.globalCompositeOperation = "lighter";
-//                    drawBalloon2(ctx,this.tx,this.ty,this.bw, this.bh, 15,1);
+                drawBalloon(ctx, this.pts[0]-this.mx, this.pts[1]-this.my, this.tPos[0]-this.mx, this.tPos[1]-this.my, this.bw, this.bh, 15, 8);
                 ctx.restore();
                 this.drawBalloonText(ctx);
             }
