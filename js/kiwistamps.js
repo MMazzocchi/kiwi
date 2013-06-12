@@ -121,7 +121,7 @@ function createStamp(dObj) {
             -this.rotation );
 
             var downIcon = document.getElementById('arrow_down');
-            ctx.drawImage(downIcon, leftBottom[0], leftBottom[1]-32);
+            ctx.drawImage(downIcon, leftBottom[0]-32, leftBottom[1]-32);
 
         var rightBottom = transformPoint(
             (this.bound[0]/2), (this.bound[1]/2),
