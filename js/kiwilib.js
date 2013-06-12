@@ -829,7 +829,7 @@ $().ready( function() {
     toolbar = document.getElementById('toolbar');
 	
     canvas.addEventListener( 'touchstart', function(e) {
-//e.preventDefault(); 
+e.preventDefault(); 
 }, false);
     canvas.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     canvas.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
