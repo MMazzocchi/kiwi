@@ -1099,6 +1099,8 @@ $().ready( function() {
   $('#rotate_icon').load(function() {});
   $('#arrow_up').load(function() {});
   $('#arrow_down').load(function() {});
+  $('#slider_img').load(function() {});
+  $('#slider_line').load(function() {});
 
     // Redraw.
     setInterval(refreshCanvas, 10);
