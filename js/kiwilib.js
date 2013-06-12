@@ -806,8 +806,6 @@ function clearAll() {
 
 function showKeyboard() {
     console.log("Keyboard requested.");
-//    objectList[0].color = "black";
-//    $('#textBox').focus();
     document.getElementById('t').focus();
 }
 
@@ -829,7 +827,7 @@ $().ready( function() {
     toolbar = document.getElementById('toolbar');
 	
     canvas.addEventListener( 'touchstart', function(e) {
-e.preventDefault(); 
+//e.preventDefault(); 
 }, false);
     canvas.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     canvas.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
