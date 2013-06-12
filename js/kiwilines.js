@@ -108,7 +108,7 @@ function startLine(dObj) {
             -this.rotation );
 
             var downIcon = document.getElementById('arrow_down');
-            ctx.drawImage(downIcon, leftBottom[0], leftBottom[1]-32);
+            ctx.drawImage(downIcon, leftBottom[0]-32, leftBottom[1]-32);
 
         var rightBottom = transformPoint(
             this.rCorner[0]-this.mx, this.rCorner[1]-this.my,

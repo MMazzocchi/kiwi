@@ -24,31 +24,56 @@ var svgList = {
 // Create a bitmap from this object
 function createBMP(dObj){
     var scanvas = document.createElement('canvas');
-    scanvas.width = dObj.bound[2];
-    scanvas.height = dObj.bound[3];
+    scanvas.width = dObj.bound[0];
+    scanvas.height = dObj.bound[1];
     var sctx = scanvas.getContext('2d');
-	canvg(scanvas,dObj.url);
- //   sctx.drawSvg(dObj.url, 0, 0, 0, 0);
+	//canvg(scanvas,dObj.url);
+    sctx.drawSvg(dObj.url, 0, 0, 0, 0);
     dObj.scanvas = scanvas;
 }
 
 // Create a stamp from this object
 function createStamp(dObj) {
     assignID(dObj);
-
+	
+	dObj.rerenderSvg = function(){
+		var scanvas = document.createElement('canvas');
+		var axScale = Math.abs(this.xScale);
+		var ayScale = Math.abs(this.yScale);
+		var bx = this.bound[0]/this.pbound[0];
+		var by = this.bound[1]/this.pbound[1];
+		scanvas.width = this.bound[0] = this.bound[0]*axScale;
+		scanvas.height = this.bound[1] = this.bound[1]*ayScale;
+		var sctx = scanvas.getContext('2d');
+		console.log(this.bound[0]);
+		console.log(this.pbound[0]);
+		console.log(svgList['butterfly'].bounds[2]);
+		sctx.scale(bx,by);
+		sctx.scale(axScale,ayScale);
+		//canvg(scanvas,this.url);
+		sctx.drawSvg(this.url, 0, 0, 0, 0);
+		this.scanvas = scanvas;
+		this.cx = this.cx*axScale;
+		this.cy = this.cy*ayScale;
+		this.yScale = this.yScale/Math.abs(this.yScale);
+		this.xScale = this.yScale/Math.abs(this.yScale);
+		
+	}
     // Draw the stamp
     dObj.draw = function(ctx) {
         var xScale = this.xScale;
         var yScale = this.yScale;
-
-        var bound = [this.bound[2],this.bound[3]];
+        var bound = [this.bound[0],this.bound[1]];
 
         ctx.save();
             ctx.globalAlpha = this.opacity;
             ctx.beginPath();
             ctx.translate(this.pts[0],this.pts[1]);
             ctx.rotate(this.rotation);
-            ctx.scale(xScale,yScale);
+			if(isDragging)
+				ctx.scale(xScale,yScale);
+			else
+				ctx.scale(xScale,yScale);
             ctx.drawImage(dObj.scanvas,-dObj.cx,-dObj.cy);
         ctx.restore();
     };
@@ -74,7 +99,7 @@ function createStamp(dObj) {
     // Draw the rotate/scale icons in the top corners of this stamp.
     dObj.drawIcons = function(ctx) {
         var leftCorner = transformPoint(
-            -(this.bound[2]/2), -(this.bound[3]/2),
+            -(this.bound[0]/2), -(this.bound[1]/2),
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
@@ -83,7 +108,7 @@ function createStamp(dObj) {
             ctx.drawImage(scaleIcon, leftCorner[0]-32, leftCorner[1]-32);
 
         var rightCorner = transformPoint(
-            (this.bound[2]/2), -(this.bound[3]/2),
+            (this.bound[0]/2), -(this.bound[1]/2),
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
@@ -92,16 +117,16 @@ function createStamp(dObj) {
             ctx.drawImage(rotateIcon, rightCorner[0]-32, rightCorner[1]-32);
 			
 		var leftBottom = transformPoint(
-            -(this.bound[2]/2), (this.bound[3]/2),
+            -(this.bound[0]/2), (this.bound[1]/2),
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
 
             var downIcon = document.getElementById('arrow_down');
-            ctx.drawImage(downIcon, leftBottom[0], leftBottom[1]-32);
+            ctx.drawImage(downIcon, leftBottom[0]-32, leftBottom[1]-32);
 
         var rightBottom = transformPoint(
-            (this.bound[2]/2), (this.bound[3]/2),
+            (this.bound[0]/2), (this.bound[1]/2),
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
@@ -118,29 +143,29 @@ function createStamp(dObj) {
 
     // Scale this object based on a a change of dx and dy in the scale icon's position
     dObj.scale = function(dx, dy) {
-        this.xScale -= (dx/(this.bound[2]/2));
-        this.yScale -= (dy/(this.bound[3]/2));
+        this.xScale -= (dx/(this.bound[0]/2));
+        this.yScale -= (dy/(this.bound[1]/2));
     }
 	
     // Return if x and y were inside of an icon and which icon
     dObj.iconClicked = function(x,y) {
         var leftCorner = transformPoint(
-            -this.bound[2]/2, -this.bound[3]/2,
+            -this.bound[0]/2, -this.bound[1]/2,
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
         var rightCorner = transformPoint(
-            this.bound[2]/2, -this.bound[3]/2,
+            this.bound[0]/2, -this.bound[1]/2,
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
 		var leftBottom = transformPoint(
-            -(this.bound[2]/2), (this.bound[3]/2),
+            -(this.bound[0]/2), (this.bound[1]/2),
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
         var rightBottom = transformPoint(
-            (this.bound[2]/2), (this.bound[3]/2),
+            (this.bound[0]/2), (this.bound[1]/2),
             this.pts[0], this.pts[1],
             this.xScale, this.yScale,
             -this.rotation );
@@ -175,6 +200,7 @@ function createStamp(dObj) {
         undo: function() {
             layerList.splice(layerList.length-1,1);
 			selectedId = -1;
+			
         },
         redo: function() {
             layerList[layerList.length] = dObj.id;
