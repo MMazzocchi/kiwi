@@ -162,7 +162,7 @@ function createTextBalloon(dObj) {
                 showKeyboard();
                 return true;
             }
-            canvas.focus();
+            window.focus();
             return false;
         }
         else{
@@ -170,7 +170,7 @@ function createTextBalloon(dObj) {
                 showKeyboard();
                 return true;
             }
-            canvas.focus();
+            window.focus();
             return false;
         }
     };
