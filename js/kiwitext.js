@@ -158,12 +158,16 @@ function createTextBalloon(dObj) {
             var t = this.tPos;
             var d = [pts[0]+(t[0]-pts[0])*this.xScale,pts[1]+(t[1]-pts[1])*this.yScale];
             var s = [this.xScale,this.yScale];
-            return x >= d[0] && y >= d[1] && x < d[0]+bw && y < d[1]+bh;
+            if( x >= d[0] && y >= d[1] && x < d[0]+bw && y < d[1]+bh) {
+                document.getElementById('text').focus();
+                return true;
+            }
         }
         else{
-            return (x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]);
+            if(x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]) {
+                document.getElementById('text').focus();
+            }
         }
-        $('#text').focus();
     };
 
     // Move this stamp by dx, dy
