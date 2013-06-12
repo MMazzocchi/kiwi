@@ -830,7 +830,7 @@ $().ready( function() {
 
     toolbar = document.getElementById('toolbar');
 	
-    canvas.addEventListener( 'touchstart', function(e) { e.preventDefault();}, false);
+    canvas.addEventListener( 'touchstart', function(e) { e.preventDefault(); showKeyboard(); }, false);
     canvas.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     canvas.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
     
@@ -850,10 +850,11 @@ $().ready( function() {
     $('#drawing_canvas').mouseup( pointerEnd );
     
     canvas.addEventListener('touchmove', pointerMove );
-    canvas.addEventListener('touchstart', 
+/*    canvas.addEventListener('touchstart', 
         showKeyboard
         //pointerDown
     );
+*/
     canvas.addEventListener('touchend', pointerEnd );
 	
 
