@@ -805,7 +805,7 @@ function clearAll() {
 }
 
 function showKeyboard() {
-    $('#text').focus();
+    $('#textBox').focus();
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
