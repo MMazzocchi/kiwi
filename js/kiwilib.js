@@ -536,7 +536,8 @@ function pointerDown(e) {
                 var id = ctx.getImageData(x, y, 1, 1);
                 var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
                 myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
-                $( "#tintSlider" ).slider( "value", hsl[2]*100);
+				console.log(alpha);
+                opacSlider.updateValue(90);
                 break;
             case "zoom":
 					isDragging = true;
@@ -583,7 +584,6 @@ function pointerMove(e) {
                 var id = ctx.getImageData(x, y, 1, 1);
                 var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
                 myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
-                $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
         case "textbox":
             placeTextArea(x,y);
@@ -732,15 +732,17 @@ function redo() {
         actionPtr++;
     }
 }
-
+/*
 function updateThick(slideAmount) {        // gets thickness from slider and sets the global thickness
     thickness = slideAmount;
     myCP.Refresh();
 }
-function updateOpac(slideAmount) {        // gets opacity from slider and sets the global opacity
-    alpha = slideAmount/100;
+function updateOpac(opac) {        // gets opacity from slider and sets the global opacity
+	console.log("here");
+    alpha = opac;
+	console.log("alpha: " + alpha);
     myCP.updateColor();
-}
+}*/
 function SelectTool(toolName) // selects proper tool based off of what user has clicked
 {
     switch (toolName) {
@@ -810,6 +812,13 @@ $().ready( function() {
     myCP = new ColorPicker();
     myCP.setHSL(0,90,50);
     
+	opacSlider = new OpacitySlider();
+	opacSlider.init("opacity");
+	opacSlider.updateValue(90);
+	
+	thickSlider = new OpacitySlider();
+	thickSlider.init("thickness");
+	thickSlider.updateValue(thickness);
     //Refresh on orientation changes
     window.addEventListener( 'resize', refreshCanvas );
     window.addEventListener( 'orientationchange', refreshCanvas );
@@ -999,7 +1008,7 @@ $().ready( function() {
     $('#clear').click( function() {
         clearAll();
     });   
-    $( "#opacitySlider" ).slider({
+/*    $( "#opacitySlider" ).slider({
         orientation: "horizontal",
         range: "min",
         min: 0,
@@ -1026,7 +1035,7 @@ $().ready( function() {
             updateThick( ui.value );
         }
     });
-	
+*/	
 	function jsKeyToChar(key,e){
 		if(key >=65 && key <= 90){ //alphanumeric
 			if(e.shiftKey)
