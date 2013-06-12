@@ -2,12 +2,12 @@
 
 function ColorPicker()
 {
-  var CPW = 80;
-  var CPH = 200;
+  var CPW = 90;
+  var CPH = 300;
   var xm = 0;
   
   this.curH = 0;
-  this.curS = 100;
+  this.curS = 255;
   this.curL = 50;
   
   var lastL = -1;
@@ -20,10 +20,10 @@ function ColorPicker()
   var dc = cpdisc.getContext('2d');
   for (var py = 0; py < CPH; ++py) {
     for (var px = 0; px < CPW; ++px) {
-	var h = py/200*360;
-    var s = 100-(px/80*100);
-    var l = this.curL;
-        dc.fillStyle = getHSLA( Math.floor(h), this.curS, Math.floor(s), 1 );
+	var h = py/CPH*360;
+    var l = 100-(px/CPW*100);
+    var s = this.curS;
+        dc.fillStyle = getHSLA( Math.floor(h), Math.floor(s), Math.floor(l), 1 );
         dc.fillRect(px,py,1,1);
     }
   }
@@ -51,20 +51,6 @@ function ColorPicker()
       lastL = this.curL;
       var dc = cpldisc.getContext('2d');
       dc.drawImage(cpdisc,0,0);
-      dc.save();
-      if (this.curL < 50) {
-        dc.globalAlpha = (50-this.curL)/50;
-        dc.fillStyle = '#000000';
-        dc.beginPath();
-		dc.fillRect(0,0,CPW,CPH);
-      }
-      else if (this.curL > 50) {
-        dc.globalAlpha = (this.curL-50)/50;
-        dc.fillStyle = '#FFFFFF';
-        dc.beginPath();
-		dc.fillRect(0,0,CPW, CPH);
-      }
-      dc.restore();
     }
     var dc = cpcanvas.getContext('2d');
     dc.clearRect(0,0,CPW+xm*2,CPH+xm*2);
@@ -89,8 +75,8 @@ function ColorPicker()
     dc.stroke();
     dc.restore();
 
-	py = this.curH*200/360+xm;
-	px = (100-this.curS)*80/100+xm;
+	py = this.curH*CPH/360+xm;
+	px = (100-this.curL)*CPW/100+xm;
 	h=py/200*360
     dc.save();
     dc.fillStyle = curColor;
@@ -130,12 +116,12 @@ function ColorPicker()
   {
     if (px >= xm && py >= xm && px < CPW+xm && py < CPH+xm)
     {
-      var h = (py-xm)/200*360;
-      var s = 100-((px-xm)/80*100);
-      var l = this.curL;
+      var h = (py-xm)/CPH*360;
+      var l = 100-((px-xm)/CPW*100);
+      var s = this.curS;
       this.curH = Math.round(h);
-      this.curS = Math.round(s);
-      curColor = getHSLA( this.curH, 255, Math.round(s), alpha );
+      this.curL = Math.round(l);
+      curColor = getHSLA( this.curH, this.curS, this.curL, alpha );
 	  myCP.Refresh();
     }
   }
