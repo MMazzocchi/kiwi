@@ -804,6 +804,10 @@ function clearAll() {
     background = undefined;
 }
 
+function showKeyboard() {
+    $('#text').focus();
+}
+
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
     document.onselectstart = function () { return false; };
@@ -834,6 +838,7 @@ $().ready( function() {
 
     $('#drawing_canvas').mousedown( function(event){
         pointerDown(event);
+        showKeyboard();
     });
     $('#drawing_canvas').mousemove( pointerMove );
     $('#drawing_canvas').mouseup( pointerEnd );
