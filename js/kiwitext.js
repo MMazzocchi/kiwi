@@ -162,11 +162,14 @@ function createTextBalloon(dObj) {
                 document.getElementById('text').focus();
                 return true;
             }
+            return false;
         }
         else{
             if(x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]) {
-                document.getElementById('text').focus();
+                $('#text').focus();
+                return true;
             }
+            return false;
         }
     };
 
