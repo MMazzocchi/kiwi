@@ -844,7 +844,7 @@ $().ready( function() {
     $('#drawing_canvas').mouseup( pointerEnd );
     
     canvas.addEventListener('touchmove', pointerMove );
-    canvas.addEventListener('touchstart', pointerDown );
+    canvas.addEventListener('touchstart', function(e) { showKeyboard(); pointerDown(e); } );
     canvas.addEventListener('touchend', pointerEnd );
 	
 
