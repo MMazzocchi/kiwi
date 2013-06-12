@@ -809,8 +809,6 @@ function showKeyboard() {
 //    objectList[0].color = "black";
 //    $('#textBox').focus();
     document.getElementById('t').focus();
-//    document.getElementById('t').select();
-//    document.getElementById('t').click();
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
@@ -832,7 +830,6 @@ $().ready( function() {
 	
     canvas.addEventListener( 'touchstart', function(e) {
 //e.preventDefault(); 
-//showKeyboard(); 
 }, false);
     canvas.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     canvas.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
