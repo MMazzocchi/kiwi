@@ -832,7 +832,8 @@ $().ready( function() {
 	
     canvas.addEventListener( 'touchstart', function(e) {
 //e.preventDefault(); 
-showKeyboard(); }, false);
+//showKeyboard(); 
+}, false);
     canvas.addEventListener( 'touchmove', function(e) { e.preventDefault();}, false);
     canvas.addEventListener( 'touchend', function(e) { e.preventDefault();}, false);
     
@@ -845,18 +846,13 @@ showKeyboard(); }, false);
 
     $('#drawing_canvas').mousedown( function(event){
         event.preventDefault();
-//        pointerDown(event);
-        showKeyboard();
+        pointerDown(event);
     });
     $('#drawing_canvas').mousemove( pointerMove );
     $('#drawing_canvas').mouseup( pointerEnd );
     
     canvas.addEventListener('touchmove', pointerMove );
-/*    canvas.addEventListener('touchstart', 
-        showKeyboard
-        //pointerDown
-    );
-*/
+    canvas.addEventListener('touchstart', pointerDown );
     canvas.addEventListener('touchend', pointerEnd );
 	
 
