@@ -43,7 +43,6 @@ function OpacitySlider()
   
 	this.setOpacity = function(opac)
 	{
-		console.log("poop");
 		alpha = opac/CPW;
 		myCP.updateColor();
 		this.Refresh();
@@ -73,7 +72,6 @@ function OpacitySlider()
 			px = x;
 			if(slide_type == "opacity"){
 				this.setOpacity(x);
-				console.log(x);
 			}
 			else if(slide_type == "thickness"){
 				this.setThickness(x);
@@ -85,7 +83,6 @@ function OpacitySlider()
 
 	function HandleClick(e)
 	{
-		console.log(slide_type);
 		e.preventDefault();
 		var ofst = $(this).offset();
 		var first = e;

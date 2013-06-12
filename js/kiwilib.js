@@ -538,7 +538,6 @@ function pointerDown(e) {
                 var id = ctx.getImageData(x, y, 1, 1);
                 var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
                 myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
-				console.log(alpha);
                 opacSlider.updateValue(90);
                 break;
             case "zoom":
