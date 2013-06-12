@@ -293,10 +293,12 @@ function applyZoom(x, y, curZoom, prevZoom){
 	var z1 = Math.pow(factor,prevZoom);
 	var z2 = zoom = Math.pow(factor,curZoom);
 	console.log(z1 + " " +z2);
+	 var r = z2/z1;
 	var px = x-zoomposx;
 	var py = y-zoomposy;
-	originx = (x/z2-x)+(px/z2-px);
-	originy = (y/z2-y)+(py/z2-py);
+	originx = (x/z2-x);
+	originy = (y/z2-y);
+
 
 	var newAct = {
 		undo: function() {
@@ -310,8 +312,8 @@ function applyZoom(x, y, curZoom, prevZoom){
 			zoomCount = curZoom;
 		}
 	};
-	zoomposx = x;
-	zoomposy = y;
+	zoomposx = originx;
+	zoomposy = originy;
 	addAction(newAct);
 	return false;
 }
