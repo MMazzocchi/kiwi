@@ -159,7 +159,7 @@ function createTextBalloon(dObj) {
             var d = [pts[0]+(t[0]-pts[0])*this.xScale,pts[1]+(t[1]-pts[1])*this.yScale];
             var s = [this.xScale,this.yScale];
             if( x >= d[0] && y >= d[1] && x < d[0]+bw && y < d[1]+bh) {
-//                document.getElementById('textfield').focus();
+                document.getElementById('textfield').focus();
                 return true;
             }
             return false;
