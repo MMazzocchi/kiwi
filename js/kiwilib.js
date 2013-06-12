@@ -808,8 +808,9 @@ function showKeyboard() {
     console.log("Keyboard requested.");
 //    objectList[0].color = "black";
 //    $('#textBox').focus();
-    document.getElementById('textBox').focus();
-    document.getElementById('textBox').focus();
+    document.getElementById('t').focus();
+//    document.getElementById('t').select();
+//    document.getElementById('t').click();
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
@@ -841,7 +842,8 @@ $().ready( function() {
     });
 
     $('#drawing_canvas').mousedown( function(event){
-   //     pointerDown(event);
+        event.preventDefault();
+//        pointerDown(event);
         showKeyboard();
     });
     $('#drawing_canvas').mousemove( pointerMove );
