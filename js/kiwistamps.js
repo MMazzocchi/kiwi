@@ -51,8 +51,8 @@ function createStamp(dObj) {
 		console.log(svgList['butterfly'].bounds[2]);
 		sctx.scale(bx,by);
 		sctx.scale(axScale,ayScale);
-		//canvg(scanvas,this.url);
-		sctx.drawSvg(this.url, 0, 0, 0, 0);
+		canvg(scanvas,this.url);
+		//sctx.drawSvg(this.url, 0, 0, 0, 0);
 		this.scanvas = scanvas;
 		this.cx = this.cx*axScale;
 		this.cy = this.cy*ayScale;

@@ -161,8 +161,8 @@ function endTransform(id, x, y, dragMode) {
             };
 
             addAction(newAct);
-			//if(objectList[id].type == "stamp")
-				//objectList[id].rerenderSvg();
+			if(objectList[id].type == "stamp")
+				objectList[id].rerenderSvg();
 			
             break;
     }
