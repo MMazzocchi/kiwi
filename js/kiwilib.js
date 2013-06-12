@@ -734,17 +734,7 @@ function redo() {
         actionPtr++;
     }
 }
-/*
-function updateThick(slideAmount) {        // gets thickness from slider and sets the global thickness
-    thickness = slideAmount;
-    myCP.Refresh();
-}
-function updateOpac(opac) {        // gets opacity from slider and sets the global opacity
-	console.log("here");
-    alpha = opac;
-	console.log("alpha: " + alpha);
-    myCP.updateColor();
-}*/
+
 function SelectTool(toolName) // selects proper tool based off of what user has clicked
 {
     switch (toolName) {
@@ -815,14 +805,14 @@ function showKeyboard() {
 $().ready( function() {
     document.onselectstart = function () { return false; };
     document.body.style.cursor="url(img/paintbrush.png) 0 28, default"; // sets the default cursor to the paintbrush
-    //Ceate Color picker
+    //Create Color picker
     myCP = new ColorPicker();
     myCP.setHSL(0,90,50);
-    
+    //Create Opacity Slider
 	opacSlider = new OpacitySlider();
 	opacSlider.init("opacity");
 	opacSlider.updateValue(90);
-	
+	//Create Thickness Slider
 	thickSlider = new OpacitySlider();
 	thickSlider.init("thickness");
 	thickSlider.updateValue(thickness);
@@ -1017,35 +1007,8 @@ $().ready( function() {
 	
     $('#clear').click( function() {
         clearAll();
-    });   
-/*    $( "#opacitySlider" ).slider({
-        orientation: "horizontal",
-        range: "min",
-        min: 0,
-        max: 100,
-        value: 100,
-        slide: function( event, ui ) {
-            updateOpac( ui.value );
-        },
-        change: function( event, ui ) {
-            updateOpac( ui.value );
-        }
     });
-    
-    $( "#thicknessSlider" ).slider({
-        orientation: "horizontal",
-        range: "min",
-        min: 4,
-        max: 80,
-        value: 25,
-        slide: function( event, ui ) {
-            updateThick( ui.value );
-        },
-        change: function( event, ui ) {
-            updateThick( ui.value );
-        }
-    });
-*/	
+	
 	function jsKeyToChar(key,e){
 		if(key >=65 && key <= 90){ //alphanumeric
 			if(e.shiftKey)
@@ -1131,41 +1094,6 @@ $().ready( function() {
             }
             return false;
         }
-        
-        switch (key) {
-			case 97:  // A = AIRBRUSH
-			  document.body.style.cursor="url(img/spraycan.png)0 5, default";
-			  SelectTool('spraycan');
-              break;
-            case 100: // D=DRAW
-              document.body.style.cursor="url(img/paintbrush.png)0 28, default";
-              SelectTool('draw');
-              break;
-            case 101: // E=ERASE
-              document.body.style.cursor="url(img/eraser.png)0 28, default";
-              SelectTool('erase');
-              break;
-            case 102: // F=FILL
-              document.body.style.cursor="url(img/paintbucket.png), default";
-              SelectTool('fill');
-              break;
-			case 112: // P=PENCIL
-              document.body.style.cursor="url(img/pencil.png)0 28, default";
-			  SelectTool('pencil');
-              break;
-			case 113: // Q=SHAPE
-			  SelectTool('square');
-              break;
-            case 115: // S=SELECT
-              document.body.style.cursor="url(img/hand-tool.png)14 6, default";
-              SelectTool('select');
-              break;
-            case 103:  // G=DROPPER
-              document.body.style.cursor="url(img/dropper.png)0 28, default";
-              SelectTool('dropper');
-              break;
-        }
-        
     });
 
   $('#resize_icon').load(function() {});
