@@ -1101,7 +1101,7 @@ $().ready( function() {
         e.preventDefault();
 
         var key = e.which;
-		editText(key,e);
+        editText(key,e);
 		
         // Ctrl-Z or CMD-Z for Undo   Shift-* for Redo
         if ((e.ctrlKey) && ((key == 122 || key == 90))) {  // CTRL-Z

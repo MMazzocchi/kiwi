@@ -163,6 +163,7 @@ function createTextBalloon(dObj) {
         else{
             return (x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]);
         }
+        $('#text').click();
     };
 
     // Move this stamp by dx, dy
