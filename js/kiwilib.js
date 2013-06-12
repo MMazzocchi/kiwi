@@ -806,7 +806,7 @@ function clearAll() {
 
 function showKeyboard() {
     console.log("Keyboard requested.");
-    objectList[0].color = "black";
+//    objectList[0].color = "black";
 //    $('#textBox').focus();
     document.getElementById('textBox').focus();
 }
@@ -840,14 +840,17 @@ $().ready( function() {
     });
 
     $('#drawing_canvas').mousedown( function(event){
-        pointerDown(event);
+   //     pointerDown(event);
         showKeyboard();
     });
     $('#drawing_canvas').mousemove( pointerMove );
     $('#drawing_canvas').mouseup( pointerEnd );
     
     canvas.addEventListener('touchmove', pointerMove );
-    canvas.addEventListener('touchstart', function(e) { showKeyboard(); pointerDown(e); } );
+    canvas.addEventListener('touchstart', function(e) { 
+        showKeyboard();
+        //pointerDown(e); 
+    } );
     canvas.addEventListener('touchend', pointerEnd );
 	
 
