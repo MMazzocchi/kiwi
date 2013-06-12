@@ -805,6 +805,8 @@ function clearAll() {
 }
 
 function showKeyboard() {
+    console.log("Keyboard requested.");
+    objectList[0].color = "black";
     $('#textBox').focus();
 }
 
