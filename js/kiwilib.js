@@ -809,6 +809,7 @@ function showKeyboard() {
 //    objectList[0].color = "black";
 //    $('#textBox').focus();
     document.getElementById('textBox').focus();
+    document.getElementById('textBox').focus();
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
