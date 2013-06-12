@@ -27,14 +27,15 @@ function createBMP(dObj){
     scanvas.width = dObj.bound[0];
     scanvas.height = dObj.bound[1];
     var sctx = scanvas.getContext('2d');
-	//canvg(scanvas,dObj.url);
-    sctx.drawSvg(dObj.url, 0, 0, 0, 0);
+	canvg(scanvas,dObj.url);
+    //sctx.drawSvg(dObj.url, 0, 0, 0, 0);
     dObj.scanvas = scanvas;
 }
 
 // Create a stamp from this object
 function createStamp(dObj) {
     assignID(dObj);
+	
 	
 	dObj.rerenderSvg = function(){
 		var scanvas = document.createElement('canvas');
@@ -70,10 +71,7 @@ function createStamp(dObj) {
             ctx.beginPath();
             ctx.translate(this.pts[0],this.pts[1]);
             ctx.rotate(this.rotation);
-			if(isDragging)
-				ctx.scale(xScale,yScale);
-			else
-				ctx.scale(xScale,yScale);
+			ctx.scale(xScale,yScale);
             ctx.drawImage(dObj.scanvas,-dObj.cx,-dObj.cy);
         ctx.restore();
     };

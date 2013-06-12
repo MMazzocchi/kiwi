@@ -508,9 +508,9 @@ function pointerDown(e) {
 					type: "stamp"
                 };    
 
-
                 createBMP(dObj);
                 createStamp(dObj);
+				
                 break;
             case "textbox":
                 var dObj = {
