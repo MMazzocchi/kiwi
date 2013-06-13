@@ -17,6 +17,7 @@
 <script type="text/javascript" src="js/kiwibind.js"></script>
 <script type="text/javascript" src="js/kiwisave.js"></script>
 <Script type="text/javascript" src="js/kiwitext.js"></script>
+<Script type="text/javascript" src="js/kiwisliders.js"></script>
 
 <script type="text/javascript" src="js/color_picker.js"></script>
 
@@ -50,16 +51,8 @@
 <textarea id="t" rows="1" cols="1" style="opacity:0" ></textarea>
         </span>
 		<div class="cp_canvas"><canvas id="colorpicker_canvas"></canvas></div>
-        <div id="sliders">
-            <span>
-                <label for="thicknessSlider">Thickness:</label>
-                <div id="thicknessSlider" class="slider"></div>
-            </span>
-            <span>
-                <label for="opacitySlider">Opacity:</label>
-                <div id="opacitySlider" class="slider"></div>
-            </span>
-        </div>
+		<div class="o_canvas"><canvas id="opac_canvas"></canvas></div>
+		<div class="t_canvas"><canvas id="thick_canvas"></canvas></div>
         <span>
 			<a class="icon" id="zoom"><img src="img/search.png" alt="Zoom" title="Zoom" /></a>
             <a class="icon" id="hand"><img src="img/hand-tool.png" alt="Hand" title="Hand" /></a>
@@ -98,6 +91,8 @@
 <img id="arrow_up" style="display:none;" src="img/arrowup.png" />
 <img id="arrow_down" style="display:none;" src="img/arrowdown.png" />
 <img id="stone" style="display:none;" src="img/stone.jpg" />
+<img id="slider_img" style="display:none;" src="img/obj_slider_bg.png" />
+<img id="slider_line" style="display:none;" src="img/obj_slider_line_blue.png" />
 <input type="file" id="upload" name="file" style="display:none" />
 </body>
 </html>

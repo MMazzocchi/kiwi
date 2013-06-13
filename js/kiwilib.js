@@ -293,10 +293,12 @@ function applyZoom(x, y, curZoom, prevZoom){
 	var z1 = Math.pow(factor,prevZoom);
 	var z2 = zoom = Math.pow(factor,curZoom);
 	console.log(z1 + " " +z2);
+	 var r = z2/z1;
 	var px = x-zoomposx;
 	var py = y-zoomposy;
-	originx = (x/z2-x)+(px/z2-px);
-	originy = (y/z2-y)+(py/z2-py);
+	originx = (x/z2-x);
+	originy = (y/z2-y);
+
 
 	var newAct = {
 		undo: function() {
@@ -310,8 +312,8 @@ function applyZoom(x, y, curZoom, prevZoom){
 			zoomCount = curZoom;
 		}
 	};
-	zoomposx = x;
-	zoomposy = y;
+	zoomposx = originx;
+	zoomposy = originy;
 	addAction(newAct);
 	return false;
 }
@@ -508,9 +510,9 @@ function pointerDown(e) {
 					type: "stamp"
                 };    
 
-
                 createBMP(dObj);
                 createStamp(dObj);
+				
                 break;
             case "textbox":
                 var dObj = {
@@ -538,7 +540,7 @@ function pointerDown(e) {
                 var id = ctx.getImageData(x, y, 1, 1);
                 var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
                 myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
-                $( "#tintSlider" ).slider( "value", hsl[2]*100);
+                opacSlider.updateValue(90);
                 break;
             case "zoom":
 					isDragging = true;
@@ -585,7 +587,6 @@ function pointerMove(e) {
                 var id = ctx.getImageData(x, y, 1, 1);
                 var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
                 myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
-                $( "#tintSlider" ).slider( "value", hsl[2]*100);
                 break;
         case "textbox":
             placeTextArea(x,y);
@@ -735,14 +736,6 @@ function redo() {
     }
 }
 
-function updateThick(slideAmount) {        // gets thickness from slider and sets the global thickness
-    thickness = slideAmount;
-    myCP.Refresh();
-}
-function updateOpac(slideAmount) {        // gets opacity from slider and sets the global opacity
-    alpha = slideAmount/100;
-    myCP.updateColor();
-}
 function SelectTool(toolName) // selects proper tool based off of what user has clicked
 {
     switch (toolName) {
@@ -818,10 +811,17 @@ function hideKeyboard() {
 $().ready( function() {
     document.onselectstart = function () { return false; };
     document.body.style.cursor="url(img/paintbrush.png) 0 28, default"; // sets the default cursor to the paintbrush
-    //Ceate Color picker
+    //Create Color picker
     myCP = new ColorPicker();
     myCP.setHSL(0,90,50);
-    
+    //Create Opacity Slider
+	opacSlider = new OpacitySlider();
+	opacSlider.init("opacity");
+	opacSlider.updateValue(90);
+	//Create Thickness Slider
+	thickSlider = new OpacitySlider();
+	thickSlider.init("thickness");
+	thickSlider.updateValue(thickness);
     //Refresh on orientation changes
     window.addEventListener( 'resize', refreshCanvas );
     window.addEventListener( 'orientationchange', refreshCanvas );
@@ -1013,33 +1013,6 @@ $().ready( function() {
 	
     $('#clear').click( function() {
         clearAll();
-    });   
-    $( "#opacitySlider" ).slider({
-        orientation: "horizontal",
-        range: "min",
-        min: 0,
-        max: 100,
-        value: 100,
-        slide: function( event, ui ) {
-            updateOpac( ui.value );
-        },
-        change: function( event, ui ) {
-            updateOpac( ui.value );
-        }
-    });
-    
-    $( "#thicknessSlider" ).slider({
-        orientation: "horizontal",
-        range: "min",
-        min: 4,
-        max: 80,
-        value: 25,
-        slide: function( event, ui ) {
-            updateThick( ui.value );
-        },
-        change: function( event, ui ) {
-            updateThick( ui.value );
-        }
     });
 	
 	function jsKeyToChar(key,e){
@@ -1127,47 +1100,14 @@ $().ready( function() {
             }
             return false;
         }
-        
-        switch (key) {
-			case 97:  // A = AIRBRUSH
-			  document.body.style.cursor="url(img/spraycan.png)0 5, default";
-			  SelectTool('spraycan');
-              break;
-            case 100: // D=DRAW
-              document.body.style.cursor="url(img/paintbrush.png)0 28, default";
-              SelectTool('draw');
-              break;
-            case 101: // E=ERASE
-              document.body.style.cursor="url(img/eraser.png)0 28, default";
-              SelectTool('erase');
-              break;
-            case 102: // F=FILL
-              document.body.style.cursor="url(img/paintbucket.png), default";
-              SelectTool('fill');
-              break;
-			case 112: // P=PENCIL
-              document.body.style.cursor="url(img/pencil.png)0 28, default";
-			  SelectTool('pencil');
-              break;
-			case 113: // Q=SHAPE
-			  SelectTool('square');
-              break;
-            case 115: // S=SELECT
-              document.body.style.cursor="url(img/hand-tool.png)14 6, default";
-              SelectTool('select');
-              break;
-            case 103:  // G=DROPPER
-              document.body.style.cursor="url(img/dropper.png)0 28, default";
-              SelectTool('dropper');
-              break;
-        }
-        
     });
 
   $('#resize_icon').load(function() {});
   $('#rotate_icon').load(function() {});
   $('#arrow_up').load(function() {});
   $('#arrow_down').load(function() {});
+  $('#slider_img').load(function() {});
+  $('#slider_line').load(function() {});
 
     // Redraw.
     setInterval(refreshCanvas, 10);
