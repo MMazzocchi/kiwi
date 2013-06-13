@@ -1,4 +1,3 @@
-
 var canvas;               // This will hold our canvas
 var objectList = {};      // This is a hash that maps an object's id to the object itself
 var layerList = [];       // This is the list of layers. Each element is an object id.
@@ -39,15 +38,27 @@ function orienting() {
     return (typeof window.orientation != "undefined");
 }
 
+function findPos(obj) {
+    var curleft = 0, curtop = 0;
+    if (obj.offsetParent) {
+        do {
+            curleft += obj.offsetLeft;
+            curtop += obj.offsetTop;
+        } while (obj = obj.offsetParent);
+        return { x: curleft, y: curtop };
+    }
+    return undefined;
+}
+
 function transformCoordinates(e) {
-    var ofst = $('#drawing_canvas').offset()
 
     if('touches' in e) {
         e = e.touches[0];
     }
 
-    var x = e.pageX - ofst.left;
-    var y = e.pageY - ofst.top;
+    var pos = findPos(canvas);
+    var x = e.pageX - pos.x;
+    var y = e.pageY - pos.y;
 
     if(orienting()) {
         switch(orientation) {
@@ -68,8 +79,12 @@ function transformCoordinates(e) {
         }
     }
 
-    //x = x/zoom;
-    //y = y/zoom;
+    var s = .93;
+    x = x*s;
+    y = y*s;
+
+   // x = x/zoom;
+   // y = y/zoom;
     return [x,y];
 }
 
