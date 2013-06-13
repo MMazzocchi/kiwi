@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Disney Create by CSM</title>
+<link rel="stylesheet" href="css/master.css" />
+<script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+
+<script type="text/javascript" src="kiwilib.js"></script>
+<script type="text/javascript" src="../js/kiwistamps.js"></script>
+<script type="text/javascript" src="../js/kiwilines.js"></script>
+<script type="text/javascript" src="../js/kiwibrush.js"></script>
+<script type="text/javascript" src="../js/kiwitransform.js"></script>
+<script type="text/javascript" src="../js/kiwifill.js"></script>
+<script type="text/javascript" src="../js/kiwishapes.js"></script>
+<script type="text/javascript" src="../js/kiwibind.js"></script>
+<script type="text/javascript" src="../js/kiwisave.js"></script>
+<Script type="text/javascript" src="../js/kiwitext.js"></script>
+<Script type="text/javascript" src="../js/kiwisliders.js"></script>
+
+<script type="text/javascript" src="../js/color_picker.js"></script>
+
+<!-- Canvas to Image -->
+<script type="text/javascript" src="../js/base64.js"></script>
+<script type="text/javascript" src="../js/canvas2image.js"></script>
+
+<!-- SVG conversion library -->
+<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/rgbcolor.js"></script>
+<script type="text/javascript" src="http://canvg.googlecode.com/svn/trunk/canvg.js"></script> 
+
+<!-- Sliders -->
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+<script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+</head>
+<body>
+	<div id="create">
+    	<div id="fileactions">
+            <span>
+                <a id="save">Save</a>
+                <a id="open">Open</a>
+                <a id="download">Download</a>
+                <a id="clear">Clear</a>
+            </span>
+            <span>
+                <a id="undo">Undo</a>
+                <a id="redo">Redo</a>
+            </span>
+        <div class="clear"></div></div>
+    	<div id="tbl">
+            <div id="left">
+                <a id="select" class="active">Select</a>
+                <a id="stamp">Stamps</a>
+                <a id="shape">Shapes</a>
+                <a id="fill">Fill</a>
+                <a id="brush">Brushes</a>
+                <a id="erase">Eraser</a>
+                <a id="text">Text</a>
+                <a id="dropper"><span>Dropper</span></a>
+            </div>
+            <div id="center">
+            	<textarea id="t" style="opacity:0" ></textarea>
+                <canvas id="drawing_canvas"></canvas>
+            </div>
+            <div id="right">
+            	<div class="o_canvas"><canvas id="opac_canvas"></canvas></div>
+                <div class="t_canvas"><canvas id="thick_canvas"></canvas></div>
+                <div class="cp_canvas"><canvas id="colorpicker_canvas"></canvas></div>
+            </div>
+       	</div>
+        <div id="extratools">
+        	<a id="sleft">Previous Tools</a>
+            <div id="list">
+            	<span id="stamps">
+                	<a id="stamp_butterfly">Butterfly</a>
+                </span>
+                <span id="shapes">
+                    <a id="shape_line">Line</a>
+                    <a id="shape_circle">Circle</a>
+                    <a id="shape_square">Square</a>
+                    <a id="shape_triangle">Triangle</a>
+                </span>
+                <span id="fills">
+                    <a id="fill_blob">Fill</a>
+                    <a id="fill_bg">Background Fill</a>
+                </span>
+                <span id="brushes">
+                    <a id="brush_normal">Brush</a>
+                    <a id="brush_calligraphy">Calligraphy</a>
+                    <a id="brush_spraycan">Spray Can</a>
+                    <a id="brush_pencil">Pencil</a>
+                </span>
+                <span id="texts">
+                    <a id="text_bubble">Text Bubble</a>
+                    <a id="text_box">Text Box</a>
+                </span>
+            </div>
+            <a id="sright">More Tools</a>
+        </div>
+    </div>
+    <img id="resize_icon" style="display:none;" src="../img/resize_icon.png" />
+    <img id="rotate_icon" style="display:none;" src="../img/rotate_icon.png" />
+    <img id="arrow_up" style="display:none;" src="../img/arrowup.png" />
+    <img id="arrow_down" style="display:none;" src="../img/arrowdown.png" />
+    <img id="stone" style="display:none;" src="../img/stone.jpg" />
+    <img id="slider_img" style="display:none;" src="../img/obj_slider_bg.png" />
+    <img id="slider_line" style="display:none;" src="../img/obj_slider_line_blue.png" />
+    <input type="file" id="upload" name="file" style="display:none" />
+    
+<script type="text/javascript">
+$("#select").click( function() {
+	$("#select").addClass("active");
+	$("#stamp").removeClass("active");
+	$("#shape").removeClass("active");
+	$("#fill").removeClass("active");
+	$("#brush").removeClass("active");
+	$("#erase").removeClass("active");
+	$("#text").removeClass("active");
+	$("#dropper").removeClass("active");
+	document.getElementById("stamps").style.display = "none";
+	document.getElementById("shapes").style.display = "none";
+	document.getElementById("fills").style.display = "none";
+	document.getElementById("brushes").style.display = "none";
+	document.getElementById("texts").style.display = "none";
+});
+
+$("#stamp").click( function() {
+	$("#select").removeClass("active");
+	$("#stamp").addClass("active");
+	$("#shape").removeClass("active");
+	$("#fill").removeClass("active");
+	$("#brush").removeClass("active");
+	$("#erase").removeClass("active");
+	$("#text").removeClass("active");
+	$("#dropper").removeClass("active");
+	document.getElementById("stamps").style.display = "block";
+	document.getElementById("shapes").style.display = "none";
+	document.getElementById("fills").style.display = "none";
+	document.getElementById("brushes").style.display = "none";
+	document.getElementById("texts").style.display = "none";
+	$("#stamp_butterfly").removeClass("active");
+});
+$("#stamp_butterfly").click( function() {
+	$("#stamp_butterfly").addClass("active");
+});
+
+$("#shape").click( function() {
+	$("#select").removeClass("active");
+	$("#stamp").removeClass("active");
+	$("#shape").addClass("active");
+	$("#fill").removeClass("active");
+	$("#brush").removeClass("active");
+	$("#erase").removeClass("active");
+	$("#text").removeClass("active");
+	$("#dropper").removeClass("active");
+	document.getElementById("stamps").style.display = "none";
+	document.getElementById("shapes").style.display = "block";
+	document.getElementById("fills").style.display = "none";
+	document.getElementById("brushes").style.display = "none";
+	document.getElementById("texts").style.display = "none";
+	$("#shape_line").removeClass("active");
+	$("#shape_circle").removeClass("active");
+	$("#shape_square").removeClass("active");
+	$("#shape_triangle").removeClass("active");
+});
+$("#shape_line").click( function() {
+	$("#shape_line").addClass("active");
+	$("#shape_circle").removeClass("active");
+	$("#shape_square").removeClass("active");
+	$("#shape_triangle").removeClass("active");
+});
+$("#shape_circle").click( function() {
+	$("#shape_line").removeClass("active");
+	$("#shape_circle").addClass("active");
+	$("#shape_square").removeClass("active");
+	$("#shape_triangle").removeClass("active");
+});
+$("#shape_square").click( function() {
+	$("#shape_line").removeClass("active");
+	$("#shape_circle").removeClass("active");
+	$("#shape_square").addClass("active");
+	$("#shape_triangle").removeClass("active");
+});
+$("#shape_triangle").click( function() {
+	$("#shape_line").removeClass("active");
+	$("#shape_circle").removeClass("active");
+	$("#shape_square").removeClass("active");
+	$("#shape_triangle").addClass("active");
+});
+
+$("#fill").click( function() {
+	$("#select").removeClass("active");
+	$("#stamp").removeClass("active");
+	$("#shape").removeClass("active");
+	$("#fill").addClass("active");
+	$("#brush").removeClass("active");
+	$("#erase").removeClass("active");
+	$("#text").removeClass("active");
+	$("#dropper").removeClass("active");
+	document.getElementById("stamps").style.display = "none";
+	document.getElementById("shapes").style.display = "none";
+	document.getElementById("fills").style.display = "block";
+	document.getElementById("brushes").style.display = "none";
+	document.getElementById("texts").style.display = "none";
+	$("#fill_blob").removeClass("active");
+	$("#fill_bg").removeClass("active");
+});
+$("#fill_blob").click( function() {
+	$("#fill_blob").addClass("active");
+	$("#fill_bg").removeClass("active");
+});
+$("#fill_bg").click( function() {
+	$("#fill_blob").removeClass("active");
+	$("#fill_bg").addClass("active");
+});
+
+$("#brush").click( function() {
+	$("#select").removeClass("active");
+	$("#stamp").removeClass("active");
+	$("#shape").removeClass("active");
+	$("#fill").removeClass("active");
+	$("#brush").addClass("active");
+	$("#erase").removeClass("active");
+	$("#text").removeClass("active");
+	$("#dropper").removeClass("active");
+	document.getElementById("stamps").style.display = "none";
+	document.getElementById("shapes").style.display = "none";
+	document.getElementById("fills").style.display = "none";
+	document.getElementById("brushes").style.display = "block";
+	document.getElementById("texts").style.display = "none";
+	$("#brush_normal").removeClass("active");
+	$("#brush_calligraphy").removeClass("active");
+	$("#brush_spraycan").removeClass("active");
+	$("#brush_pencil").removeClass("active");
+});
+$("#brush_normal").click( function() {
+	$("#brush_normal").addClass("active");
+	$("#brush_calligraphy").removeClass("active");
+	$("#brush_spraycan").removeClass("active");
+	$("#brush_pencil").removeClass("active");
+});
+$("#brush_calligraphy").click( function() {
+	$("#brush_normal").removeClass("active");
+	$("#brush_calligraphy").addClass("active");
+	$("#brush_spraycan").removeClass("active");
+	$("#brush_pencil").removeClass("active");
+});
+$("#brush_spraycan").click( function() {
+	$("#brush_normal").removeClass("active");
+	$("#brush_calligraphy").removeClass("active");
+	$("#brush_spraycan").addClass("active");
+	$("#brush_pencil").removeClass("active");
+});
+$("#brush_pencil").click( function() {
+	$("#brush_normal").removeClass("active");
+	$("#brush_calligraphy").removeClass("active");
+	$("#brush_spraycan").removeClass("active");
+	$("#brush_pencil").addClass("active");
+});
+
+$("#erase").click( function() {
+	$("#select").removeClass("active");
+	$("#stamp").removeClass("active");
+	$("#shape").removeClass("active");
+	$("#fill").removeClass("active");
+	$("#brush").removeClass("active");
+	$("#erase").addClass("active");
+	$("#text").removeClass("active");
+	$("#dropper").removeClass("active");
+	document.getElementById("stamps").style.display = "none";
+	document.getElementById("shapes").style.display = "none";
+	document.getElementById("fills").style.display = "none";
+	document.getElementById("brushes").style.display = "none";
+	document.getElementById("texts").style.display = "none";
+});
+
+$("#text").click( function() {
+	$("#select").removeClass("active");
+	$("#stamp").removeClass("active");
+	$("#shape").removeClass("active");
+	$("#fill").removeClass("active");
+	$("#brush").removeClass("active");
+	$("#erase").removeClass("active");
+	$("#text").addClass("active");
+	$("#dropper").removeClass("active");
+	document.getElementById("stamps").style.display = "none";
+	document.getElementById("shapes").style.display = "none";
+	document.getElementById("fills").style.display = "none";
+	document.getElementById("brushes").style.display = "none";
+	document.getElementById("texts").style.display = "block";
+	$("#text_bubble").removeClass("active");
+	$("#text_box").removeClass("active");
+});
+$("#text_bubble").click( function() {
+	$("#text_bubble").addClass("active");
+	$("#text_box").removeClass("active");
+});
+$("#text_box").click( function() {
+	$("#text_bubble").removeClass("active");
+	$("#text_box").addClass("active");
+});
+
+$("#dropper").click( function() {
+	$("#select").removeClass("active");
+	$("#stamp").removeClass("active");
+	$("#shape").removeClass("active");
+	$("#fill").removeClass("active");
+	$("#brush").removeClass("active");
+	$("#erase").removeClass("active");
+	$("#text").removeClass("active");
+	$("#dropper").addClass("active");
+	document.getElementById("stamps").style.display = "none";
+	document.getElementById("shapes").style.display = "none";
+	document.getElementById("fills").style.display = "none";
+	document.getElementById("brushes").style.display = "none";
+	document.getElementById("texts").style.display = "none";
+});
+//if ((screen.width < 797) || (screen.height < 797)) {
+	/*$("#stamp").click(showextratoolbar);
+	$("#shape").click(showextratoolbar);
+	$("#fill").click(showextratoolbar);
+	$("#brush").click(showextratoolbar);
+	$("#text").click(showextratoolbar);
+	function showextratoolbar() {
+		document.getElementById("extratools").style.display = "block";
+		document.getElementById("right").style.display = "none";
+	}
+	$("#dropper").click( function() { 
+		document.getElementById("right").style.display = "block"; 
+		document.getElementById("extratools").style.display = "none";
+	});
+	$("#select").click(hideextratoolbar);
+	$("#stamp_butterfly").click(hideextratoolbar);
+	$("#shape_line").click(hideextratoolbar);
+	$("#shape_circle").click(hideextratoolbar);
+	$("#shape_square").click(hideextratoolbar);
+	$("#shape_triangle").click(hideextratoolbar);
+	$("#fill_blob").click(hideextratoolbar);
+	$("#fill_bg").click(hideextratoolbar);
+	$("#brush_normal").click(hideextratoolbar);
+	$("#brush_calligraphy").click(hideextratoolbar);
+	$("#brush_spraycan").click(hideextratoolbar);
+	$("#brush_pencil").click(hideextratoolbar);
+	$("#erase").click(hideextratoolbar);
+	$("#text_bubble").click(hideextratoolbar);
+	$("#text_box").click(hideextratoolbar);
+	function hideextratoolbar() {
+		document.getElementById("extratools").style.display = "none";
+		document.getElementById("right").style.display = "none";
+	}*/
+//}
+</script>
+</body>
+</html>
