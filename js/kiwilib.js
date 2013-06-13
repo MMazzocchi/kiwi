@@ -809,6 +809,11 @@ function showKeyboard() {
     document.getElementById('t').focus();
 }
 
+function hideKeyboard() {
+    console.log("Keyboard hidden.");
+    document.getElementById('t').blur();
+}
+
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
     document.onselectstart = function () { return false; };
