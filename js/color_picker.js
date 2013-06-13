@@ -28,7 +28,6 @@ function ColorPicker()
 		}
 	}
 
-
 	var cpldisc = document.createElement('canvas');
 	cpldisc.width = CPW;
 	cpldisc.height = CPH;
@@ -169,13 +168,6 @@ function ColorPicker()
 	$('#colorpicker_canvas').bind('touchend', HandleColorUp );
 }
 
- // Color Utility Functions - currently unused - using rgb(r,g,b) or rgba(r,g,b,a) or hsla(h,s,l,a) instead
-function getRGB(r,g,b) {
-	return 'rgb(' + r + ',' + g + ',' + b + ')';
-}
-function getRGBA(r,g,b,a) {
-	return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')';
-}
 function getHSLA(h,s,l,a) {
 	return 'hsla(' + h + ',' + s + '%,' + l + '%,' + a + ')';
 }

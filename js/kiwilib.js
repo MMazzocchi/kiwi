@@ -201,6 +201,7 @@ function copy(){
 
 //Paste the copied object
 function paste(dObj){
+        ungroupSelection();
 	copyList = [];
 	var newObject = jQuery.extend(true, {}, dObj);
 	if(newObject.type == "bind"){
@@ -209,11 +210,13 @@ function paste(dObj){
 			layerList.splice(layerList.length-1,1);
 			copyList[i] = newObject.bindList[i];
 		}
+                var lc = [dObj.lCorner[0], dObj.lCorner[1]];
+                var rc = [dObj.rCorner[0], dObj.rCorner[1]];
 		var newObject = {
 			pts: dObj.pts,
 			tPos: dObj.tPos,
-			lCorner: dObj.lCorner,
-			rCorner: dObj.rCorner,
+			lCorner: lc, 
+			rCorner: rc,
 			mx: dObj.mx, my: dObj.my,
 			bindList: copyList,
 			type: "bind",
@@ -223,6 +226,7 @@ function paste(dObj){
 			scaling: dObj.scaling,
 		};
 		startBind(newObject);
+
 	}
 	else{
 		assignID(newObject);
@@ -545,8 +549,8 @@ function pointerDown(e) {
                 opacSlider.updateValue(90);
                 break;
             case "zoom":
-					isDragging = true;
-					zoomType = 'in';
+                isDragging = true;
+                zoomType = 'in';
                 break;
         }
     }
@@ -601,41 +605,45 @@ function pointerEnd(e) {
     var c = transformCoordinates(e);
     var x = c[0]; var y = c[1];
 
-    if(curTool == 'draw') {
-        var obj = objectList[layerList[layerList.length-1]];
-        obj.lCorner[0] -= 32;
-        obj.lCorner[1] -= 32;
-        obj.rCorner[0] += 32;
-        obj.rCorner[1] += 32;
-		if(obj.type != "spray"){
-			obj.smoothLine();
-		}
-    }
-	else if(curTool == 'zoom'){
-		if(isZoom == true){
-			if (zoomType == 'in'){
-				if (zoomCount < 8){
-					zoomCount += 1;
-					applyZoom(x, y, zoomCount, zoomCount-1);
-				}
-			}
-			else{
-				if(zoomCount > 0){
-					zoomCount -= 1;
-					applyZoom(x, y, zoomCount, zoomCount+1);
-				}
-			}
-		}
-		isZoom = true;
-	}
-	
-    if(isDragging && (curTool == 'select')) {
-		if(selectedId != -1){
-			endTransform(selectedId, x, y, dragMode);
-		}
-		else{
-			groupSelection();
-		}
+    switch(curTool) {
+        case 'draw':
+            var obj = objectList[layerList[layerList.length-1]];
+            obj.lCorner[0] -= 32;
+            obj.lCorner[1] -= 32;
+            obj.rCorner[0] += 32;
+            obj.rCorner[1] += 32;
+            if(obj.type != "spray"){
+                obj.smoothLine();
+            }
+            break;
+	case 'zoom':
+            if(isZoom == true){
+                if (zoomType == 'in'){
+                    if (zoomCount < 8){
+                        zoomCount += 1;
+                        applyZoom(x, y, zoomCount, zoomCount-1);
+                    }
+                } else{
+                    if(zoomCount > 0){
+                        zoomCount -= 1;
+                        applyZoom(x, y, zoomCount, zoomCount+1);
+                        }
+                    }
+            }
+            isZoom = true;
+            break;
+        case 'select':
+            if(isDragging) {
+                if(selectedId != -1){
+                    endTransform(selectedId, x, y, dragMode);
+                } else{
+                    groupSelection();
+                }
+            }
+            break;
+        case 'textbox':
+            showKeyboard();
+            break;
     }
     
     isDragging = false;
@@ -802,6 +810,11 @@ function clearAll() {
 function showKeyboard() {
     console.log("Keyboard requested.");
     document.getElementById('t').focus();
+}
+
+function hideKeyboard() {
+    console.log("Keyboard hidden.");
+    document.getElementById('t').blur();
 }
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
@@ -1103,6 +1116,8 @@ $().ready( function() {
   $('#rotate_icon').load(function() {});
   $('#arrow_up').load(function() {});
   $('#arrow_down').load(function() {});
+  $('#slider_img').load(function() {});
+  $('#slider_line').load(function() {});
 
     // Redraw.
     setInterval(refreshCanvas, 10);

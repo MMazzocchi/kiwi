@@ -148,29 +148,47 @@ function createTextBalloon(dObj) {
     };
 
     dObj.select = function(x,y) {
-        var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,1/this.xScale,1/this.yScale,-this.rotation);
-        x=pt[0]; y=pt[1];
         
         if(this.type == "balloon"){
-            var bw = this.bw*this.xScale;
-            var bh = this.bh*this.yScale;
-            var pts = this.pts;
-            var t = this.tPos;
-            var d = [pts[0]+(t[0]-pts[0])*this.xScale,pts[1]+(t[1]-pts[1])*this.yScale];
-            var s = [this.xScale,this.yScale];
-            if( x >= d[0] && y >= d[1] && x < d[0]+bw && y < d[1]+bh) {
-                showKeyboard();
+            //"Scratch canvas" method
+            var scanvas = document.createElement('canvas');
+            scanvas.width = window.innerWidth;
+            scanvas.height = window.innerHeight;
+            var ctx = scanvas.getContext('2d');
+            this.draw(ctx);
+            var imageData = ctx.getImageData(x, y, 1, 1);
+
+            if (imageData.data[3] > 0 || imageData.data[0] > 0) {
+                if(this.selected) {
+                    var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,1/this.xScale,1/this.yScale,-this.rotation);
+                    x=pt[0]; y=pt[1];
+                    console.log("tx: "+this.tx+" | ty: "+this.ty);
+                    if((x >= this.lCorner[0]+this.tx) &&
+                       (x <= this.rCorner[0]) &&
+                       (y >= this.lCorner[1]+this.ty) &&
+                       (y <= this.rCorner[1])) {
+                        showKeyboard();
+                        this.selected = false;
+                    } else { 
+                        hideKeyboard();
+                    }
+                } else {
+                    this.selected = true;
+                    hideKeyboard();
+                }
                 return true;
             }
-            window.focus();
+            hideKeyboard();
             return false;
         }
         else{
+            var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,1/this.xScale,1/this.yScale,-this.rotation);
+            x=pt[0]; y=pt[1];
             if(x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]) {
                 showKeyboard();
                 return true;
             }
-            window.focus();
+            hideKeyboard();
             return false;
         }
     };
