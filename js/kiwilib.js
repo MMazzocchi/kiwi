@@ -201,6 +201,7 @@ function copy(){
 
 //Paste the copied object
 function paste(dObj){
+        ungroupSelection();
 	copyList = [];
 	var newObject = jQuery.extend(true, {}, dObj);
 	if(newObject.type == "bind"){
@@ -209,11 +210,13 @@ function paste(dObj){
 			layerList.splice(layerList.length-1,1);
 			copyList[i] = newObject.bindList[i];
 		}
+                var lc = [dObj.lCorner[0], dObj.lCorner[1]];
+                var rc = [dObj.rCorner[0], dObj.rCorner[1]];
 		var newObject = {
 			pts: dObj.pts,
 			tPos: dObj.tPos,
-			lCorner: dObj.lCorner,
-			rCorner: dObj.rCorner,
+			lCorner: lc, 
+			rCorner: rc,
 			mx: dObj.mx, my: dObj.my,
 			bindList: copyList,
 			type: "bind",
@@ -223,6 +226,7 @@ function paste(dObj){
 			scaling: dObj.scaling,
 		};
 		startBind(newObject);
+
 	}
 	else{
 		assignID(newObject);
