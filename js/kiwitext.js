@@ -1,3 +1,19 @@
+function findMaxLine(id){
+    var num_lines = objectList[id].theText.length;
+    var num_words = objectList[id].theText[num_lines-1].length;
+    var max = objectList[id].strpixel;
+    for(var i=0; objectList[id].theText && i< num_lines; i++){
+        var t = 0;
+        for(var j=0; objectList[id].theText[i][j] && j<num_words ; j++){
+            t += objectList[id].theText[i][j].length;
+        }
+        if(t > max){
+            objectList[id].strpixel = max = t;
+            objectList[id].max = i;
+        }
+    }
+}
+
 function drawBalloon(ctx, ptx, pty, lx, ly, bw, bh, radius, lw){
 
     ctx.save();
