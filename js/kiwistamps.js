@@ -1,19 +1,22 @@
 var svgList = {
     'mickey':{
         svg:null,
+		default_scale: 1,
         cx:156, cy:145,
         bounds:[0,0,313,290],
         url:'svg/mickey.svg' },
 	'butterfly':{
         svg:null,
+		default_scale: 1,
         cx:205, cy:143,
         bounds:[0,0,410,286],
         url:'svg/butterfly.svg' },
     'bnl':{
         svg:null,
-        cx:197, cy:154,
-        bounds:[0,0,378,302],
-        url:'svg/BnL.svg' },
+		default_scale: 0.5,
+        cx:396, cy:612,
+        bounds:[0,0,792,1224],
+        url:'svg/AVASA_P_0101_FEB13.svg' },
     'troll':{
         svg:null,
         cx:301, cy:226,
@@ -24,18 +27,23 @@ var svgList = {
 // Create a bitmap from this object
 function createBMP(dObj){
     var scanvas = document.createElement('canvas');
+	dObj.cx = dObj.cx*dObj.default_scale;
+	dObj.cy = dObj.cy*dObj.default_scale;
+	dObj.bound[0] = dObj.bound[0]*dObj.default_scale;
+	dObj.bound[1] = dObj.bound[1]*dObj.default_scale;
     scanvas.width = dObj.bound[0];
     scanvas.height = dObj.bound[1];
     var sctx = scanvas.getContext('2d');
-	canvg(scanvas,dObj.url);
-    //sctx.drawSvg(dObj.url, 0, 0, 0, 0);
+	sctx.globalCompositeOperation = 'darker';
+	//sctx.scale(dObj.default_scale,dObj.default_scale);
+	//canvg(scanvas,dObj.url);
+    sctx.drawSvg(dObj.url, 0, 0, dObj.bound[0], dObj.bound[1]);
     dObj.scanvas = scanvas;
 }
 
 // Create a stamp from this object
 function createStamp(dObj) {
     assignID(dObj);
-	
 	
 	dObj.rerenderSvg = function(){
 		var scanvas = document.createElement('canvas');
@@ -46,18 +54,14 @@ function createStamp(dObj) {
 		scanvas.width = this.bound[0] = this.bound[0]*axScale;
 		scanvas.height = this.bound[1] = this.bound[1]*ayScale;
 		var sctx = scanvas.getContext('2d');
-		console.log(this.bound[0]);
-		console.log(this.pbound[0]);
-		console.log(svgList['butterfly'].bounds[2]);
-		sctx.scale(bx,by);
-		sctx.scale(axScale,ayScale);
-		canvg(scanvas,this.url);
-		//sctx.drawSvg(this.url, 0, 0, 0, 0);
+		sctx.scale(bx*axScale,by*ayScale);
+		//canvg(scanvas,this.url);
+		sctx.drawSvg(this.url, 0, 0);
 		this.scanvas = scanvas;
 		this.cx = this.cx*axScale;
 		this.cy = this.cy*ayScale;
 		this.yScale = this.yScale/Math.abs(this.yScale);
-		this.xScale = this.yScale/Math.abs(this.yScale);
+		this.xScale = this.xScale/Math.abs(this.xScale);
 		
 	}
     // Draw the stamp
