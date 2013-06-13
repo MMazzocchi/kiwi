@@ -40,8 +40,7 @@ body {
 }
 .clear { clear:both; }
 #create {
-	width:100%;
-	max-width:900px;
+	width:900px;
 	margin:0 auto;
 	background:#000;
 }
@@ -196,7 +195,7 @@ body {
 #create #sright { background:none; }
 
 @media (max-width:797px) {
-	#create { position:relative; }
+	#create { position:relative; width:100%; }
 	#create #tbl,
 	#create #left,
 	#create #center,
