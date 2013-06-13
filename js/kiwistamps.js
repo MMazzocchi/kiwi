@@ -34,7 +34,6 @@ function createBMP(dObj){
     scanvas.width = dObj.bound[0];
     scanvas.height = dObj.bound[1];
     var sctx = scanvas.getContext('2d');
-	sctx.globalCompositeOperation = 'darker';
 	//sctx.scale(dObj.default_scale,dObj.default_scale);
 	//canvg(scanvas,dObj.url);
     sctx.drawSvg(dObj.url, 0, 0, dObj.bound[0], dObj.bound[1]);
