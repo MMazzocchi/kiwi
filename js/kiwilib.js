@@ -968,7 +968,7 @@ $().ready( function() {
         SelectTool('dropper');
     });
     
-    $('#filli_blob').click( function() {
+    $('#fill_blob').click( function() {
         document.body.style.cursor="url(img/paintbucket.png)4 28, default";
         curFillId = "";
         bgFill = false;
