@@ -93,6 +93,8 @@ function ColorPicker()
 		dc.restore();
 		dc.stroke();
 		dc.restore();
+		
+		$('#dropper span').css("background-color", curColor);
 	}
 
 	this.setRGB = function(r,g,b)
