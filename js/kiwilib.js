@@ -79,9 +79,9 @@ function transformCoordinates(e) {
         }
     }
 
-    var s = .93;
-    x = x*s;
-    y = y*s;
+//    var s = .93;
+//    x = x*s;
+//    y = y*s;
 
    // x = x/zoom;
    // y = y/zoom;
@@ -96,7 +96,12 @@ function refreshCanvas() {
     }
 
     var ctx = canvas.getContext('2d');
-	ctx.save();
+
+        ctx.canvas.width = 743;
+        ctx.canvas.height = 608;
+
+
+/*	ctx.save();
     var heightoffset = $("#toolbar").height();
     var widthoffset = $("#toolbar").width();
     
@@ -108,7 +113,7 @@ function refreshCanvas() {
         ctx.canvas.width  = window.innerWidth - widthoffset;
         ctx.canvas.height = window.innerHeight;
     }
-
+*/
     if(orienting()) {
         orientation = window.orientation;
         ctx.rotate(-orientation*Math.PI/180);
@@ -137,10 +142,13 @@ function refreshCanvas() {
         }
     } else {
         ctx.fillStyle="#FFFFFF";
-        if (window.innerWidth < window.innerHeight) // portrait
+/*        if (window.innerWidth < window.innerHeight) // portrait
             ctx.fillRect(0,0,window.innerWidth,window.innerHeight-heightoffset);
         else // landscape
             ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
+*/
+        ctx.canvas.width = 743;
+        ctx.canvas.height = 608;
     }
 	
     //Redraw every object at the current zoom
