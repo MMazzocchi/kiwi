@@ -178,6 +178,8 @@ function createTextBalloon(dObj) {
                 }
                 return true;
             }
+            hideKeyboard();
+            return false;
         }
         else{
             var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,1/this.xScale,1/this.yScale,-this.rotation);
