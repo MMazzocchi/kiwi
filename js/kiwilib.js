@@ -22,6 +22,7 @@ var originx = 0;
 var originy = 0;
 var zoomposx = 0;
 var zoomposy = 0;
+var cachedraw = true;
 var textMode;
 var scratch;
 var copiedObj;
@@ -138,22 +139,26 @@ function refreshCanvas() {
     if(background) {
         background.draw(ctx);
     }
-	   
+	if(!cachedraw){
+	
+	}
     // For each id in layerList, call this function:
-    $.each(layerList, function(i, id) {
-        // Get the object for this layer
-        var dObj = objectList[id];
-        //if(scratch){
-        //    ctx.putImageData(scratch,0,0);
-        //}
-        //dObj.draw(ctx);
-        //scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
+    else{
+		$.each(layerList, function(i, id) {
+			// Get the object for this layer
+			var dObj = objectList[id];
+			//if(scratch){
+			//    ctx.putImageData(scratch,0,0);
+			//}
+			//dObj.draw(ctx);
+			//scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
 
-        if((!isDragging) || (id != selectedId)) {
-            // Draw the object
-            dObj.draw(ctx);
-        }
-    });
+			if((!isDragging) || (id != selectedId)) {
+				// Draw the object
+				dObj.draw(ctx);
+			}
+		});
+	}
 
     // Draw the selected layer on top of the rest
     if(selectedId != -1) {

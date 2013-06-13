@@ -4,19 +4,19 @@ var svgList = {
 		default_scale: 1,
         cx:156, cy:145,
         bounds:[0,0,313,290],
-        url:'svg/mickey.svg' },
+        url:'svg/Frame.svg' },
 	'butterfly':{
         svg:null,
-		default_scale: 1,
-        cx:205, cy:143,
-        bounds:[0,0,410,286],
-        url:'svg/butterfly.svg' },
+		default_scale: 0.5,
+        cx:396, cy:612,
+        bounds:[0,0,792,1224],
+        url:'svg/AVASA_P_0116_FEB13.svg' },
     'bnl':{
         svg:null,
 		default_scale: 0.5,
         cx:396, cy:612,
         bounds:[0,0,792,1224],
-        url:'svg/AVASA_P_0101_FEB13.svg' },
+        url:'svg/AVASA_P_0134_FEB13.svg' },
     'troll':{
         svg:null,
         cx:301, cy:226,
@@ -75,7 +75,8 @@ function createStamp(dObj) {
             ctx.translate(this.pts[0],this.pts[1]);
             ctx.rotate(this.rotation);
 			ctx.scale(xScale,yScale);
-            ctx.drawImage(dObj.scanvas,-dObj.cx,-dObj.cy);
+            ctx.drawImage(this.scanvas,-dObj.cx,-dObj.cy);
+			//ctx.drawSvg(this.url, 0, 0, dObj.bound[0], dObj.bound[1]);
         ctx.restore();
     };
 
