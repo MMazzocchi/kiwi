@@ -547,8 +547,8 @@ function pointerDown(e) {
                 opacSlider.updateValue(90);
                 break;
             case "zoom":
-					isDragging = true;
-					zoomType = 'in';
+                isDragging = true;
+                zoomType = 'in';
                 break;
         }
     }
@@ -603,41 +603,45 @@ function pointerEnd(e) {
     var c = transformCoordinates(e);
     var x = c[0]; var y = c[1];
 
-    if(curTool == 'draw') {
-        var obj = objectList[layerList[layerList.length-1]];
-        obj.lCorner[0] -= 32;
-        obj.lCorner[1] -= 32;
-        obj.rCorner[0] += 32;
-        obj.rCorner[1] += 32;
-		if(obj.type != "spray"){
-			obj.smoothLine();
-		}
-    }
-	else if(curTool == 'zoom'){
-		if(isZoom == true){
-			if (zoomType == 'in'){
-				if (zoomCount < 8){
-					zoomCount += 1;
-					applyZoom(x, y, zoomCount, zoomCount-1);
-				}
-			}
-			else{
-				if(zoomCount > 0){
-					zoomCount -= 1;
-					applyZoom(x, y, zoomCount, zoomCount+1);
-				}
-			}
-		}
-		isZoom = true;
-	}
-	
-    if(isDragging && (curTool == 'select')) {
-		if(selectedId != -1){
-			endTransform(selectedId, x, y, dragMode);
-		}
-		else{
-			groupSelection();
-		}
+    switch(curTool) {
+        case 'draw':
+            var obj = objectList[layerList[layerList.length-1]];
+            obj.lCorner[0] -= 32;
+            obj.lCorner[1] -= 32;
+            obj.rCorner[0] += 32;
+            obj.rCorner[1] += 32;
+            if(obj.type != "spray"){
+                obj.smoothLine();
+            }
+            break;
+	case 'zoom':
+            if(isZoom == true){
+                if (zoomType == 'in'){
+                    if (zoomCount < 8){
+                        zoomCount += 1;
+                        applyZoom(x, y, zoomCount, zoomCount-1);
+                    }
+                } else{
+                    if(zoomCount > 0){
+                        zoomCount -= 1;
+                        applyZoom(x, y, zoomCount, zoomCount+1);
+                        }
+                    }
+            }
+            isZoom = true;
+            break;
+        case 'select':
+            if(isDragging) {
+                if(selectedId != -1){
+                    endTransform(selectedId, x, y, dragMode);
+                } else{
+                    groupSelection();
+                }
+            }
+            break;
+        case 'textbox':
+            showKeyboard();
+            break;
     }
     
     isDragging = false;
