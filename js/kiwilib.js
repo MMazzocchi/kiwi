@@ -138,6 +138,7 @@ function refreshCanvas() {
     if(background) {
         background.draw(ctx);
     }
+	   
     // For each id in layerList, call this function:
     $.each(layerList, function(i, id) {
         // Get the object for this layer
@@ -298,11 +299,11 @@ function applyZoom(x, y, curZoom, prevZoom){
 	var z2 = zoom = Math.pow(factor,curZoom);
 	console.log(z1 + " " +z2);
 	 var r = z2-z1;
-	var px = x-originx;
-	var py = y-originy;
+	var px = x/z2;
+	var py = y/z2;
 	console.log(px + " " +py);
-	originx -= (x/z2);
-	originy -= (y/z2);
+	originx = (px - x);
+	originy = (py - y);
 
 
 	var newAct = {
@@ -384,7 +385,7 @@ function downloadImage() {
 function pointerDown(e) {
     var c = transformCoordinates(e);
     var ctx = canvas.getContext('2d');
-    var x = c[0]; var y = c[1];
+    var x = c[0]/zoom-originx; var y = c[1]/zoom-originy;
 	if (curTool != "select"){
 		ungroupSelection();
 	} 
@@ -559,7 +560,7 @@ function pointerDown(e) {
 function pointerMove(e) {
     var c = transformCoordinates(e);
     var ctx = canvas.getContext('2d');
-    var x = c[0]; var y = c[1];
+    var x = c[0]/zoom-originx; var y = c[1]/zoom-originy;
 
     if (isDragging){
         switch(curTool) {
@@ -603,7 +604,7 @@ function pointerMove(e) {
 
 function pointerEnd(e) {
     var c = transformCoordinates(e);
-    var x = c[0]; var y = c[1];
+    var x = c[0]/zoom-originx; var y = c[1]/zoom-originy;
 
     switch(curTool) {
         case 'draw':
