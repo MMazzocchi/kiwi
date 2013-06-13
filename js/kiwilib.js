@@ -297,11 +297,12 @@ function applyZoom(x, y, curZoom, prevZoom){
 	var z1 = Math.pow(factor,prevZoom);
 	var z2 = zoom = Math.pow(factor,curZoom);
 	console.log(z1 + " " +z2);
-	 var r = z2/z1;
-	var px = x-zoomposx;
-	var py = y-zoomposy;
-	originx = (x/z2-x);
-	originy = (y/z2-y);
+	 var r = z2-z1;
+	var px = x-originx;
+	var py = y-originy;
+	console.log(px + " " +py);
+	originx -= (x/z2);
+	originy -= (y/z2);
 
 
 	var newAct = {
@@ -505,6 +506,7 @@ function pointerDown(e) {
                     cx: svgList[ curStamp ].cx,
                     cy: svgList[ curStamp ].cy,
                     opacity: alpha,
+					default_scale: svgList[ curStamp ].default_scale,
                     xScale: 1, 
                     yScale: 1, 
                     bound: [svgList[ curStamp ].bounds[2],svgList[ curStamp ].bounds[3]],
