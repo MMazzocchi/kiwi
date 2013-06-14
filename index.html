@@ -50,11 +50,11 @@
         <div class="clear"></div></div>
     	<div id="tbl">
             <div id="left">
-                <a id="select" class="active">Select</a>
+                <a id="select">Select</a>
                 <a id="stamp">Stamps</a>
                 <a id="shape">Shapes</a>
                 <a id="fill">Fill</a>
-                <a id="brush">Brushes</a>
+                <a id="brush" class="active">Brushes</a>
                 <a id="erase">Eraser</a>
                 <a id="text">Text</a>
                 <a id="dropper"><span>Dropper</span></a>
@@ -136,6 +136,7 @@ $("#select").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
+        document.getElementById("selects").style.display = "block";
 });
 
 $("#stamp").click( function() {
@@ -152,6 +153,7 @@ $("#stamp").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
+        document.getElementById("selects").style.display = "none";
 	$("#stamp_butterfly").removeClass("active");
 });
 $("#stamp_butterfly").click( function() {
@@ -172,6 +174,7 @@ $("#shape").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
+        document.getElementById("selects").style.display = "none";
 	$("#shape_line").removeClass("active");
 	$("#shape_circle").removeClass("active");
 	$("#shape_square").removeClass("active");
@@ -216,6 +219,7 @@ $("#fill").click( function() {
 	document.getElementById("fills").style.display = "block";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
+        document.getElementById("selects").style.display = "none";
 	$("#fill_blob").removeClass("active");
 	$("#fill_bg").removeClass("active");
 });
@@ -242,6 +246,7 @@ $("#brush").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "block";
 	document.getElementById("texts").style.display = "none";
+        document.getElementById("selects").style.display = "none";
 	$("#brush_normal").removeClass("active");
 	$("#brush_calligraphy").removeClass("active");
 	$("#brush_spraycan").removeClass("active");
@@ -286,6 +291,7 @@ $("#erase").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
+        document.getElementById("selects").style.display = "none";
 });
 
 $("#text").click( function() {
@@ -302,6 +308,7 @@ $("#text").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "block";
+        document.getElementById("selects").style.display = "none";
 	$("#text_bubble").removeClass("active");
 	$("#text_box").removeClass("active");
 });
@@ -328,6 +335,7 @@ $("#dropper").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
+        document.getElementById("selects").style.display = "none";
 });
 function showextratoolbar() {
     document.getElementById("extratools").style.display = "block";
@@ -339,16 +347,21 @@ function hideextratoolbar() {
 }
 
 if (/*(screen.width < 797) || (screen.height < 797)*/ orienting()) {
-	$("#stamp").click(showextratoolbar);
+	$("#select").click(showextratoolbar);
+        $("#stamp").click(showextratoolbar);
 	$("#shape").click(showextratoolbar);
 	$("#fill").click(showextratoolbar);
 	$("#brush").click(showextratoolbar);
 	$("#text").click(showextratoolbar);
 	$("#dropper").click( function() { 
-		document.getElementById("right").style.display = "block"; 
+		if(document.getElementById("right").style.display == "block") {
+                    document.getElementById("right").style.display = "none";
+                } else {
+                    document.getElementById("right").style.display = 'block';
+                }
 		document.getElementById("extratools").style.display = "none";
 	});
-	$("#select").click(hideextratoolbar);
+	$("#select_select").click(hideextratoolbar);
 	$("#stamp_butterfly").click(hideextratoolbar);
 	$("#shape_line").click(hideextratoolbar);
 	$("#shape_circle").click(hideextratoolbar);
