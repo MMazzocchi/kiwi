@@ -149,6 +149,7 @@ function refreshCanvas() {
                 ctx.fillStyle="#FFFFFF";
                 tx=-w; ty=-h;
                 ctx.translate(-w,-h);
+                ctx.scale(1,h/608);
                 break;
         }
         ctx.fillRect(0,0,w,h);
