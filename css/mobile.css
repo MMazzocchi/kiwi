@@ -1,21 +1,22 @@
-#create { position:relative; width:100%; }
-#create #tbl,
-#create #left,
-#create #center,
-#create #right { display:block; }
-#create #fileactions { padding:3px; }
-#create #fileactions span:last-of-type { float:none; }
-#create #left { width:auto; padding:3px; position:relative; }
-#create #left a { display:inline-block; }
-#create #left a#dropper { position:absolute; top:0; right:0; }
-
-#create #sleft, #create #sright { display:none!important; }
-
-#create #right,
-#create #extratools { display:none; position:absolute; top:131px; background:#000; }
-#create #right { right:0; width:auto; }
-#create #extratools { left:0; padding:3px 5px; }
-
+@media (max-width:979px) and (max-height:979px) {
+	#create { position:relative; width:100%; }
+	#create #tbl,
+	#create #left,
+	#create #center,
+	#create #right { display:block; }
+	#create #fileactions { padding:3px; }
+	#create #fileactions span:last-of-type { float:none; }
+	#create #left { width:auto; padding:3px; position:relative; }
+	#create #left a { display:inline-block; }
+	#create #left a#dropper { position:absolute; top:0; right:0; }
+	
+	#create #sleft, #create #sright { display:none!important; }
+	
+	#create #right,
+	#create #extratools { display:none; position:absolute; top:131px; background:#000; }
+	#create #right { right:0; width:auto; }
+	#create #extratools { left:0; padding:3px 5px; }
+}
 @media (max-width:575px) and (max-height:575px) {
 	#create #fileactions a, 
 	#create #left a { background:none!important; width:auto; height:auto; text-indent:0; padding:1px 2px; color:#CCC; }
