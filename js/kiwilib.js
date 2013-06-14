@@ -123,12 +123,7 @@ function refreshCanvas() {
         canvas.height = h;
         ctx = canvas.getContext('2d');
 
-//        if(b == 1) {
-            ctx.scale(1,h/608);
-//        } else {
-//            ctx.scale(743/w,1);
-//        }
-
+        ctx.scale(1,h/608);
 
         orientation = window.orientation;
         ctx.rotate(-orientation*Math.PI/180);
@@ -136,36 +131,25 @@ function refreshCanvas() {
 
         switch(orientation) {
             case 0:
-//                canvas.width = w;
-//                canvas.height = h;
-//                ctx = canvas.getContext('2d');
                 ctx.fillStyle="#FFFFFF";
-//                ctx.fillRect(0,0,w,h);
-//                ctx.scale(1,h/608);
                 tx=0; ty=0; 
                 break;
             case -90:
                 tx=0; ty=-h;
                 ctx.translate(0,-h);
-//                ctx.fillRect(0,0,w,h);
                 break;
             case 90:
                 tx=-w; ty=0;
                 ctx.translate(-w,0);
-//                ctx.fillRect(0,0,w,h);
                 break;
             case 180:
-//                canvas.width = w;
-//                canvas.height = h;
-//                ctx = canvas.getContext('2d');
-//                ctx.rotate(-orientation*Math.PI/180); 
                 ctx.fillStyle="#FFFFFF";
                 tx=-w; ty=-h;
                 ctx.translate(-w,-h);
-//                ctx.fillRect(0,0,w,h);
                 break;
         }
         ctx.fillRect(0,0,w,h);
+        ctx.scale(1,h/608);
     } else {
         ctx.fillStyle="#FFFFFF";
         ctx.canvas.width = 743;
