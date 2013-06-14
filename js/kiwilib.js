@@ -121,19 +121,19 @@ function refreshCanvas() {
                 tx=0; ty=0; 
                 break;
             case -90:
-                tx=0; ty=-window.innerWidth;
-                ctx.translate(0,-window.innerWidth);
-                ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+                tx=0; ty=-w;
+                ctx.translate(0,-w);
+                ctx.fillRect(0,0,h,w);
                 break;
             case 90:
-                tx=-window.innerHeight; ty=0;
-                ctx.translate(-window.innerHeight,0);
-                ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+                tx=-h; ty=0;
+                ctx.translate(-h,0);
+                ctx.fillRect(0,0,h,w);
                 break;
             case 180:
-                tx=-window.innerWidth; ty=-window.innerHeight;
-                ctx.translate(-window.innerWidth,-window.innerHeight);
-                ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+                tx=-w; ty=-h;
+                ctx.translate(-w,-h);
+                ctx.fillRect(0,0,w,h);
                 break;
         }
     } else {
