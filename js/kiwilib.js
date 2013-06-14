@@ -110,15 +110,13 @@ function refreshCanvas() {
         ctx.rotate(-orientation*Math.PI/180);
         ctx.fillStyle="#FFFFFF";
 
-/*        var r = h/w;
+        var r = h/w;
         if(screen.width < screen.height) {
-             w = screen.width;
-             h = w*r;
+            r = screen.width/w;
         } else {
-             h = screen.height;
-             w = h/r;
+             r = screen.height/h;
         }
-*/
+
         canvas.width = w;
         canvas.height = h;
         ctx = canvas.getContext('2d');
@@ -157,6 +155,7 @@ function refreshCanvas() {
                 ctx.fillRect(0,0,w,h);
                 break;
         }
+       ctx.scale(r,r);
     } else {
         ctx.fillStyle="#FFFFFF";
         ctx.canvas.width = 743;
