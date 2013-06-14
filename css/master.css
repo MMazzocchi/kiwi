@@ -21,7 +21,7 @@
 
 /* EXTRA TOOLBAR */
 #create #list a#select_select { background-image:url(../img/btn_tool_select-selects.png); }
-#create #list a#select_zoom { background-image:url(../img/btn_tool_select-zoom.png); }
+#create #list a#zoom { background-image:url(../img/btn_tool_select-zoom.png); }
 #create #list a#stamp_butterfly { background-image:url(../img/btn_tool_stamp-butterfly.png); }
 #create #list a#stamp_blackwidow { background-image:url(../img/btn_tool_stamp-blackwidow.png); }
 #create #list a#stamp_captain1 { background-image:url(../img/btn_tool_stamp-captain1.png); }
