@@ -23,7 +23,7 @@ function OpacitySlider()
 		// Init Disc
 		ctx = slider.getContext('2d');
 		line_img = document.getElementById("slider_line");
-		ctx.drawImage(slider_img,0,0);
+//		ctx.drawImage(slider_img,0,0);
 		var canvas_name;
 		if(slide_type == "opacity"){
 			canvas_name = "#opac_canvas";
