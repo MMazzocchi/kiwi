@@ -125,7 +125,7 @@ function refreshCanvas() {
         canvas.height = h;
         ctx = canvas.getContext('2d');
 
-        ctx.scale(743/w,h/608);
+        ctx.scale(608/w,h/608);
 
         orientation = window.orientation;
         ctx.rotate(-orientation*Math.PI/180);
