@@ -132,7 +132,7 @@ function refreshCanvas() {
             case 0:
                 ctx.fillStyle="#FFFFFF";
                 tx=0; ty=0; 
-                ctx.scale(1,h/608);
+//                ctx.scale(1,h/608);
                 break;
             case -90:
                 tx=0; ty=-h;
@@ -145,7 +145,7 @@ function refreshCanvas() {
             case 180:
                 ctx.fillStyle="#FFFFFF";
                 tx=-w; ty=-h;
-                ctx.scale(1,h/608);
+//                ctx.scale(1,h/608);
                 ctx.translate(-w,-h);
                 break;
         }
