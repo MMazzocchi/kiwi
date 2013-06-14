@@ -114,6 +114,7 @@ function refreshCanvas() {
 
         switch(orientation) {
             case 0:
+                if(h > screen.width) { h = screen.width; }
                 canvas.width = h;
                 canvas.height = w;
                 ctx = canvas.getContext('2d');
@@ -132,6 +133,7 @@ function refreshCanvas() {
                 ctx.fillRect(0,0,h,w);
                 break;
             case 180:
+                if(h > screen.width) { h = screen.width; }
                 canvas.width = h;
                 canvas.height = w;
                 ctx = canvas.getContext('2d');
