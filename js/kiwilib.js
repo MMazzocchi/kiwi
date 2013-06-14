@@ -859,7 +859,8 @@ function hideKeyboard() {
 
 // The '$().ready(' means that this function will be called as soon as the page is loaded.
 $().ready( function() {
-    document.onselectstart = function () { return false; };
+    document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+	document.onselectstart = function () { return false; };
 
     //Create Color picker
     myCP = new ColorPicker();
