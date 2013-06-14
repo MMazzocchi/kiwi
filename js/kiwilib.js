@@ -113,6 +113,7 @@ function refreshCanvas() {
 
         switch(orientation) {
             case 0:
+                ctx.translate(window.innerWidth/2, 0);
                 ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
                 tx=0; ty=0; 
                 break;
