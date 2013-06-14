@@ -81,7 +81,7 @@ function transformCoordinates(e) {
         }
     }
 
-//    var s = .93;
+    var s = .93;
 //    x = x*s;
 //    y = y*s;
 
@@ -102,8 +102,8 @@ function refreshCanvas() {
     var w = 743;
     var h = 608;
 
-    canvas.width = 743;
-    canvas.height = 608;
+//    canvas.width = 743;
+//    canvas.height = 608;
 
     var ctx = canvas.getContext('2d');
 
@@ -112,14 +112,31 @@ function refreshCanvas() {
         ctx.rotate(-orientation*Math.PI/180);
         ctx.fillStyle="#FFFFFF";
 
+        var r = h/w;
+        if(screen.width < screen.height) {
+             w = screen.width;
+             h = w*r;
+        } else {
+             h = screen.height;
+             w = h/r;
+        }
+
+        canvas.width = w;
+        canvas.height = h;
+        ctx = canvas.getContext('2d');
+
+
+        orientation = window.orientation;
+        ctx.rotate(-orientation*Math.PI/180);
+        ctx.fillStyle="#FFFFFF";
+
         switch(orientation) {
             case 0:
-                if(h > screen.width) { h = screen.width; }
-                canvas.width = h;
-                canvas.height = w;
+                canvas.width = w;
+                canvas.height = h;
                 ctx = canvas.getContext('2d');
                 ctx.fillStyle="#FFFFFF";
-                ctx.fillRect(0,0,h,w);
+                ctx.fillRect(0,0,w,h);
                 tx=0; ty=0; 
                 break;
             case -90:
@@ -133,15 +150,14 @@ function refreshCanvas() {
                 ctx.fillRect(0,0,h,w);
                 break;
             case 180:
-                if(h > screen.width) { h = screen.width; }
-                canvas.width = h;
-                canvas.height = w;
+                canvas.width = w;
+                canvas.height = h;
                 ctx = canvas.getContext('2d');
                 ctx.rotate(-orientation*Math.PI/180); 
                 ctx.fillStyle="#FFFFFF";
                 tx=-h; ty=-w;
-                ctx.translate(-h,-w);
-                ctx.fillRect(0,0,h,w);
+                ctx.translate(-w,-h);
+                ctx.fillRect(0,0,w,h);
                 break;
         }
     } else {
@@ -152,8 +168,8 @@ function refreshCanvas() {
 	
     //Redraw every object at the current zoom
 
-	ctx.scale(zoom, zoom);
-	ctx.translate(originx, originy);
+    ctx.scale(zoom, zoom);
+    ctx.translate(originx, originy);
 
     if(background) {
         background.draw(ctx);
@@ -929,11 +945,19 @@ $().ready( function() {
         window.open(canvas.toDataURL(), "Drawing", canvas.width, canvas.height);
     });
 	
+	$('#brush').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('draw');
+    });
     $('#brush_normal').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('draw');
     });
 
+	$('#shape').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('line');
+    });
     $('#shape_line').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('line');
@@ -968,6 +992,10 @@ $().ready( function() {
         document.body.style.cursor="url(img/hand-tool.png)14 6, default";
         SelectTool('select');
     });
+	$('#select_select').click( function() {
+        document.body.style.cursor="url(img/hand-tool.png)14 6, default";
+        SelectTool('select');
+    });
 
     $('#brush_pencil').click( function() {
         document.body.style.cursor="url(img/pencil.png)0 28, default";
@@ -993,7 +1021,13 @@ $().ready( function() {
         SelectTool('dropper');
     });
     
-    $('#fill_blob').click( function() {
+    $('#fill').click( function() {
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = "";
+        bgFill = false;
+        SelectTool('fill');
+    });
+	$('#fill_blob').click( function() {
         document.body.style.cursor="url(img/paintbucket.png)4 28, default";
         curFillId = "";
         bgFill = false;
@@ -1015,7 +1049,12 @@ $().ready( function() {
     });
 
 	
-    $('#text_bubble').click( function() {
+    $('#text').click( function() {
+        document.body.style.cursor="default";
+        SelectTool('textbox');
+        textMode = "balloon";
+    });
+	$('#text_bubble').click( function() {
         document.body.style.cursor="default";
         SelectTool('textbox');
         textMode = "balloon";
@@ -1027,7 +1066,11 @@ $().ready( function() {
         textMode = "box";
     });
 	
-    $('#stamp_butterfly').click( function() {
+    $('#stamp').click( function() {
+        SelectTool('stamp');
+        curStamp = 'butterfly'
+    });
+	$('#stamp_butterfly').click( function() {
         SelectTool('stamp');
         curStamp = 'butterfly'
     });
