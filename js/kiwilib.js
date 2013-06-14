@@ -126,7 +126,7 @@ function refreshCanvas() {
         if(b == 1) {
             ctx.scale(1,h/608);
         } else {
-            ctx.scale(w/743,1);
+            ctx.scale(743/w,1);
         }
 
 
