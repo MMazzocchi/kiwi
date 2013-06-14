@@ -332,14 +332,14 @@ function findSectors(dObj, x, y, sectors, width, height, ctx) {
     dObj.my = Math.round((dObj.lCorner[1]+dObj.rCorner[1])/2);
 }
 
-function makePattern(id) {
-    var pic = document.getElementById(id);
+function makePattern(url) {
+    //var pic = document.getElementById(id);
 
     var tCanvas = document.createElement('canvas');
-    tCanvas.width  = pic.width;
-    tCanvas.height = pic.height;
+    tCanvas.width  = canvas.width;
+    tCanvas.height = canvas.height;
     var tCtx = tCanvas.getContext('2d');
-    tCtx.drawImage(pic, 0, 0);
+    tCtx.drawSvg(url, 0, 0,tCanvas.width,tCanvas.height);
 
     var pattern = tCtx.createPattern(tCanvas, "repeat");
     return pattern;

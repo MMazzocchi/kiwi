@@ -10,7 +10,7 @@ var svgList = {
 	'hulk2':		{svg:null,default_scale: 0.25,cx:504, cy:612,bounds:[0,0,1008,1224],url:'svg/hulk2.svg' },
 	'fury':			{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/fury1.svg' },
 	'blackwidow':	{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/blackwidow.svg' },
-	'hawkeye':		{svg:null,default_scale: 0.25,cx:468, cy:612,bounds:[0,0,936,1224],url:'svg/hawkeye.svg' }	
+	'hawkeye':		{svg:null,default_scale: 0.25,cx:468, cy:612,bounds:[0,0,936,1224],url:'svg/hawkeye.svg' }
 };
 
 // Create a bitmap from this object

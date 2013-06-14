@@ -32,6 +32,7 @@ function drawBalloon(ctx, ptx, pty, lx, ly, bw, bh, radius, lw){
         ctx.lineTo(lx, ly+radius);
         ctx.quadraticCurveTo(lx, ly, lx+radius, ly);
         ctx.stroke();
+		ctx.fillStyle="#FFFFFF";
         ctx.fill();
 
         var cx = lx+bw/2;
@@ -55,6 +56,8 @@ function placeTextArea(x,y){
     
     dObj.mx = (dObj.lCorner[0] + dObj.rCorner[0])/2;
     dObj.my = (dObj.lCorner[1] + dObj.rCorner[1])/2;
+	console.log(dObj.lCorner[0] + " "+ dObj.rCorner[0]);
+	console.log(dObj.lCorner[1] + " "+ dObj.rCorner[1]);
 }
 
 function createTextBalloon(dObj) {
@@ -106,7 +109,6 @@ function createTextBalloon(dObj) {
         for(var i=0; i<this.theText.length; i++){
             var line_length = 0; 
             for(var j=0; j<this.theText[i].length; j++){
-                
                 var span = 0;
                 var nl = 0;
                 

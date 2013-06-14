@@ -854,7 +854,7 @@ function showKeyboard() {
     } else {
         txt = objectList[selectedId].theText;
     }
-    if(txt != "") {
+    if(txt && txt != "") {
         txt = txt.join("\n");
         txt = txt.join(" ");
     }
