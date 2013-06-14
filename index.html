@@ -347,7 +347,8 @@ function hideextratoolbar() {
 }
 
 if (/*(screen.width < 797) || (screen.height < 797)*/ orienting()) {
-	$("#stamp").click(showextratoolbar);
+	$("#select").click(showextratoolbar);
+        $("#stamp").click(showextratoolbar);
 	$("#shape").click(showextratoolbar);
 	$("#fill").click(showextratoolbar);
 	$("#brush").click(showextratoolbar);
@@ -360,7 +361,7 @@ if (/*(screen.width < 797) || (screen.height < 797)*/ orienting()) {
                 }
 		document.getElementById("extratools").style.display = "none";
 	});
-	$("#select").click(hideextratoolbar);
+	$("#select_select").click(hideextratoolbar);
 	$("#stamp_butterfly").click(hideextratoolbar);
 	$("#shape_line").click(hideextratoolbar);
 	$("#shape_circle").click(hideextratoolbar);
