@@ -97,7 +97,8 @@ function refreshCanvas() {
         selectedId = -1;
     }
 
-//    var ctx = canvas.getContext('2d');
+    var ctx = canvas.getContext('2d');
+    ctx.save();
 
     var w = 743;
     var h = 608;
@@ -112,7 +113,7 @@ function refreshCanvas() {
         ctx.rotate(-orientation*Math.PI/180);
         ctx.fillStyle="#FFFFFF";
 
-/*        var r = h/w;
+        var r = h/w;
         if(screen.width < screen.height) {
              w = screen.width;
              h = w*r;
@@ -120,7 +121,7 @@ function refreshCanvas() {
              h = screen.height;
              w = h/r;
         }
-*/
+
         canvas.width = w;
         canvas.height = h;
         ctx = canvas.getContext('2d');
@@ -205,7 +206,7 @@ function refreshCanvas() {
         }
         objectList[selectedId].drawIcons(ctx);
     }
-	ctx.restore();
+    ctx.restore();
 }
 
 // Assign a new ID to this object
