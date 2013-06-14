@@ -155,19 +155,18 @@ function refreshCanvas() {
         background.draw(ctx);
     }
 	if(!cachedraw){
-	
+		var dObj = objectList[ayerList[layerList.length-1]];
+		if(scratch){
+		    ctx.putImageData(scratch,0,0);
+		}
+		dObj.draw(ctx);
+		scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
 	}
     // For each id in layerList, call this function:
     else{
 		$.each(layerList, function(i, id) {
 			// Get the object for this layer
 			var dObj = objectList[id];
-			//if(scratch){
-			//    ctx.putImageData(scratch,0,0);
-			//}
-			//dObj.draw(ctx);
-			//scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
-
 			if((!isDragging) || (id != selectedId)) {
 				// Draw the object
 				dObj.draw(ctx);
@@ -317,14 +316,11 @@ function eraseObject(id) {
 function applyZoom(x, y, curZoom, prevZoom){
 	var z1 = Math.pow(factor,prevZoom);
 	var z2 = zoom = Math.pow(factor,curZoom);
-	console.log(z1 + " " +z2);
-	 var r = z2-z1;
+	var r = z2-z1;
 	var px = x/z2;
 	var py = y/z2;
-	console.log(px + " " +py);
 	originx = (px - x);
 	originy = (py - y);
-
 
 	var newAct = {
 		undo: function() {
