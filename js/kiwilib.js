@@ -396,7 +396,7 @@ function pointerDown(e) {
                 yOld = y;
                 xFirst = x;
                 yFirst = y;
-				isDragging  = true;
+                isDragging  = true;
                 if((selectedId != -1) && objectList[selectedId].iconClicked(x, y)) {
                     dragMode = objectList[selectedId].iconClicked(x, y);
                     if(dragMode == 'scale') {
@@ -793,8 +793,11 @@ function showKeyboard() {
         txt = objectList[selectedId].theText;
     }
     if(txt && txt != "") {
+        console.log(txt);
+        for(var i=0; i<txt.length; i++) {
+            txt[i] = txt[i].join(" ");
+        }
         txt = txt.join("\n");
-        txt = txt.join(" ");
     }
     $('#t').val(txt);
     $('#t').focus();

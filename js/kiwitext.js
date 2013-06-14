@@ -205,7 +205,6 @@ function createTextBalloon(dObj) {
         else{
             var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,1/this.xScale,1/this.yScale,-this.rotation);
             x=pt[0]; y=pt[1];
-            console.log(pt);
             if(x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]) {
                 showKeyboard();
                 return true;
