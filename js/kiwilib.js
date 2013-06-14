@@ -156,7 +156,7 @@ function refreshCanvas() {
                 break;
         }
         ctx.fillRect(0,0,w,h);
-
+        ctx.scale(1,w/h);
     } else {
         ctx.fillStyle="#FFFFFF";
         ctx.canvas.width = 743;
