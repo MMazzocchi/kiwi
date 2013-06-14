@@ -570,7 +570,7 @@ function pointerDown(e) {
                 isDragging = true;
                 var id = ctx.getImageData(x, y, 1, 1);
                 var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
-                myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+                myCP.setHSL( hsl[0]*360, 255, hsl[2]*100);
                 opacSlider.updateValue(90);
                 break;
             case "zoom":
@@ -617,7 +617,7 @@ function pointerMove(e) {
             case "dropper":
                 var id = ctx.getImageData(x, y, 1, 1);
                 var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
-                myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+                myCP.setHSL( hsl[0]*360, 255, hsl[2]*100);
                 break;
         case "textbox":
             placeTextArea(x,y);
