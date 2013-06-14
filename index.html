@@ -70,6 +70,8 @@
             	<span id="selects">
                 	<a id="select_select" class="active">Select</a>
                     <a id="zoom">Zoom</a>
+                    <a id="copy">Copy</a>
+                    <a id="paste">Paste</a>
                 </span>
                 <span id="stamps">
                 	<a id="stamp_butterfly" class="active">Butterfly</a>
@@ -138,14 +140,32 @@ $("#select").click( function() {
     document.getElementById("selects").style.display = "block";
 	$("#select_select").addClass("active");
 	$("#zoom").removeClass("active");
+	$("#copy").removeClass("active");
+	$("#paste").removeClass("active");
 });
 $("#select_select").click( function() {
 	$("#select_select").addClass("active");
 	$("#zoom").removeClass("active");
+	$("#copy").removeClass("active");
+	$("#paste").removeClass("active");
 });
 $("#zoom").click( function() {
 	$("#select_select").removeClass("active");
 	$("#zoom").addClass("active");
+	$("#copy").removeClass("active");
+	$("#paste").removeClass("active");
+});
+$("#copy").click( function() {
+	$("#select_select").removeClass("active");
+	$("#zoom").removeClass("active");
+	$("#copy").addClass("active");
+	$("#paste").removeClass("active");
+});
+$("#paste").click( function() {
+	$("#select_select").removeClass("active");
+	$("#zoom").removeClass("active");
+	$("#copy").removeClass("active");
+	$("#paste").addClass("active");
 });
 
 $("#stamp").click( function() {
@@ -579,6 +599,8 @@ if (orienting()) {
 	document.getElementById("selects").style.display = "none";
 	document.getElementById("select_select").style.display = "none";
 	document.getElementById("zoom").style.display = "none";
+	document.getElementById("copy").style.display = "none";
+	document.getElementById("paste").style.display = "none";
 	$("#stamp_butterfly").click(hideextratoolbar);
 	$("#stamp_ironman1").click(hideextratoolbar);
 	$("#stamp_ironman2").click(hideextratoolbar);
