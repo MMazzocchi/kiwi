@@ -117,10 +117,8 @@ function refreshCanvas() {
              w = h/r;
         }
 
-        ctx.canvas.width = w;
-        ctx.canvas.height = h;
-        ctx.canvas.style.width = w;
-        ctx.canvas.style.height = h;
+        canvas.width = w;
+        canvas.height = h;
         ctx = canvas.getContext('2d');
 
         orientation = window.orientation;
@@ -134,6 +132,7 @@ function refreshCanvas() {
 //                ctx = canvas.getContext('2d');
                 ctx.fillStyle="#FFFFFF";
 //                ctx.fillRect(0,0,w,h);
+                ctx.scale(1,w/h);
                 tx=0; ty=0; 
                 break;
             case -90:
