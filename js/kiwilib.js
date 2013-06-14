@@ -136,7 +136,7 @@ function refreshCanvas() {
                 ctx = canvas.getContext('2d');
                 ctx.fillStyle="#FFFFFF";
                 tx=-h; ty=-w;
-                ctx.translate(-h,-w);
+//                ctx.translate(-h,-w);
                 ctx.fillRect(0,0,h,w);
                 break;
         }
