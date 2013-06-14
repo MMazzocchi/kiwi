@@ -112,9 +112,11 @@ function refreshCanvas() {
 
         var r = h/w;
         if(screen.width < screen.height) {
-            r = screen.width/w;
+             w = screen.width;
+             h = w*r;
         } else {
-             r = screen.height/h;
+             h = screen.height;
+             w = h/r;
         }
 
         canvas.width = w;
@@ -124,9 +126,6 @@ function refreshCanvas() {
         orientation = window.orientation;
         ctx.rotate(-orientation*Math.PI/180);
         ctx.fillStyle="#FFFFFF";
-
-        ctx.scale(r,r);
-
 
         switch(orientation) {
             case 0:
