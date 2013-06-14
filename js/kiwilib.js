@@ -125,6 +125,9 @@ function refreshCanvas() {
         ctx.rotate(-orientation*Math.PI/180);
         ctx.fillStyle="#FFFFFF";
 
+        ctx.scale(r,r);
+
+
         switch(orientation) {
             case 0:
                 canvas.width = w;
@@ -155,7 +158,6 @@ function refreshCanvas() {
                 ctx.fillRect(0,0,w,h);
                 break;
         }
-       ctx.scale(r,r);
     } else {
         ctx.fillStyle="#FFFFFF";
         ctx.canvas.width = 743;
