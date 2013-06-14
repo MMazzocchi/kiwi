@@ -133,7 +133,7 @@ function refreshCanvas() {
                 canvas.height = w;
                 ctx = canvas.getContext('2d');
                 ctx.fillStyle="#FFFFFF";
-                ctx.fillRect(0,0,w,h);
+                ctx.fillRect(0,0,h,w);
                 tx=0; ty=0; 
                 break;
             case -90:
@@ -152,9 +152,9 @@ function refreshCanvas() {
                 ctx = canvas.getContext('2d');
                 ctx.rotate(-orientation*Math.PI/180); 
                 ctx.fillStyle="#FFFFFF";
-                tx=-w; ty=-h;
-                ctx.translate(-w,-h);
-                ctx.fillRect(0,0,w,h);
+                tx=-h; ty=-w;
+                ctx.translate(-h,-w);
+                ctx.fillRect(0,0,h,w);
                 break;
         }
     } else {
