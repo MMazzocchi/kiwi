@@ -230,3 +230,16 @@ body {
 	#create #right { right:0; width:auto; }
 	#create #extratools { left:0; padding:3px 5px; }
 }
+
+@media (max-width:575px) {
+	#create #fileactions a, 
+	#create #left a { background:none!important; width:auto; height:auto; text-indent:0; padding:1px 2px; color:#CCC; }
+	#create #fileactions a:hover,
+	#create #left a:hover { color:#FFF; text-decoration:underline; }
+	#create #fileactions a:active,
+	#create #fileactions a.active,
+	#create #left a:active,
+	#create #left a.active { color:#FFF; }
+	#create #left a#dropper { background:none!important; position:relative; width:auto; height:auto; padding:1px 2px; }
+	#create #left a#dropper span { display:inline-block; width:auto; height:auto; background:none!important; }
+}
