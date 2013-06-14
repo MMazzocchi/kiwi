@@ -1,77 +1,16 @@
 var svgList = {
-	'butterfly':{
-        svg:null,
-		cx:205, 
-		cy:143, 
-		bounds:[0,0,410,286], 
-		url:'svg/butterfly.svg'  },
-	'ironman1':{
-        svg:null,
-		default_scale: 0.5,
-        cx:396, cy:612,
-        bounds:[0,0,792,1224],
-        url:'svg/ironman1.svg' },
-	'ironman2':{
-        svg:null,
-		default_scale: 0.5,
-        cx:396, cy:612,
-        bounds:[0,0,792,1224],
-        url:'svg/ironman2.svg' },
-	'thor1':{
-        svg:null,
-		default_scale: 0.5,
-        cx:396, cy:612,
-        bounds:[0,0,792,1224],
-        url:'svg/ironman1.svg' },
-	'thor2':{
-        svg:null,
-		default_scale: 0.5,
-        cx:396, cy:612,
-        bounds:[0,0,792,1224],
-        url:'svg/ironman2.svg' },
-	'captain1':{
-        svg:null,
-		default_scale: 0.5,
-        cx:396, cy:612,
-        bounds:[0,0,792,1224],
-        url:'svg/captain1.svg' },
-	'captain2':{
-        svg:null,
-		default_scale: 0.5,
-        cx:396, cy:612,
-        bounds:[0,0,792,1224],
-        url:'svg/captain2.svg' },
-	'hulk1':{
-        svg:null,
-		default_scale: 0.5,
-        cx:396, cy:612,
-        bounds:[0,0,792,1224],
-        url:'svg/hulk1.svg' },
-	'hulk2':{
-        svg:null,
-		default_scale: 0.5,
-        cx:396, cy:612,
-        bounds:[0,0,792,1224],
-        url:'svg/hulk2.svg' },
-	'fury':{
-        svg:null,
-		default_scale: 0.5,
-        cx:396, cy:612,
-        bounds:[0,0,792,1224],
-        url:'svg/fury.svg' },
-	'blackwidow':{
-        svg:null,
-		default_scale: 0.5,
-        cx:396, cy:612,
-        bounds:[0,0,792,1224],
-        url:'svg/blackwidow.svg' },
-	'hawkeye':{
-        svg:null,
-		default_scale: 0.5,
-        cx:396, cy:612,
-        bounds:[0,0,792,1224],
-        url:'svg/hawkeye.svg' }
-		
+	'butterfly':	{svg:null,default_scale: 1.0,cx:205, cy:143, bounds:[0,0,410,286], url:'svg/butterfly.svg'  },
+	'ironman1':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/ironman1.svg' },
+	'ironman2':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/ironman2.svg' },
+	'thor1':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/ironman1.svg' },
+	'thor2':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/ironman2.svg' },
+	'captain1':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/captain1.svg' },
+	'captain2':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/captain2.svg' },
+	'hulk1':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/hulk1.svg' },
+	'hulk2':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/hulk2.svg' },
+	'fury':			{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/fury.svg' },
+	'blackwidow':	{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/blackwidow.svg' },
+	'hawkeye':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/hawkeye.svg' }	
 };
 
 // Create a bitmap from this object
