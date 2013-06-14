@@ -110,9 +110,9 @@ function refreshCanvas() {
 
         switch(orientation) {
             case 0:
-                ctx.canvas.width = height;
-                ctx.canvas.height = width;
-                ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+                ctx.canvas.width = width;
+                ctx.canvas.height = height;
+                ctx.fillRect(0,0,width,height);
                 tx=0; ty=0; 
                 break;
             case -90:
