@@ -134,6 +134,7 @@ function refreshCanvas() {
                 canvas.width = h;
                 canvas.height = w;
                 ctx = canvas.getContext('2d');
+                ctx.rotate(-orientation*Math.PI/180); 
                 ctx.fillStyle="#FFFFFF";
                 tx=-h; ty=-w;
 //                ctx.translate(-h,-w);
