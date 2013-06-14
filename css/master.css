@@ -211,7 +211,7 @@ body {
 #create #sleft,
 #create #sright { background:none; }
 
-@media (max-width:900px) {
+@media (max-width:969px) {
 	#create { position:relative; width:100%; }
 	#create #tbl,
 	#create #left,
