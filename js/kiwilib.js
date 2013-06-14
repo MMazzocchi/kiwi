@@ -154,12 +154,16 @@ function refreshCanvas() {
         background.draw(ctx);
     }
 	if(!cachedraw){
-		var dObj = objectList[ayerList[layerList.length-1]];
-		if(scratch){
-		    ctx.putImageData(scratch,0,0);
-		}
-		dObj.draw(ctx);
+		ctx.save();
+		ctx.fillStyle = "#FFFFFF";
+		ctx.globalAlpha = 1;
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+		ctx.globalCompositeOperation = "darker";
+		var dObj = objectList[layerList[layerList.length-1]];
+		scratch && ctx.putImageData(scratch,0,0);
+		dObj && dObj.draw(ctx);
 		scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
+		ctx.restore();
 	}
     // For each id in layerList, call this function:
     else{
