@@ -133,8 +133,11 @@ function refreshCanvas() {
             case 180:
                 canvas.width = h;
                 canvas.height = w;
+                ctx = canvas.getContext('2d');
+                ctx.fillStyle="#FFFFFF";
+                ctx.rotate(-orientation*Math.PI/180);
                 tx=-h; ty=-w;
-//                ctx.translate(-h,-w);
+                ctx.translate(-h,-w);
                 ctx.fillRect(0,0,h,w);
                 break;
         }
