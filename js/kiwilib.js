@@ -83,7 +83,7 @@ function transformCoordinates(e) {
 
     var s = .93;
 //    x = x*s;
-    y = y*s;
+//    y = y*s;
 
    // x = x/zoom;
    // y = y/zoom;
@@ -102,8 +102,8 @@ function refreshCanvas() {
     var w = 743;
     var h = 608;
 
-    canvas.width = 743;
-    canvas.height = 608;
+//    canvas.width = 743;
+//    canvas.height = 608;
 
     var ctx = canvas.getContext('2d');
 
@@ -121,32 +121,41 @@ function refreshCanvas() {
              w = h/r;
         }
 
+        canvas.width = w;
+        canvas.height = h;
+        ctx = canvas.getContext('2d');
+
+
+        orientation = window.orientation;
+        ctx.rotate(-orientation*Math.PI/180);
+        ctx.fillStyle="#FFFFFF";
+
         switch(orientation) {
             case 0:
-                canvas.width = w;
-                canvas.height = h;
+//                canvas.width = w;
+//                canvas.height = h;
                 ctx = canvas.getContext('2d');
                 ctx.fillStyle="#FFFFFF";
                 ctx.fillRect(0,0,w,h);
                 tx=0; ty=0; 
                 break;
             case -90:
-                tx=0; ty=-w;
+                tx=0; ty=-h;
                 ctx.translate(0,-h);
                 ctx.fillRect(0,0,h,w);
                 break;
             case 90:
                 tx=-h; ty=0;
-                ctx.translate(-h,0);
+                ctx.translate(-w,0);
                 ctx.fillRect(0,0,h,w);
                 break;
             case 180:
-                canvas.width = w;
-                canvas.height = h;
+//                canvas.width = w;
+//                canvas.height = h;
                 ctx = canvas.getContext('2d');
                 ctx.rotate(-orientation*Math.PI/180); 
                 ctx.fillStyle="#FFFFFF";
-                tx=-h; ty=-w;
+                tx=-w; ty=-h;
                 ctx.translate(-w,-h);
                 ctx.fillRect(0,0,w,h);
                 break;
@@ -577,7 +586,7 @@ function pointerDown(e) {
                 isDragging = true;
                 var id = ctx.getImageData(x, y, 1, 1);
                 var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
-                myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+                myCP.setHSL( hsl[0]*360, 255, hsl[2]*100);
                 opacSlider.updateValue(90);
                 break;
             case "zoom":
@@ -624,7 +633,7 @@ function pointerMove(e) {
             case "dropper":
                 var id = ctx.getImageData(x, y, 1, 1);
                 var hsl = rgbToHsl( id.data[0], id.data[1], id.data[2] );
-                myCP.setHSL( hsl[0]*360, hsl[1]*100, hsl[2]*100);
+                myCP.setHSL( hsl[0]*360, 255, hsl[2]*100);
                 break;
         case "textbox":
             placeTextArea(x,y);
