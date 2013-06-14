@@ -108,6 +108,9 @@ function refreshCanvas() {
         ctx.rotate(-orientation*Math.PI/180);
         ctx.fillStyle="#FFFFFF";
 
+    ctx.canvas.width = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
+
         switch(orientation) {
             case 0:
                 ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
