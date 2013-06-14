@@ -123,11 +123,11 @@ function refreshCanvas() {
         canvas.height = h;
         ctx = canvas.getContext('2d');
 
-        if(b == 1) {
+//        if(b == 1) {
             ctx.scale(1,h/608);
-        } else {
-            ctx.scale(743/w,1);
-        }
+//        } else {
+//            ctx.scale(743/w,1);
+//        }
 
 
         orientation = window.orientation;
