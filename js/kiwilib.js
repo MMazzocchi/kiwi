@@ -131,13 +131,9 @@ function refreshCanvas() {
                 ctx.fillRect(0,0,h,w);
                 break;
             case 180:
-                canvas.width = h;
-                canvas.height = w;
-                ctx = canvas.getContext('2d');
-                ctx.fillStyle="#FFFFFF";
                 tx=-w; ty=-h;
-                ctx.translate(-h,-w);
-                ctx.fillRect(0,0,h,w);
+                ctx.translate(-w,-h);
+                ctx.fillRect(0,0,w,h);
                 break;
         }
     } else {
