@@ -119,6 +119,8 @@ function refreshCanvas() {
 
         ctx.canvas.width = w;
         ctx.canvas.height = h;
+        ctx.canvas.style.width = w;
+        ctx.canvas.style.height = h;
         ctx = canvas.getContext('2d');
 
         orientation = window.orientation;
