@@ -35,8 +35,6 @@ var bgFill = false;
 var background = undefined;
 
 function orienting() {
-//    return (typeof window.orientation != "undefined");
-//    return ( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent));
     return 'ontouchstart' in document.documentElement;
 }
 
@@ -358,57 +356,6 @@ function dragZoom(x, y){
 	zoomposx = x;
 	zoomposy = y;
 }
-
-/*
-function downloadImage(){
-	var img = canvas.toDataURL("image/jpeg;base64;");
-//	img = img.replace("image/jpeg","image/octet-stream"); // force download, user would have to give the file name.
-// you can also use anchor tag with download attribute to force download the canvas with file name.
-	window.open(img,"","width=700,height=700");
-}
-*/
-
-
-// http://www.nihilogic.dk/labs/canvas2image/
-function downloadImage() {
-	var dcanvas = document.getElementById("drawing_canvas"); 
-	Canvas2Image.saveAsPNG(dcanvas);	
-}
-// download canvas as JPEG
-// from http://www.joeltrost.com/blog/2012/01/29/html5-canvas-save-a-jpeg-with-extension/
-/*function downloadImage(){
-	var cs = new CanvasSaver('http://joeltrost.com/php/functions/saveme.php');
-	cs.saveJPEG(canvas, 'image');
-
-	function CanvasSaver(url) {
-	  this.url = url;
-	  this.saveJPEG = function(cnvs, fname) {
-	  if(!cnvs || !url) return;
-		fname = fname || 'picture';
-
-		var data = cnvs.toDataURL("image/jpeg");
-		data = data.substr(data.indexOf(',') + 1).toString();
-		var dataInput = document.createElement("input") ;
-		dataInput.setAttribute("name", 'imgdata') ;
-		dataInput.setAttribute("value", data);
-
-		var nameInput = document.createElement("input") ;
-		nameInput.setAttribute("name", 'name') ;
-		nameInput.setAttribute("value", fname + '.jpg');
-
-		var myForm = document.createElement("form");
-		myForm.method = 'post';
-		myForm.action = url;
-		myForm.appendChild(dataInput);
-		myForm.appendChild(nameInput);
-
-		document.body.appendChild(myForm) ;
-		myForm.submit() ;
-		document.body.removeChild(myForm) ;
-		
-	  };
-	}
-}*/
 
 function pointerDown(e) {
     var c = transformCoordinates(e);
