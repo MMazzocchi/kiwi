@@ -1029,15 +1029,49 @@ $().ready( function() {
         SelectTool('stamp');
         curStamp = 'butterfly'
     });
-	
-    $('#mickey_button').click( function() {
+	$('#stamp_ironman1').click( function() {
         SelectTool('stamp');
-        curStamp = 'mickey'
+        curStamp = 'ironman1'
     });
-	
-    $('#bnl').click( function() {
+	$('#stamp_ironman2').click( function() {
         SelectTool('stamp');
-        curStamp = 'bnl'
+        curStamp = 'ironman2'
+    });
+	$('#stamp_captain1').click( function() {
+        SelectTool('stamp');
+        curStamp = 'captain1'
+    });
+	$('#stamp_captain2').click( function() {
+        SelectTool('stamp');
+        curStamp = 'captain2'
+    });
+    $('#stamp_hulk1').click( function() {
+        SelectTool('stamp');
+        curStamp = 'hulk1'
+    });
+    $('#stamp_hulk2').click( function() {
+        SelectTool('stamp');
+        curStamp = 'hulk2'
+    });
+	$('#stamp_thor1').click( function() {
+        SelectTool('stamp');
+        curStamp = 'thor1'
+    });
+    $('#stamp_thor2').click( function() {
+        SelectTool('stamp');
+        curStamp = 'thor2'
+    });
+	$('#stamp_blackwidow').click( function() {
+        SelectTool('stamp');
+        curStamp = 'blackwidow'
+    });
+    $('#stamp_hawkeye').click( function() {
+        SelectTool('stamp');
+        curStamp = 'hawkeye'
+    });
+	$('#stamp_fury').click( function() {
+        SelectTool('stamp');
+        curStamp = 'fury'
     });
 	
     $('#stamp').click( function() {

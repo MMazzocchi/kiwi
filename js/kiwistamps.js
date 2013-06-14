@@ -1,27 +1,77 @@
 var svgList = {
-    'mickey':{
-        svg:null,
-		default_scale: 1,
-        cx:156, cy:145,
-        bounds:[0,0,313,290],
-        url:'svg/Frame.svg' },
 	'butterfly':{
         svg:null,
-		default_scale: 0.5,
-        cx:396, cy:612,
-        bounds:[0,0,792,1224],
-        url:'svg/AVASA_P_0116_FEB13.svg' },
-    'bnl':{
+		cx:205, 
+		cy:143, 
+		bounds:[0,0,410,286], 
+		url:'svg/butterfly.svg'  },
+	'ironman1':{
         svg:null,
 		default_scale: 0.5,
         cx:396, cy:612,
         bounds:[0,0,792,1224],
-        url:'svg/AVASA_P_0134_FEB13.svg' },
-    'troll':{
+        url:'svg/ironman1.svg' },
+	'ironman2':{
         svg:null,
-        cx:301, cy:226,
-        bounds:[0,0,603,453],
-        url:'svg/troll_face.svg' }
+		default_scale: 0.5,
+        cx:396, cy:612,
+        bounds:[0,0,792,1224],
+        url:'svg/ironman2.svg' },
+	'thor1':{
+        svg:null,
+		default_scale: 0.5,
+        cx:396, cy:612,
+        bounds:[0,0,792,1224],
+        url:'svg/ironman1.svg' },
+	'thor2':{
+        svg:null,
+		default_scale: 0.5,
+        cx:396, cy:612,
+        bounds:[0,0,792,1224],
+        url:'svg/ironman2.svg' },
+	'captain1':{
+        svg:null,
+		default_scale: 0.5,
+        cx:396, cy:612,
+        bounds:[0,0,792,1224],
+        url:'svg/captain1.svg' },
+	'captain2':{
+        svg:null,
+		default_scale: 0.5,
+        cx:396, cy:612,
+        bounds:[0,0,792,1224],
+        url:'svg/captain2.svg' },
+	'hulk1':{
+        svg:null,
+		default_scale: 0.5,
+        cx:396, cy:612,
+        bounds:[0,0,792,1224],
+        url:'svg/hulk1.svg' },
+	'hulk2':{
+        svg:null,
+		default_scale: 0.5,
+        cx:396, cy:612,
+        bounds:[0,0,792,1224],
+        url:'svg/hulk2.svg' },
+	'fury':{
+        svg:null,
+		default_scale: 0.5,
+        cx:396, cy:612,
+        bounds:[0,0,792,1224],
+        url:'svg/fury.svg' },
+	'blackwidow':{
+        svg:null,
+		default_scale: 0.5,
+        cx:396, cy:612,
+        bounds:[0,0,792,1224],
+        url:'svg/blackwidow.svg' },
+	'hawkeye':{
+        svg:null,
+		default_scale: 0.5,
+        cx:396, cy:612,
+        bounds:[0,0,792,1224],
+        url:'svg/hawkeye.svg' }
+		
 };
 
 // Create a bitmap from this object
