@@ -7,7 +7,6 @@ function OpacitySlider()
 	var slide_type = "";
 	var slider;
 	var ctx;
-	var slider_img;
 	var line_img;
   
 	this.init = function(type){
@@ -23,9 +22,8 @@ function OpacitySlider()
 
 		// Init Disc
 		ctx = slider.getContext('2d');
-		slider_img=document.getElementById("slider_img");
 		line_img = document.getElementById("slider_line");
-		ctx.drawImage(slider_img,0,0);
+//		ctx.drawImage(slider_img,0,0);
 		var canvas_name;
 		if(slide_type == "opacity"){
 			canvas_name = "#opac_canvas";
@@ -56,7 +54,6 @@ function OpacitySlider()
 
 	this.Refresh = function()
 	{
-		ctx.drawImage(slider_img,0,0);
 		ctx.save();
 		ctx.translate(px,0);
 		ctx.rotate(90*Math.PI/180);

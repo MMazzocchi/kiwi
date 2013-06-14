@@ -42,6 +42,7 @@
                 <a id="download">Download</a>
                 <a id="clear">Clear</a>
             </span>
+                <textarea id="t" style="opacity:0; float:right; width:0" rows="0" cols="0"></textarea>
             <span>
                 <a id="undo">Undo</a>
                 <a id="redo">Redo</a>
@@ -59,7 +60,6 @@
                 <a id="dropper"><span>Dropper</span></a>
             </div>
             <div id="center">
-            	<textarea id="t" style="opacity:0" ></textarea>
                 <canvas id="drawing_canvas"></canvas>
             </div>
             <div id="right">
@@ -71,8 +71,23 @@
         <div id="extratools">
         	<a id="sleft">Previous Tools</a>
             <div id="list">
-            	<span id="stamps">
+            	<span id="selects">
+                	<a id="select_select">Select</a>
+                    <a id="select_zoom">Zoom</a>
+                </span>
+                <span id="stamps">
                 	<a id="stamp_butterfly">Butterfly</a>
+                    <a id="stamp_ironman1">Ironman 1</a>
+                    <a id="stamp_ironman2">Ironman 2</a>
+                    <a id="stamp_captain1">Captain America 1</a>
+                    <a id="stamp_captain2">Captain America 2</a>
+                    <a id="stamp_hulk1">Hulk 1</a>
+                    <a id="stamp_hulk2">Hulk 2</a>
+                    <a id="stamp_thor1">Thor 1</a>
+                    <a id="stamp_thor2">Thor 2</a>
+                    <a id="stamp_blackwidow">Black Widow</a>
+                    <a id="stamp_hawkeye">Hawkeye</a>
+                    <a id="stamp_fury">Fury</a>
                 </span>
                 <span id="shapes">
                     <a id="shape_line">Line</a>
@@ -103,7 +118,6 @@
     <img id="arrow_up" style="display:none;" src="img/arrowup.png" />
     <img id="arrow_down" style="display:none;" src="img/arrowdown.png" />
     <img id="stone" style="display:none;" src="img/stone.jpg" />
-    <img id="slider_img" style="display:none;" src="img/obj_slider_bg.png" />
     <img id="slider_line" style="display:none;" src="img/obj_slider_line_blue.png" />
     <input type="file" id="upload" name="file" style="display:none" />
     
@@ -315,16 +329,21 @@ $("#dropper").click( function() {
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
 });
-//if ((screen.width < 797) || (screen.height < 797)) {
-	/*$("#stamp").click(showextratoolbar);
+function showextratoolbar() {
+    document.getElementById("extratools").style.display = "block";
+    document.getElementById("right").style.display = "none";
+}
+function hideextratoolbar() {
+    document.getElementById("extratools").style.display = "none";
+    document.getElementById("right").style.display = "none";
+}
+
+if (/*(screen.width < 797) || (screen.height < 797)*/ orienting()) {
+	$("#stamp").click(showextratoolbar);
 	$("#shape").click(showextratoolbar);
 	$("#fill").click(showextratoolbar);
 	$("#brush").click(showextratoolbar);
 	$("#text").click(showextratoolbar);
-	function showextratoolbar() {
-		document.getElementById("extratools").style.display = "block";
-		document.getElementById("right").style.display = "none";
-	}
 	$("#dropper").click( function() { 
 		document.getElementById("right").style.display = "block"; 
 		document.getElementById("extratools").style.display = "none";
@@ -344,11 +363,7 @@ $("#dropper").click( function() {
 	$("#erase").click(hideextratoolbar);
 	$("#text_bubble").click(hideextratoolbar);
 	$("#text_box").click(hideextratoolbar);
-	function hideextratoolbar() {
-		document.getElementById("extratools").style.display = "none";
-		document.getElementById("right").style.display = "none";
-	}*/
-//}
+}
 </script>
 </body>
 </html>

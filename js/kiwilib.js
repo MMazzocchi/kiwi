@@ -34,9 +34,10 @@ var curFillId = "";
 var bgFill = false;
 var background = undefined;
 
-
 function orienting() {
-    return (typeof window.orientation != "undefined");
+//    return (typeof window.orientation != "undefined");
+//    return ( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent));
+    return 'ontouchstart' in document.documentElement;
 }
 
 function findPos(obj) {
@@ -80,9 +81,9 @@ function transformCoordinates(e) {
         }
     }
 
-    var s = .93;
-    x = x*s;
-    y = y*s;
+//    var s = .93;
+//    x = x*s;
+//    y = y*s;
 
    // x = x/zoom;
    // y = y/zoom;
@@ -96,19 +97,15 @@ function refreshCanvas() {
         selectedId = -1;
     }
 
+//    var ctx = canvas.getContext('2d');
+
+    var w = 743;
+    var h = 608;
+
+    canvas.width = 743;
+    canvas.height = 608;
+
     var ctx = canvas.getContext('2d');
-	ctx.save();
-    var heightoffset = $("#toolbar").height();
-    var widthoffset = $("#toolbar").width();
-    
-    if (window.innerWidth < window.innerHeight) { // portrait
-        ctx.canvas.width  = window.innerWidth;
-        ctx.canvas.height = window.innerHeight - heightoffset;
-    }
-    else { // landscape
-        ctx.canvas.width  = window.innerWidth - widthoffset;
-        ctx.canvas.height = window.innerHeight;
-    }
 
     if(orienting()) {
         orientation = window.orientation;
@@ -117,37 +114,39 @@ function refreshCanvas() {
 
         switch(orientation) {
             case 0:
-                ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+                canvas.width = h;
+                canvas.height = w;
+                ctx = canvas.getContext('2d');
+                ctx.fillStyle="#FFFFFF";
+                ctx.fillRect(0,0,h,w);
                 tx=0; ty=0; 
                 break;
             case -90:
-                tx=0; ty=-window.innerWidth;
-                ctx.translate(0,-window.innerWidth);
-                ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+                tx=0; ty=-w;
+                ctx.translate(0,-w);
+                ctx.fillRect(0,0,h,w);
                 break;
             case 90:
-                tx=-window.innerHeight; ty=0;
-                ctx.translate(-window.innerHeight,0);
-                ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
+                tx=-h; ty=0;
+                ctx.translate(-h,0);
+                ctx.fillRect(0,0,h,w);
                 break;
             case 180:
-                tx=-window.innerWidth; ty=-window.innerHeight;
-                ctx.translate(-window.innerWidth,-window.innerHeight);
-                ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
+                canvas.width = h;
+                canvas.height = w;
+                tx=-h; ty=-w;
+//                ctx.translate(-h,-w);
+                ctx.fillRect(0,0,h,w);
                 break;
         }
     } else {
         ctx.fillStyle="#FFFFFF";
-        if (window.innerWidth < window.innerHeight) // portrait
-            ctx.fillRect(0,0,window.innerWidth,window.innerHeight-heightoffset);
-        else // landscape
-            ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
+        ctx.canvas.width = 743;
+        ctx.canvas.height = 608;
     }
 	
     //Redraw every object at the current zoom
 
-	//console.log(x1+ " " + y1);
-	//console.log(ctx.canvas.width);
 	ctx.scale(zoom, zoom);
 	ctx.translate(originx, originy);
 
