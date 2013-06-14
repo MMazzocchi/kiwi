@@ -122,6 +122,8 @@ function refreshCanvas() {
              w = h/r;
         }
 
+        canvas.style.width = w;
+        canvas.style.height = h;
         canvas.width = w;
         canvas.height = h;
         ctx = canvas.getContext('2d');
