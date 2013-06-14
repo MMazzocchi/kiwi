@@ -21,6 +21,7 @@ var originx = 0;
 var originy = 0;
 var zoomposx = 0;
 var zoomposy = 0;
+var cachedraw = true;
 var textMode;
 var scratch;
 var copiedObj;
@@ -164,22 +165,29 @@ function refreshCanvas() {
     if(background) {
         background.draw(ctx);
     }
-	   
+	if(!cachedraw){
+		ctx.save();
+		ctx.fillStyle = "#FFFFFF";
+		ctx.globalAlpha = 1;
+        ctx.fillRect(0,0,canvas.width,canvas.height);
+		ctx.globalCompositeOperation = "darker";
+		var dObj = objectList[layerList[layerList.length-1]];
+		scratch && ctx.putImageData(scratch,0,0);
+		dObj && dObj.draw(ctx);
+		scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
+		ctx.restore();
+	}
     // For each id in layerList, call this function:
-    $.each(layerList, function(i, id) {
-        // Get the object for this layer
-        var dObj = objectList[id];
-        //if(scratch){
-        //    ctx.putImageData(scratch,0,0);
-        //}
-        //dObj.draw(ctx);
-        //scratch = ctx.getImageData(0,0,canvas.width,canvas.height);
-
-        if((!isDragging) || (id != selectedId)) {
-            // Draw the object
-            dObj.draw(ctx);
-        }
-    });
+    else{
+		$.each(layerList, function(i, id) {
+			// Get the object for this layer
+			var dObj = objectList[id];
+			if((!isDragging) || (id != selectedId)) {
+				// Draw the object
+				dObj.draw(ctx);
+			}
+		});
+	}
 
     // Draw the selected layer on top of the rest
     if(selectedId != -1) {
@@ -323,14 +331,11 @@ function eraseObject(id) {
 function applyZoom(x, y, curZoom, prevZoom){
 	var z1 = Math.pow(factor,prevZoom);
 	var z2 = zoom = Math.pow(factor,curZoom);
-	console.log(z1 + " " +z2);
-	 var r = z2-z1;
+	var r = z2-z1;
 	var px = x/z2;
 	var py = y/z2;
-	console.log(px + " " +py);
 	originx = (px - x);
 	originy = (py - y);
-
 
 	var newAct = {
 		undo: function() {
@@ -931,11 +936,19 @@ $().ready( function() {
         window.open(canvas.toDataURL(), "Drawing", canvas.width, canvas.height);
     });
 	
+	$('#brush').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('draw');
+    });
     $('#brush_normal').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('draw');
     });
 
+	$('#shape').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('line');
+    });
     $('#shape_line').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('line');
@@ -970,6 +983,10 @@ $().ready( function() {
         document.body.style.cursor="url(img/hand-tool.png)14 6, default";
         SelectTool('select');
     });
+	$('#select_select').click( function() {
+        document.body.style.cursor="url(img/hand-tool.png)14 6, default";
+        SelectTool('select');
+    });
 
     $('#brush_pencil').click( function() {
         document.body.style.cursor="url(img/pencil.png)0 28, default";
@@ -995,7 +1012,13 @@ $().ready( function() {
         SelectTool('dropper');
     });
     
-    $('#fill_blob').click( function() {
+    $('#fill').click( function() {
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = "";
+        bgFill = false;
+        SelectTool('fill');
+    });
+	$('#fill_blob').click( function() {
         document.body.style.cursor="url(img/paintbucket.png)4 28, default";
         curFillId = "";
         bgFill = false;
@@ -1017,7 +1040,12 @@ $().ready( function() {
     });
 
 	
-    $('#text_bubble').click( function() {
+    $('#text').click( function() {
+        document.body.style.cursor="default";
+        SelectTool('textbox');
+        textMode = "balloon";
+    });
+	$('#text_bubble').click( function() {
         document.body.style.cursor="default";
         SelectTool('textbox');
         textMode = "balloon";
@@ -1029,19 +1057,57 @@ $().ready( function() {
         textMode = "box";
     });
 	
-    $('#stamp_butterfly').click( function() {
+    $('#stamp').click( function() {
         SelectTool('stamp');
         curStamp = 'butterfly'
     });
-	
-    $('#mickey_button').click( function() {
+	$('#stamp_butterfly').click( function() {
         SelectTool('stamp');
-        curStamp = 'mickey'
+        curStamp = 'butterfly'
     });
-	
-    $('#bnl').click( function() {
+	$('#stamp_ironman1').click( function() {
         SelectTool('stamp');
-        curStamp = 'bnl'
+        curStamp = 'ironman1'
+    });
+	$('#stamp_ironman2').click( function() {
+        SelectTool('stamp');
+        curStamp = 'ironman2'
+    });
+	$('#stamp_captain1').click( function() {
+        SelectTool('stamp');
+        curStamp = 'captain1'
+    });
+	$('#stamp_captain2').click( function() {
+        SelectTool('stamp');
+        curStamp = 'captain2'
+    });
+    $('#stamp_hulk1').click( function() {
+        SelectTool('stamp');
+        curStamp = 'hulk1'
+    });
+    $('#stamp_hulk2').click( function() {
+        SelectTool('stamp');
+        curStamp = 'hulk2'
+    });
+	$('#stamp_thor1').click( function() {
+        SelectTool('stamp');
+        curStamp = 'thor1'
+    });
+    $('#stamp_thor2').click( function() {
+        SelectTool('stamp');
+        curStamp = 'thor2'
+    });
+	$('#stamp_blackwidow').click( function() {
+        SelectTool('stamp');
+        curStamp = 'blackwidow'
+    });
+    $('#stamp_hawkeye').click( function() {
+        SelectTool('stamp');
+        curStamp = 'hawkeye'
+    });
+	$('#stamp_fury').click( function() {
+        SelectTool('stamp');
+        curStamp = 'fury'
     });
 	
     $('#stamp').click( function() {

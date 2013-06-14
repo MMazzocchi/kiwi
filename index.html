@@ -72,11 +72,11 @@
         	<a id="sleft">Previous Tools</a>
             <div id="list">
             	<span id="selects">
-                	<a id="select_select">Select</a>
-                    <a id="select_zoom">Zoom</a>
+                	<a id="select_select" class="active">Select</a>
+                    <a id="zoom">Zoom</a>
                 </span>
                 <span id="stamps">
-                	<a id="stamp_butterfly">Butterfly</a>
+                	<a id="stamp_butterfly" class="active">Butterfly</a>
                     <a id="stamp_ironman1">Ironman 1</a>
                     <a id="stamp_ironman2">Ironman 2</a>
                     <a id="stamp_captain1">Captain America 1</a>
@@ -90,23 +90,23 @@
                     <a id="stamp_fury">Fury</a>
                 </span>
                 <span id="shapes">
-                    <a id="shape_line">Line</a>
+                    <a id="shape_line" class="active">Line</a>
                     <a id="shape_circle">Circle</a>
                     <a id="shape_square">Square</a>
                     <a id="shape_triangle">Triangle</a>
                 </span>
                 <span id="fills">
-                    <a id="fill_blob">Fill</a>
+                    <a id="fill_blob" class="active">Fill</a>
                     <a id="fill_bg">Background Fill</a>
                 </span>
                 <span id="brushes">
-                    <a id="brush_normal">Brush</a>
+                    <a id="brush_normal" class="active">Brush</a>
                     <a id="brush_calligraphy">Calligraphy</a>
                     <a id="brush_spraycan">Spray Can</a>
                     <a id="brush_pencil">Pencil</a>
                 </span>
                 <span id="texts">
-                    <a id="text_bubble">Text Bubble</a>
+                    <a id="text_bubble" class="active">Text Bubble</a>
                     <a id="text_box">Text Box</a>
                 </span>
             </div>
@@ -136,7 +136,17 @@ $("#select").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
-        document.getElementById("selects").style.display = "block";
+    document.getElementById("selects").style.display = "block";
+	$("#select_select").addClass("active");
+	$("#zoom").removeClass("active");
+});
+$("#select_select").click( function() {
+	$("#select_select").addClass("active");
+	$("#zoom").removeClass("active");
+});
+$("#select_zoom").click( function() {
+	$("#select_select").removeClass("active");
+	$("#zoom").addClass("active");
 });
 
 $("#stamp").click( function() {
@@ -153,11 +163,187 @@ $("#stamp").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
-        document.getElementById("selects").style.display = "none";
-	$("#stamp_butterfly").removeClass("active");
+    document.getElementById("selects").style.display = "none";
+	$("#stamp_butterfly").addClass("active");
+	$("#stamp_ironman1").removeClass("active");
+	$("#stamp_ironman2").removeClass("active");
+	$("#stamp_captain1").removeClass("active");
+	$("#stamp_captain2").removeClass("active");
+	$("#stamp_hulk1").removeClass("active");
+	$("#stamp_hulk2").removeClass("active");
+	$("#stamp_thor1").removeClass("active");
+	$("#stamp_thor2").removeClass("active");
+	$("#stamp_blackwidow").removeClass("active");
+	$("#stamp_hawkeye").removeClass("active");
+	$("#stamp_fury").removeClass("active");
 });
 $("#stamp_butterfly").click( function() {
 	$("#stamp_butterfly").addClass("active");
+	$("#stamp_ironman1").removeClass("active");
+	$("#stamp_ironman2").removeClass("active");
+	$("#stamp_captain1").removeClass("active");
+	$("#stamp_captain2").removeClass("active");
+	$("#stamp_hulk1").removeClass("active");
+	$("#stamp_hulk2").removeClass("active");
+	$("#stamp_thor1").removeClass("active");
+	$("#stamp_thor2").removeClass("active");
+	$("#stamp_blackwidow").removeClass("active");
+	$("#stamp_hawkeye").removeClass("active");
+	$("#stamp_fury").removeClass("active");
+});
+$("#stamp_ironman1").click( function() {
+	$("#stamp_butterfly").removeClass("active");
+	$("#stamp_ironman1").addClass("active");
+	$("#stamp_ironman2").removeClass("active");
+	$("#stamp_captain1").removeClass("active");
+	$("#stamp_captain2").removeClass("active");
+	$("#stamp_hulk1").removeClass("active");
+	$("#stamp_hulk2").removeClass("active");
+	$("#stamp_thor1").removeClass("active");
+	$("#stamp_thor2").removeClass("active");
+	$("#stamp_blackwidow").removeClass("active");
+	$("#stamp_hawkeye").removeClass("active");
+	$("#stamp_fury").removeClass("active");
+});
+$("#stamp_ironman2").click( function() {
+	$("#stamp_butterfly").removeClass("active");
+	$("#stamp_ironman1").removeClass("active");
+	$("#stamp_ironman2").addClass("active");
+	$("#stamp_captain1").removeClass("active");
+	$("#stamp_captain2").removeClass("active");
+	$("#stamp_hulk1").removeClass("active");
+	$("#stamp_hulk2").removeClass("active");
+	$("#stamp_thor1").removeClass("active");
+	$("#stamp_thor2").removeClass("active");
+	$("#stamp_blackwidow").removeClass("active");
+	$("#stamp_hawkeye").removeClass("active");
+	$("#stamp_fury").removeClass("active");
+});
+$("#stamp_captain1").click( function() {
+	$("#stamp_butterfly").removeClass("active");
+	$("#stamp_ironman1").removeClass("active");
+	$("#stamp_ironman2").removeClass("active");
+	$("#stamp_captain1").addClass("active");
+	$("#stamp_captain2").removeClass("active");
+	$("#stamp_hulk1").removeClass("active");
+	$("#stamp_hulk2").removeClass("active");
+	$("#stamp_thor1").removeClass("active");
+	$("#stamp_thor2").removeClass("active");
+	$("#stamp_blackwidow").removeClass("active");
+	$("#stamp_hawkeye").removeClass("active");
+	$("#stamp_fury").removeClass("active");
+});
+$("#stamp_captain2").click( function() {
+	$("#stamp_butterfly").removeClass("active");
+	$("#stamp_ironman1").removeClass("active");
+	$("#stamp_ironman2").removeClass("active");
+	$("#stamp_captain1").removeClass("active");
+	$("#stamp_captain2").addClass("active");
+	$("#stamp_hulk1").removeClass("active");
+	$("#stamp_hulk2").removeClass("active");
+	$("#stamp_thor1").removeClass("active");
+	$("#stamp_thor2").removeClass("active");
+	$("#stamp_blackwidow").removeClass("active");
+	$("#stamp_hawkeye").removeClass("active");
+	$("#stamp_fury").removeClass("active");
+});
+$("#stamp_hulk1").click( function() {
+	$("#stamp_butterfly").removeClass("active");
+	$("#stamp_ironman1").removeClass("active");
+	$("#stamp_ironman2").removeClass("active");
+	$("#stamp_captain1").removeClass("active");
+	$("#stamp_captain2").removeClass("active");
+	$("#stamp_hulk1").addClass("active");
+	$("#stamp_hulk2").removeClass("active");
+	$("#stamp_thor1").removeClass("active");
+	$("#stamp_thor2").removeClass("active");
+	$("#stamp_blackwidow").removeClass("active");
+	$("#stamp_hawkeye").removeClass("active");
+	$("#stamp_fury").removeClass("active");
+});
+$("#stamp_hulk2").click( function() {
+	$("#stamp_butterfly").removeClass("active");
+	$("#stamp_ironman1").removeClass("active");
+	$("#stamp_ironman2").removeClass("active");
+	$("#stamp_captain1").removeClass("active");
+	$("#stamp_captain2").removeClass("active");
+	$("#stamp_hulk1").removeClass("active");
+	$("#stamp_hulk2").addClass("active");
+	$("#stamp_thor1").removeClass("active");
+	$("#stamp_thor2").removeClass("active");
+	$("#stamp_blackwidow").removeClass("active");
+	$("#stamp_hawkeye").removeClass("active");
+	$("#stamp_fury").removeClass("active");
+});
+$("#stamp_thor1").click( function() {
+	$("#stamp_butterfly").removeClass("active");
+	$("#stamp_ironman1").removeClass("active");
+	$("#stamp_ironman2").removeClass("active");
+	$("#stamp_captain1").removeClass("active");
+	$("#stamp_captain2").removeClass("active");
+	$("#stamp_hulk1").removeClass("active");
+	$("#stamp_hulk2").removeClass("active");
+	$("#stamp_thor1").addClass("active");
+	$("#stamp_thor2").removeClass("active");
+	$("#stamp_blackwidow").removeClass("active");
+	$("#stamp_hawkeye").removeClass("active");
+	$("#stamp_fury").removeClass("active");
+});
+$("#stamp_thor2").click( function() {
+	$("#stamp_butterfly").removeClass("active");
+	$("#stamp_ironman1").removeClass("active");
+	$("#stamp_ironman2").removeClass("active");
+	$("#stamp_captain1").removeClass("active");
+	$("#stamp_captain2").removeClass("active");
+	$("#stamp_hulk1").removeClass("active");
+	$("#stamp_hulk2").removeClass("active");
+	$("#stamp_thor1").removeClass("active");
+	$("#stamp_thor2").addClass("active");
+	$("#stamp_blackwidow").removeClass("active");
+	$("#stamp_hawkeye").removeClass("active");
+	$("#stamp_fury").removeClass("active");
+});
+$("#stamp_blackwidow").click( function() {
+	$("#stamp_butterfly").removeClass("active");
+	$("#stamp_ironman1").removeClass("active");
+	$("#stamp_ironman2").removeClass("active");
+	$("#stamp_captain1").removeClass("active");
+	$("#stamp_captain2").removeClass("active");
+	$("#stamp_hulk1").removeClass("active");
+	$("#stamp_hulk2").removeClass("active");
+	$("#stamp_thor1").removeClass("active");
+	$("#stamp_thor2").removeClass("active");
+	$("#stamp_blackwidow").addClass("active");
+	$("#stamp_hawkeye").removeClass("active");
+	$("#stamp_fury").removeClass("active");
+});
+$("#stamp_hawkeye").click( function() {
+	$("#stamp_butterfly").removeClass("active");
+	$("#stamp_ironman1").removeClass("active");
+	$("#stamp_ironman2").removeClass("active");
+	$("#stamp_captain1").removeClass("active");
+	$("#stamp_captain2").removeClass("active");
+	$("#stamp_hulk1").removeClass("active");
+	$("#stamp_hulk2").removeClass("active");
+	$("#stamp_thor1").removeClass("active");
+	$("#stamp_thor2").removeClass("active");
+	$("#stamp_blackwidow").removeClass("active");
+	$("#stamp_hawkeye").addClass("active");
+	$("#stamp_fury").removeClass("active");
+});
+$("#stamp_fury").click( function() {
+	$("#stamp_butterfly").removeClass("active");
+	$("#stamp_ironman1").removeClass("active");
+	$("#stamp_ironman2").removeClass("active");
+	$("#stamp_captain1").removeClass("active");
+	$("#stamp_captain2").removeClass("active");
+	$("#stamp_hulk1").removeClass("active");
+	$("#stamp_hulk2").removeClass("active");
+	$("#stamp_thor1").removeClass("active");
+	$("#stamp_thor2").removeClass("active");
+	$("#stamp_blackwidow").removeClass("active");
+	$("#stamp_hawkeye").removeClass("active");
+	$("#stamp_fury").addClass("active");
 });
 
 $("#shape").click( function() {
@@ -174,8 +360,8 @@ $("#shape").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
-        document.getElementById("selects").style.display = "none";
-	$("#shape_line").removeClass("active");
+    document.getElementById("selects").style.display = "none";
+	$("#shape_line").addClass("active");
 	$("#shape_circle").removeClass("active");
 	$("#shape_square").removeClass("active");
 	$("#shape_triangle").removeClass("active");
@@ -219,8 +405,8 @@ $("#fill").click( function() {
 	document.getElementById("fills").style.display = "block";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
-        document.getElementById("selects").style.display = "none";
-	$("#fill_blob").removeClass("active");
+    document.getElementById("selects").style.display = "none";
+	$("#fill_blob").addClass("active");
 	$("#fill_bg").removeClass("active");
 });
 $("#fill_blob").click( function() {
@@ -246,8 +432,8 @@ $("#brush").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "block";
 	document.getElementById("texts").style.display = "none";
-        document.getElementById("selects").style.display = "none";
-	$("#brush_normal").removeClass("active");
+    document.getElementById("selects").style.display = "none";
+	$("#brush_normal").addClass("active");
 	$("#brush_calligraphy").removeClass("active");
 	$("#brush_spraycan").removeClass("active");
 	$("#brush_pencil").removeClass("active");
@@ -291,7 +477,7 @@ $("#erase").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
-        document.getElementById("selects").style.display = "none";
+    document.getElementById("selects").style.display = "none";
 });
 
 $("#text").click( function() {
@@ -308,8 +494,8 @@ $("#text").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "block";
-        document.getElementById("selects").style.display = "none";
-	$("#text_bubble").removeClass("active");
+    document.getElementById("selects").style.display = "none";
+	$("#text_bubble").addClass("active");
 	$("#text_box").removeClass("active");
 });
 $("#text_bubble").click( function() {
@@ -335,20 +521,20 @@ $("#dropper").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
-        document.getElementById("selects").style.display = "none";
+    document.getElementById("selects").style.display = "none";
 });
 function showextratoolbar() {
     document.getElementById("extratools").style.display = "block";
-//    document.getElementById("right").style.display = "none";
+    document.getElementById("right").style.display = "none";
 }
 function hideextratoolbar() {
     document.getElementById("extratools").style.display = "none";
-//    document.getElementById("right").style.display = "none";
+    document.getElementById("right").style.display = "none";
 }
 
-if (/*(screen.width < 797) || (screen.height < 797)*/ orienting()) {
+if (orienting()) {
 	$("#select").click(showextratoolbar);
-        $("#stamp").click(showextratoolbar);
+    $("#stamp").click(showextratoolbar);
 	$("#shape").click(showextratoolbar);
 	$("#fill").click(showextratoolbar);
 	$("#brush").click(showextratoolbar);
@@ -362,7 +548,19 @@ if (/*(screen.width < 797) || (screen.height < 797)*/ orienting()) {
             document.getElementById("extratools").style.display = "none";
 	});
 	$("#select_select").click(hideextratoolbar);
+	$("#zoom").click(hideextratoolbar);
 	$("#stamp_butterfly").click(hideextratoolbar);
+	$("#stamp_ironman1").click(hideextratoolbar);
+	$("#stamp_ironman2").click(hideextratoolbar);
+	$("#stamp_captain1").click(hideextratoolbar);
+	$("#stamp_captain2").click(hideextratoolbar);
+	$("#stamp_hulk1").click(hideextratoolbar);
+	$("#stamp_hulk2").click(hideextratoolbar);
+	$("#stamp_thor1").click(hideextratoolbar);
+	$("#stamp_thor2").click(hideextratoolbar);
+	$("#stamp_blackwidow").click(hideextratoolbar);
+	$("#stamp_hawkeye").click(hideextratoolbar);
+	$("#stamp_fury").click(hideextratoolbar);
 	$("#shape_line").click(hideextratoolbar);
 	$("#shape_circle").click(hideextratoolbar);
 	$("#shape_square").click(hideextratoolbar);

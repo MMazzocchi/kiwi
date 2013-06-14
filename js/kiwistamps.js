@@ -1,27 +1,16 @@
 var svgList = {
-    'mickey':{
-        svg:null,
-		default_scale: 1,
-        cx:156, cy:145,
-        bounds:[0,0,313,290],
-        url:'svg/mickey.svg' },
-	'butterfly':{
-        svg:null,
-		default_scale: 1,
-        cx:205, cy:143,
-        bounds:[0,0,410,286],
-        url:'svg/butterfly.svg' },
-    'bnl':{
-        svg:null,
-		default_scale: 0.5,
-        cx:396, cy:612,
-        bounds:[0,0,792,1224],
-        url:'svg/AVASA_P_0101_FEB13.svg' },
-    'troll':{
-        svg:null,
-        cx:301, cy:226,
-        bounds:[0,0,603,453],
-        url:'svg/troll_face.svg' }
+	'butterfly':	{svg:null,default_scale: 1.0,cx:205, cy:143, bounds:[0,0,410,286], url:'svg/butterfly.svg'  },
+	'ironman1':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/ironman1.svg' },
+	'ironman2':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/ironman2.svg' },
+	'thor1':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/ironman1.svg' },
+	'thor2':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/ironman2.svg' },
+	'captain1':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/captain1.svg' },
+	'captain2':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/captain2.svg' },
+	'hulk1':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/hulk1.svg' },
+	'hulk2':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/hulk2.svg' },
+	'fury':			{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/fury.svg' },
+	'blackwidow':	{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/blackwidow.svg' },
+	'hawkeye':		{svg:null,default_scale: 0.25,cx:396, cy:612,bounds:[0,0,792,1224],url:'svg/hawkeye.svg' }	
 };
 
 // Create a bitmap from this object
@@ -75,7 +64,8 @@ function createStamp(dObj) {
             ctx.translate(this.pts[0],this.pts[1]);
             ctx.rotate(this.rotation);
 			ctx.scale(xScale,yScale);
-            ctx.drawImage(dObj.scanvas,-dObj.cx,-dObj.cy);
+            ctx.drawImage(this.scanvas,-dObj.cx,-dObj.cy);
+			//ctx.drawSvg(this.url, 0, 0, dObj.bound[0], dObj.bound[1]);
         ctx.restore();
     };
 

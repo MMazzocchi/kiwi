@@ -74,10 +74,10 @@ body {
 	vertical-align:top;	
 }
 
+#selects,
 #stamps,
 #shapes,
 #fills,
-#brushes,
 #texts { display:none; }
 
 
