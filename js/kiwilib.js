@@ -33,7 +33,6 @@ var curFillId = "";
 var bgFill = false;
 var background = undefined;
 
-
 function orienting() {
 //    return (typeof window.orientation != "undefined");
     return ( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent));
@@ -111,14 +110,12 @@ function refreshCanvas() {
 
         switch(orientation) {
             case 0:
-                ctx.canvas.width = height;
-                ctx.canvas.height = width;
-                ctx.fillRect(0,0,height,width);
+                ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
                 tx=0; ty=0; 
                 break;
             case -90:
                 tx=0; ty=-window.innerWidth;
-                ctx.translate(0,-height);
+                ctx.translate(0,-window.innerWidth);
                 ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
                 break;
             case 90:
