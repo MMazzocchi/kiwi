@@ -7,7 +7,6 @@ function OpacitySlider()
 	var slide_type = "";
 	var slider;
 	var ctx;
-	var slider_img;
 	var line_img;
   
 	this.init = function(type){
