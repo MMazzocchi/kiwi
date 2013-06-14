@@ -112,6 +112,7 @@ function refreshCanvas() {
         if(screen.width < screen.height) {
              w = screen.width;
              h = w*r;
+             ctx.scale(1,h/608);
         } else {
              h = screen.height;
              w = h/r;
@@ -132,7 +133,7 @@ function refreshCanvas() {
 //                ctx = canvas.getContext('2d');
                 ctx.fillStyle="#FFFFFF";
 //                ctx.fillRect(0,0,w,h);
-                ctx.scale(1,h/608);
+//                ctx.scale(1,h/608);
                 tx=0; ty=0; 
                 break;
             case -90:
