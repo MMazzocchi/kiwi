@@ -106,7 +106,7 @@ function refreshCanvas() {
     if(orienting()) {
         orientation = window.orientation;
         ctx.rotate(-orientation*Math.PI/180);
-        ctx.fillStyle="#FFFFFF";
+        ctx.fillStyle="red";
 
     ctx.canvas.width = window.innerWidth;
     ctx.canvas.height = window.innerHeight;
