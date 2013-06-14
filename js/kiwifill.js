@@ -117,8 +117,8 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
     //ex is East x; it'll be the farthest point east we can go in the current segment
     var ex = pt[0];
 
-//    while(validPoint(ex,pt[1],color,checked,cData,width,height)) {
-    while(validAlias(ex,pt[1],color,checked,cData,width,height,-1,0)) {
+    while(validPoint(ex,pt[1],color,checked,cData,width,height)) {
+//    while(validAlias(ex,pt[1],color,checked,cData,width,height,-1,0)) {
         checked[""+ex+","+pt[1]] = 1;
         if(validPoint(ex,pt[1]+1,color,checked,cData,width,height)) {
             if(!segmentN) {
@@ -155,8 +155,8 @@ function searchSegment(pt, color, checked, ctx, cData, width, height, direc) {
     segmentS = validPoint(wx-1,pt[1]-1,color,checked,cData,width,height);
 
     //Start going west
-//    while(validPoint(wx,pt[1],color,checked,cData,width,height)) {
-    while(validAlias(wx,pt[1],color,checked,cData,width,height,1,0)) {
+    while(validPoint(wx,pt[1],color,checked,cData,width,height)) {
+//    while(validAlias(wx,pt[1],color,checked,cData,width,height,1,0)) {
         checked[""+wx+","+pt[1]] = 1;
         if(validPoint(wx,pt[1]+1,color,checked,cData,width,height)) {
             if(!segmentN) {
