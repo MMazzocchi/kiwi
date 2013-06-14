@@ -231,7 +231,7 @@ body {
 	#create #extratools { left:0; padding:3px 5px; }
 }
 
-@media (max-width:575px) {
+@media (max-width:575px) and (max-height:575px) {
 	#create #fileactions a, 
 	#create #left a { background:none!important; width:auto; height:auto; text-indent:0; padding:1px 2px; color:#CCC; }
 	#create #fileactions a:hover,
