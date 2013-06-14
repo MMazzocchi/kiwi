@@ -35,7 +35,8 @@ var background = undefined;
 
 
 function orienting() {
-    return (typeof window.orientation != "undefined");
+//    return (typeof window.orientation != "undefined");
+    return ( /Android|webOS|iPhone|iPad|iPod|BlackBerry/i.test(navigator.userAgent));
 }
 
 function findPos(obj) {
