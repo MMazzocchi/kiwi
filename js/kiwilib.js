@@ -132,8 +132,8 @@ function refreshCanvas() {
 
         switch(orientation) {
             case 0:
-                canvas.width = w;
-                canvas.height = h;
+//                canvas.width = w;
+//                canvas.height = h;
                 ctx = canvas.getContext('2d');
                 ctx.fillStyle="#FFFFFF";
                 ctx.fillRect(0,0,w,h);
@@ -150,8 +150,8 @@ function refreshCanvas() {
                 ctx.fillRect(0,0,h,w);
                 break;
             case 180:
-                canvas.width = w;
-                canvas.height = h;
+//                canvas.width = w;
+//                canvas.height = h;
                 ctx = canvas.getContext('2d');
                 ctx.rotate(-orientation*Math.PI/180); 
                 ctx.fillStyle="#FFFFFF";
