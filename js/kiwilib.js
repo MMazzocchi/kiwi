@@ -231,7 +231,8 @@ function copy(){
 }
 
 //Paste the copied object
-function paste(dObj){
+function paste(){
+        var dObj = copiedObj;
         ungroupSelection();
 	copyList = [];
 	var newObject = jQuery.extend(true, {}, dObj);
