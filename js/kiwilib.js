@@ -148,8 +148,8 @@ function refreshCanvas() {
             case 180:
                 ctx.fillStyle="#FFFFFF";
                 tx=-w; ty=-h;
+                ctx.scale(1,h/608);
                 ctx.translate(-w,-h);
-                ctx.scale(1,608/h);
                 break;
         }
         ctx.fillRect(0,0,w,h);
