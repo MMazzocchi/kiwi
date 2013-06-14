@@ -73,7 +73,7 @@
             <div id="list">
             	<span id="selects">
                 	<a id="select_select" class="active">Select</a>
-                    <a id="select_zoom">Zoom</a>
+                    <a id="zoom">Zoom</a>
                 </span>
                 <span id="stamps">
                 	<a id="stamp_butterfly" class="active">Butterfly</a>
@@ -138,15 +138,15 @@ $("#select").click( function() {
 	document.getElementById("texts").style.display = "none";
     document.getElementById("selects").style.display = "block";
 	$("#select_select").addClass("active");
-	$("#select_zoom").removeClass("active");
+	$("#zoom").removeClass("active");
 });
 $("#select_select").click( function() {
 	$("#select_select").addClass("active");
-	$("#select_zoom").removeClass("active");
+	$("#zoom").removeClass("active");
 });
 $("#select_zoom").click( function() {
 	$("#select_select").removeClass("active");
-	$("#select_zoom").addClass("active");
+	$("#zoom").addClass("active");
 });
 
 $("#stamp").click( function() {
@@ -548,7 +548,7 @@ if (orienting()) {
             document.getElementById("extratools").style.display = "none";
 	});
 	$("#select_select").click(hideextratoolbar);
-	$("#select_zoom").click(hideextratoolbar);
+	$("#zoom").click(hideextratoolbar);
 	$("#stamp_butterfly").click(hideextratoolbar);
 	$("#stamp_ironman1").click(hideextratoolbar);
 	$("#stamp_ironman2").click(hideextratoolbar);

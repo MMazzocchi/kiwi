@@ -929,11 +929,19 @@ $().ready( function() {
         window.open(canvas.toDataURL(), "Drawing", canvas.width, canvas.height);
     });
 	
+	$('#brush').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('draw');
+    });
     $('#brush_normal').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('draw');
     });
 
+	$('#shape').click( function() {
+        document.body.style.cursor="url(img/paintbrush.png)0 28, default";
+        SelectTool('line');
+    });
     $('#shape_line').click( function() {
         document.body.style.cursor="url(img/paintbrush.png)0 28, default";
         SelectTool('line');
@@ -968,6 +976,10 @@ $().ready( function() {
         document.body.style.cursor="url(img/hand-tool.png)14 6, default";
         SelectTool('select');
     });
+	$('#select_select').click( function() {
+        document.body.style.cursor="url(img/hand-tool.png)14 6, default";
+        SelectTool('select');
+    });
 
     $('#brush_pencil').click( function() {
         document.body.style.cursor="url(img/pencil.png)0 28, default";
@@ -993,7 +1005,13 @@ $().ready( function() {
         SelectTool('dropper');
     });
     
-    $('#fill_blob').click( function() {
+    $('#fill').click( function() {
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = "";
+        bgFill = false;
+        SelectTool('fill');
+    });
+	$('#fill_blob').click( function() {
         document.body.style.cursor="url(img/paintbucket.png)4 28, default";
         curFillId = "";
         bgFill = false;
@@ -1015,7 +1033,12 @@ $().ready( function() {
     });
 
 	
-    $('#text_bubble').click( function() {
+    $('#text').click( function() {
+        document.body.style.cursor="default";
+        SelectTool('textbox');
+        textMode = "balloon";
+    });
+	$('#text_bubble').click( function() {
         document.body.style.cursor="default";
         SelectTool('textbox');
         textMode = "balloon";
@@ -1027,7 +1050,11 @@ $().ready( function() {
         textMode = "box";
     });
 	
-    $('#stamp_butterfly').click( function() {
+    $('#stamp').click( function() {
+        SelectTool('stamp');
+        curStamp = 'butterfly'
+    });
+	$('#stamp_butterfly').click( function() {
         SelectTool('stamp');
         curStamp = 'butterfly'
     });
