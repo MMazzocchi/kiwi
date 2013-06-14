@@ -81,9 +81,9 @@ function transformCoordinates(e) {
         }
     }
 
-//    var s = .93;
+    var s = .93;
 //    x = x*s;
-//    y = y*s;
+    y = y*s;
 
    // x = x/zoom;
    // y = y/zoom;
