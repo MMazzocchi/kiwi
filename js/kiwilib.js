@@ -103,9 +103,6 @@ function refreshCanvas() {
     var w = 743;
     var h = 608;
 
-//    canvas.width = 743;
-//    canvas.height = 608;
-
     var ctx = canvas.getContext('2d');
 
     if(orienting()) {
@@ -122,8 +119,6 @@ function refreshCanvas() {
              w = h/r;
         }
 
-        canvas.style.width = w;
-        canvas.style.height = h;
         canvas.width = w;
         canvas.height = h;
         ctx = canvas.getContext('2d');
@@ -163,6 +158,7 @@ function refreshCanvas() {
                 ctx.fillRect(0,0,w,h);
                 break;
         }
+        ctx.scale(canvas.width/743, canvas.height/403);
     } else {
         ctx.fillStyle="#FFFFFF";
         ctx.canvas.width = 743;
