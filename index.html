@@ -315,8 +315,8 @@ $("#dropper").click( function() {
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
 });
-//if ((screen.width < 797) || (screen.height < 797)) {
-	/*$("#stamp").click(showextratoolbar);
+if (/*(screen.width < 797) || (screen.height < 797)*/ orienting()) {
+	$("#stamp").click(showextratoolbar);
 	$("#shape").click(showextratoolbar);
 	$("#fill").click(showextratoolbar);
 	$("#brush").click(showextratoolbar);
@@ -347,8 +347,8 @@ $("#dropper").click( function() {
 	function hideextratoolbar() {
 		document.getElementById("extratools").style.display = "none";
 		document.getElementById("right").style.display = "none";
-	}*/
-//}
+	}
+}
 </script>
 </body>
 </html>
