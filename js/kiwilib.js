@@ -993,13 +993,13 @@ $().ready( function() {
     });
 	$('#fill_bg-city').click( function() {
         document.body.style.cursor="url(img/paintbucket.png)4 28, default";
-        curFillId = 'svg/BG7b.svg';
+        curFillId = 'svg/BG15.svg';
         SelectTool('fill');
         bgFill = true;
     });
 	$('#fill_bg-liberty').click( function() {
         document.body.style.cursor="url(img/paintbucket.png)4 28, default";
-        curFillId = 'svg/BG7b.svg';
+        curFillId = 'svg/BG11.svg';
         SelectTool('fill');
         bgFill = true;
     });

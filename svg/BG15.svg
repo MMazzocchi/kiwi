@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Generator: Adobe Illustrator 15.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="480px"
-	 height="260px" viewBox="0 0 480 260" enable-background="new 0 0 480 260" xml:space="preserve">
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<svg version="1.0" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="480px" height="260px" viewBox="0 0 480 260" enable-background="new 0 0 480 260" xml:space="preserve">
 <symbol  id="Background_x5F_1_1_" viewBox="97.45 -198.55 83.3 79.4">
 	<g id="Layer_1_4_">
 		<path fill-rule="evenodd" clip-rule="evenodd" fill="#7E807F" d="M157.825-160.35h0.375l-0.15,2.2v0.1h0.05v0.5v1.3h-2.725
@@ -6525,42 +6525,30 @@ AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACye/xdgAPhY
 		<polygon fill-rule="evenodd" clip-rule="evenodd" fill="#FFFFFF" fill-opacity="0" points="480,-260 0,-260 0,0 480,0 		"/>
 	</g>
 </symbol>
-<g id="Layer_1">
-</g>
-<g id="Layer_2">
-	<g>
-		<defs>
-			<rect id="SVGID_16_" y="-0.531" width="481.525" height="262.681"/>
-		</defs>
-		<clipPath id="SVGID_17_">
-			<use xlink:href="#SVGID_16_"  overflow="visible"/>
-		</clipPath>
-		<g clip-path="url(#SVGID_17_)">
-			<g id="mask">
-				
-					<use xlink:href="#mask_2_"  width="480" height="260" id="mask_1_" y="-260" transform="matrix(1 0 0 -1 0 0)" overflow="visible"/>
-			</g>
-			<g id="Sky">
-				
-					<use xlink:href="#Sky_1_"  width="480" height="269.601" id="background" x="-240.45" y="1106.35" transform="matrix(1 0 0 -1 240.4502 1371.4502)" overflow="visible"/>
-			</g>
-			<g id="beams">
-				
-					<use xlink:href="#beams_x5F_mc"  width="527" height="359" id="rays" x="-298" y="-82" transform="matrix(1 0 0 -1 240.4502 120.1499)" overflow="visible"/>
-			</g>
-			<g id="Background_x5F_1">
-				
-					<use xlink:href="#Background_x5F_1_1_"  width="83.3" height="79.4" id="back_x5F_buildings" x="97.45" y="-198.55" transform="matrix(1 0 0 -1 105.6499 1.5498)" overflow="visible"/>
-			</g>
-			<g id="Midground_x5F_1">
-				
-					<use xlink:href="#Midground_x5F_1_1_"  width="251.3" height="129.675" id="mid_x5F_buildings" x="376.7" y="-323.8" transform="matrix(1 0 0 -1 -255.8999 -82.4502)" overflow="visible"/>
-			</g>
-			<g id="Foreground">
-				
-					<use xlink:href="#Center"  width="818.15" height="270.45" id="front_x5F_buildings" x="-687.2" y="407.45" transform="matrix(1 0 0 -1 448 672)" overflow="visible"/>
-			</g>
-		</g>
+<g>
+	<g id="mask">
+		
+			<use xlink:href="#mask_2_"  width="480" height="260" id="mask_1_" y="-260" transform="matrix(1 0 0 -1 0 0)" overflow="visible"/>
+	</g>
+	<g id="Sky">
+		
+			<use xlink:href="#Sky_1_"  width="480" height="269.601" id="background" x="-240.45" y="1106.35" transform="matrix(1 0 0 -1 240.4502 1371.4502)" overflow="visible"/>
+	</g>
+	<g id="beams">
+		
+			<use xlink:href="#beams_x5F_mc"  width="527" height="359" id="rays" x="-298" y="-82" transform="matrix(1 0 0 -1 240.4502 120.1499)" overflow="visible"/>
+	</g>
+	<g id="Background_x5F_1">
+		
+			<use xlink:href="#Background_x5F_1_1_"  width="83.3" height="79.4" id="back_x5F_buildings" x="97.45" y="-198.55" transform="matrix(1 0 0 -1 105.6499 1.5498)" overflow="visible"/>
+	</g>
+	<g id="Midground_x5F_1">
+		
+			<use xlink:href="#Midground_x5F_1_1_"  width="251.3" height="129.675" id="mid_x5F_buildings" x="376.7" y="-323.8" transform="matrix(1 0 0 -1 -255.8999 -82.4502)" overflow="visible"/>
+	</g>
+	<g id="Foreground">
+		
+			<use xlink:href="#Center"  width="818.15" height="270.45" id="front_x5F_buildings" x="-687.2" y="407.45" transform="matrix(1 0 0 -1 448 672)" overflow="visible"/>
 	</g>
 </g>
 </svg>
