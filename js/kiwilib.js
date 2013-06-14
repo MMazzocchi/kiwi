@@ -129,11 +129,11 @@ function refreshCanvas() {
 
         switch(orientation) {
             case 0:
-                canvas.width = h;
-                canvas.height = w;
+                canvas.width = w;
+                canvas.height = h;
                 ctx = canvas.getContext('2d');
                 ctx.fillStyle="#FFFFFF";
-                ctx.fillRect(0,0,h,w);
+                ctx.fillRect(0,0,w,h);
                 tx=0; ty=0; 
                 break;
             case -90:
@@ -147,14 +147,14 @@ function refreshCanvas() {
                 ctx.fillRect(0,0,w,h);
                 break;
             case 180:
-                canvas.width = h;
-                canvas.height = hw
+                canvas.width = w;
+                canvas.height = h;
                 ctx = canvas.getContext('2d');
                 ctx.rotate(-orientation*Math.PI/180); 
                 ctx.fillStyle="#FFFFFF";
-                tx=-h; ty=-w;
-                ctx.translate(-h,-w);
-                ctx.fillRect(0,0,h,w);
+                tx=-w; ty=-h;
+                ctx.translate(-w,-h);
+                ctx.fillRect(0,0,w,h);
                 break;
         }
     } else {
