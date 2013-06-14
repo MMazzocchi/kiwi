@@ -15,8 +15,25 @@
 #create #left a#erase { background-image:url(../img/btn_tool_erase.png); }
 #create #left a#text { background-image:url(../img/btn_tool_text.png); }
 
+/* RIGHT TOOLBAR */
+#opac_canvas { background:#000 url(../img/obj_slider_bg-opacity.png) bottom right; }
+#thick_canvas { background:#000 url(../img/obj_slider_bg-thickness.png) bottom right; }
+
 /* EXTRA TOOLBAR */
+#create #list a#select_select { background-image:url(../img/btn_tool_select-selects.png); }
+#create #list a#select_zoom { background-image:url(../img/btn_tool_select-zoom.png); }
 #create #list a#stamp_butterfly { background-image:url(../img/btn_tool_stamp-butterfly.png); }
+#create #list a#stamp_blackwidow { background-image:url(../img/btn_tool_stamp-blackwidow.png); }
+#create #list a#stamp_captain1 { background-image:url(../img/btn_tool_stamp-captain1.png); }
+#create #list a#stamp_captain2 { background-image:url(../img/btn_tool_stamp-captain2.png); }
+#create #list a#stamp_fury { background-image:url(../img/btn_tool_stamp-fury.png); }
+#create #list a#stamp_hawkeye { background-image:url(../img/btn_tool_stamp-hawkeye.png); }
+#create #list a#stamp_hulk1 { background-image:url(../img/btn_tool_stamp-hulk1.png); }
+#create #list a#stamp_hulk2 { background-image:url(../img/btn_tool_stamp-hulk2.png); }
+#create #list a#stamp_ironman1 { background-image:url(../img/btn_tool_stamp-ironman1.png); }
+#create #list a#stamp_ironman2 { background-image:url(../img/btn_tool_stamp-ironman2.png); }
+#create #list a#stamp_thor1 { background-image:url(../img/btn_tool_stamp-thor1.png); }
+#create #list a#stamp_thor2 { background-image:url(../img/btn_tool_stamp-thor2.png); }
 #create #list a#shape_line { background-image:url(../img/btn_tool_shape-line.png); }
 #create #list a#shape_circle { background-image:url(../img/btn_tool_shape-circle.png); }
 #create #list a#shape_square { background-image:url(../img/btn_tool_shape-square.png); }
