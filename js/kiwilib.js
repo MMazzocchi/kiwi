@@ -136,8 +136,8 @@ function refreshCanvas() {
                 ctx = canvas.getContext('2d');
                 ctx.fillStyle="#FFFFFF";
                 tx=-w; ty=-h;
-                ctx.translate(-w,-h);
-                ctx.fillRect(0,0,w,h);
+                ctx.translate(-h,-w);
+                ctx.fillRect(0,0,h,w);
                 break;
         }
     } else {
