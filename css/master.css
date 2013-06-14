@@ -16,8 +16,8 @@
 #create #left a#text { background-image:url(../img/btn_tool_text.png); }
 
 /* RIGHT TOOLBAR */
-#o_canvas { background:#000 url(../img/obj_slider_bg-opacity.png) bottom right; }
-#t_canvas { background:#000 url(../img/obj_slider_bg-thickness.png) bottom right; }
+#opac_canvas { background:#000 url(../img/obj_slider_bg-opacity.png) bottom right; }
+#thick_canvas { background:#000 url(../img/obj_slider_bg-thickness.png) bottom right; }
 
 /* EXTRA TOOLBAR */
 #create #list a#select_select { background-image:url(../img/btn_tool_select-selects.png); }
