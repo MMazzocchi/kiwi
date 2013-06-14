@@ -70,6 +70,8 @@
             	<span id="selects">
                 	<a id="select_select" class="active">Select</a>
                     <a id="zoom">Zoom</a>
+                    <a id="copy">Copy</a>
+                    <a id="paste">Paste</a>
                 </span>
                 <span id="stamps">
                 	<a id="stamp_butterfly" class="active">Butterfly</a>
@@ -562,7 +564,7 @@ function hideextratoolbar() {
 }
 
 if (orienting()) {
-	//$("#select").click(showextratoolbar);
+	$("#select").click(showextratoolbar);
     $("#stamp").click(showextratoolbar);
 	$("#shape").click(showextratoolbar);
 	$("#fill").click(showextratoolbar);
@@ -576,9 +578,9 @@ if (orienting()) {
             }
             document.getElementById("extratools").style.display = "none";
 	});
-	document.getElementById("selects").style.display = "none";
-	document.getElementById("select_select").style.display = "none";
+	$("#select_select").click(hideextratoolbar);
 	document.getElementById("zoom").style.display = "none";
+	$("#paste").click(hideextratoolbar);
 	$("#stamp_butterfly").click(hideextratoolbar);
 	$("#stamp_ironman1").click(hideextratoolbar);
 	$("#stamp_ironman2").click(hideextratoolbar);
