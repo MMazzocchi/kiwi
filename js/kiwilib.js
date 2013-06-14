@@ -112,7 +112,7 @@ function refreshCanvas() {
 
         var r = h/w;
         var b = 1;
-        if(screen.width < screen.height) {
+        if(screen.width > screen.height) {
              w = screen.width;
              h = w*r;
         } else {
