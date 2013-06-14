@@ -140,32 +140,14 @@ $("#select").click( function() {
     document.getElementById("selects").style.display = "block";
 	$("#select_select").addClass("active");
 	$("#zoom").removeClass("active");
-	$("#copy").removeClass("active");
-	$("#paste").removeClass("active");
 });
 $("#select_select").click( function() {
 	$("#select_select").addClass("active");
 	$("#zoom").removeClass("active");
-	$("#copy").removeClass("active");
-	$("#paste").removeClass("active");
 });
 $("#zoom").click( function() {
 	$("#select_select").removeClass("active");
 	$("#zoom").addClass("active");
-	$("#copy").removeClass("active");
-	$("#paste").removeClass("active");
-});
-$("#copy").click( function() {
-	$("#select_select").removeClass("active");
-	$("#zoom").removeClass("active");
-	$("#copy").addClass("active");
-	$("#paste").removeClass("active");
-});
-$("#paste").click( function() {
-	$("#select_select").removeClass("active");
-	$("#zoom").removeClass("active");
-	$("#copy").removeClass("active");
-	$("#paste").addClass("active");
 });
 
 $("#stamp").click( function() {
