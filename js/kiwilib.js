@@ -97,13 +97,11 @@ function refreshCanvas() {
         selectedId = -1;
     }
 
-//    var ctx = canvas.getContext('2d');
+    var ctx = canvas.getContext('2d');
+    ctx.save();
 
     var w = 743;
     var h = 608;
-
-//    canvas.width = 743;
-//    canvas.height = 608;
 
     var ctx = canvas.getContext('2d');
 
@@ -132,8 +130,8 @@ function refreshCanvas() {
 
         switch(orientation) {
             case 0:
-//                canvas.width = w;
-//                canvas.height = h;
+                canvas.width = w;
+                canvas.height = h;
                 ctx = canvas.getContext('2d');
                 ctx.fillStyle="#FFFFFF";
                 ctx.fillRect(0,0,w,h);
@@ -142,16 +140,16 @@ function refreshCanvas() {
             case -90:
                 tx=0; ty=-h;
                 ctx.translate(0,-h);
-                ctx.fillRect(0,0,h,w);
+                ctx.fillRect(0,0,w,h);
                 break;
             case 90:
-                tx=-h; ty=0;
+                tx=-w; ty=0;
                 ctx.translate(-w,0);
-                ctx.fillRect(0,0,h,w);
+                ctx.fillRect(0,0,w,h);
                 break;
             case 180:
-//                canvas.width = w;
-//                canvas.height = h;
+                canvas.width = w;
+                canvas.height = h;
                 ctx = canvas.getContext('2d');
                 ctx.rotate(-orientation*Math.PI/180); 
                 ctx.fillStyle="#FFFFFF";
@@ -160,6 +158,7 @@ function refreshCanvas() {
                 ctx.fillRect(0,0,w,h);
                 break;
         }
+        ctx.scale(canvas.width/743, canvas.height/403);
     } else {
         ctx.fillStyle="#FFFFFF";
         ctx.canvas.width = 743;
@@ -205,7 +204,7 @@ function refreshCanvas() {
         }
         objectList[selectedId].drawIcons(ctx);
     }
-	ctx.restore();
+    ctx.restore();
 }
 
 // Assign a new ID to this object
