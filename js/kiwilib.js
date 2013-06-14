@@ -137,7 +137,7 @@ function refreshCanvas() {
                 ctx.fillStyle="#FFFFFF";
 //                ctx.rotate(-orientation*Math.PI/180);
                 tx=-h; ty=-w;
-                ctx.translate(-1.5*h,-1.5*w);
+                ctx.translate(1.5*h,1.5*w);
                 ctx.fillRect(0,0,h,w);
                 break;
         }
