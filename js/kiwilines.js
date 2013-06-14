@@ -42,7 +42,7 @@ function createSprayTex(dObj){
     dObj.scanvas = scanvas;
 }
 function createTextureBrush(dObj){
-	var scanvas = document.createElement('canvas');
+    var scanvas = document.createElement('canvas');
     scanvas.height = scanvas.width = dObj.width;
     var ctx = scanvas.getContext('2d');
     var w = dObj.width;
@@ -123,8 +123,8 @@ function startLine(dObj) {
     dObj.select = function(x,y) {
         //"Scratch canvas" method
         var scanvas = document.createElement('canvas');
-        scanvas.width = window.innerWidth;
-        scanvas.height = window.innerHeight;
+        scanvas.width = canvas.width;
+        scanvas.height = canvas.height;
         var ctx = scanvas.getContext('2d');
         this.draw(ctx);
         var imageData = ctx.getImageData(x, y, 1, 1);

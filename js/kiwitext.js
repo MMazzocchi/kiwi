@@ -168,10 +168,13 @@ function createTextBalloon(dObj) {
     dObj.select = function(x,y) {
         
         if(this.type == "balloon"){
+            var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,1/this.xScale,1/this.yScale,-this.rotation);
+            x=pt[0]; y=pt[1];
+
             //"Scratch canvas" method
             var scanvas = document.createElement('canvas');
-            scanvas.width = window.innerWidth;
-            scanvas.height = window.innerHeight;
+            scanvas.width = canvas.width;
+            scanvas.height = canvas.height;
             var ctx = scanvas.getContext('2d');
             this.draw(ctx);
             var imageData = ctx.getImageData(x, y, 1, 1);
@@ -202,6 +205,7 @@ function createTextBalloon(dObj) {
         else{
             var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,1/this.xScale,1/this.yScale,-this.rotation);
             x=pt[0]; y=pt[1];
+            console.log(pt);
             if(x >= dObj.lCorner[0] && x <= dObj.rCorner[0] && y >= dObj.lCorner[1] && y <= dObj.rCorner[1]) {
                 showKeyboard();
                 return true;

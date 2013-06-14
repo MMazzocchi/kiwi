@@ -423,8 +423,8 @@ function createFill(dObj){
     dObj.select = function(x,y) {
         //"Scratch canvas" method
         var scanvas = document.createElement('canvas');
-        scanvas.width = window.innerWidth;
-        scanvas.height = window.innerHeight;
+        scanvas.width = canvas.width;
+        scanvas.height = canvas.height;
         var ctx = scanvas.getContext('2d');
         this.draw(ctx);
         var imageData = ctx.getImageData(x, y, 1, 1);
