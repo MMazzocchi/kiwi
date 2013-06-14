@@ -102,6 +102,8 @@ function refreshCanvas() {
 
     var w = 743;
     var h = 608;
+    canvas.width = w;
+    canvas.height = h;
 
     if(orienting()) {
         orientation = window.orientation;
@@ -123,7 +125,7 @@ function refreshCanvas() {
         canvas.height = h;
         ctx = canvas.getContext('2d');
 
-        ctx.scale(1,h/608);
+//        ctx.scale(1,h/608);
 
         orientation = window.orientation;
         ctx.rotate(-orientation*Math.PI/180);
