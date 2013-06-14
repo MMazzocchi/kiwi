@@ -140,13 +140,13 @@ function refreshCanvas() {
                 tx=0; ty=0; 
                 break;
             case -90:
-                tx=0; ty=-w;
+                tx=0; ty=-h;
                 ctx.translate(0,-h);
                 ctx.fillRect(0,0,h,w);
                 break;
             case 90:
                 tx=-h; ty=0;
-                ctx.translate(-h,0);
+                ctx.translate(-w,0);
                 ctx.fillRect(0,0,h,w);
                 break;
             case 180:
@@ -155,7 +155,7 @@ function refreshCanvas() {
                 ctx = canvas.getContext('2d');
                 ctx.rotate(-orientation*Math.PI/180); 
                 ctx.fillStyle="#FFFFFF";
-                tx=-h; ty=-w;
+                tx=-w; ty=-h;
                 ctx.translate(-w,-h);
                 ctx.fillRect(0,0,w,h);
                 break;
