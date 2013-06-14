@@ -131,9 +131,11 @@ function refreshCanvas() {
                 ctx.fillRect(0,0,h,w);
                 break;
             case 180:
-                tx=-w; ty=-h;
-                ctx.translate(-w,-h);
-                ctx.fillRect(0,0,w,h);
+                canvas.width = h;
+                canvas.height = w;
+                tx=-h; ty=-w;
+                ctx.translate(-h,-w);
+                ctx.fillRect(0,0,h,w);
                 break;
         }
     } else {
