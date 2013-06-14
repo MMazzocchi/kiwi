@@ -354,12 +354,8 @@ if (/*(screen.width < 797) || (screen.height < 797)*/ orienting()) {
 	$("#brush").click(showextratoolbar);
 	$("#text").click(showextratoolbar);
 	$("#dropper").click( function() { 
-		if(document.getElementById("right").style.display == "block") {
-                    document.getElementById("right").style.display = "none";
-                } else {
-                    document.getElementById("right").style.display = 'block';
-                }
-		document.getElementById("extratools").style.display = "none";
+            document.getElementById("right").style.display = 'block';
+            document.getElementById("extratools").style.display = "none";
 	});
 	$("#select_select").click(hideextratoolbar);
 	$("#stamp_butterfly").click(hideextratoolbar);
