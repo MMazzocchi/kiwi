@@ -112,14 +112,22 @@ function refreshCanvas() {
         ctx.rotate(-orientation*Math.PI/180);
         ctx.fillStyle="#FFFFFF";
 
+        var r = h/w;
+        if(screen.width < screen.height) {
+             w = screen.width;
+             h = w*r;
+        } else {
+             h = screen.height;
+             w = h/r;
+        }
+
         switch(orientation) {
             case 0:
-                if(h > screen.width) { h = screen.width; }
-                canvas.width = h;
-                canvas.height = w;
+                canvas.width = w;
+                canvas.height = h;
                 ctx = canvas.getContext('2d');
                 ctx.fillStyle="#FFFFFF";
-                ctx.fillRect(0,0,h,w);
+                ctx.fillRect(0,0,w,h);
                 tx=0; ty=0; 
                 break;
             case -90:
@@ -133,15 +141,14 @@ function refreshCanvas() {
                 ctx.fillRect(0,0,h,w);
                 break;
             case 180:
-                if(h > screen.width) { h = screen.width; }
-                canvas.width = h;
-                canvas.height = w;
+                canvas.width = w;
+                canvas.height = h;
                 ctx = canvas.getContext('2d');
                 ctx.rotate(-orientation*Math.PI/180); 
                 ctx.fillStyle="#FFFFFF";
                 tx=-h; ty=-w;
-                ctx.translate(-h,-w);
-                ctx.fillRect(0,0,h,w);
+                ctx.translate(-w,-h);
+                ctx.fillRect(0,0,w,h);
                 break;
         }
     } else {
@@ -152,8 +159,8 @@ function refreshCanvas() {
 	
     //Redraw every object at the current zoom
 
-	ctx.scale(zoom, zoom);
-	ctx.translate(originx, originy);
+    ctx.scale(zoom, zoom);
+    ctx.translate(originx, originy);
 
     if(background) {
         background.draw(ctx);
