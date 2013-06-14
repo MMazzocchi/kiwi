@@ -339,8 +339,10 @@ function makePattern(url) {
     tCanvas.width  = canvas.width;
     tCanvas.height = canvas.height;
     var tCtx = tCanvas.getContext('2d');
+	//canvg(tCanvas, url)
     tCtx.drawSvg(url, 0, 0,tCanvas.width,tCanvas.height);
-
+	background.svg = tCanvas;
+	//tCtx.fillRect(url, 0, 0,50,50);
     var pattern = tCtx.createPattern(tCanvas, "repeat");
     return pattern;
 }
@@ -388,6 +390,10 @@ function createFill(dObj){
         } else {
             ctx.fillStyle = this.color;
         }
+		if(this.svg){
+			ctx.drawImage(background.svg,0,0);
+			return;
+		}
         ctx.globalAlpha = this.opacity;
 
         ctx.translate(Math.round(this.mx), Math.round(this.my));

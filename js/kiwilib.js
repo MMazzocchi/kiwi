@@ -523,6 +523,7 @@ function pointerDown(e) {
                     pts: [[x, y]]
                 };
                 if(curFillId != "") {
+					console.log(curFillId);
                     dObj.patternId = curFillId;
                 }
                 createFill(dObj);
@@ -1031,6 +1032,24 @@ $().ready( function() {
     $('#fill_bg').click( function() {
         document.body.style.cursor="url(img/paintbucket.png)4 28, default";
         curFillId = '';
+        SelectTool('fill');
+        bgFill = true;
+    });
+	 $('#fill_bg-desert').click( function() {
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = 'svg/BG7b.svg';
+        SelectTool('fill');
+        bgFill = true;
+    });
+	$('#fill_bg-city').click( function() {
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = 'svg/BG7b.svg';
+        SelectTool('fill');
+        bgFill = true;
+    });
+	$('#fill_bg-liberty').click( function() {
+        document.body.style.cursor="url(img/paintbucket.png)4 28, default";
+        curFillId = 'svg/BG7b.svg';
         SelectTool('fill');
         bgFill = true;
     });
