@@ -23,7 +23,6 @@ function OpacitySlider()
 
 		// Init Disc
 		ctx = slider.getContext('2d');
-		slider_img=document.getElementById("slider_img");
 		line_img = document.getElementById("slider_line");
 		ctx.drawImage(slider_img,0,0);
 		var canvas_name;
@@ -56,7 +55,6 @@ function OpacitySlider()
 
 	this.Refresh = function()
 	{
-		ctx.drawImage(slider_img,0,0);
 		ctx.save();
 		ctx.translate(px,0);
 		ctx.rotate(90*Math.PI/180);
