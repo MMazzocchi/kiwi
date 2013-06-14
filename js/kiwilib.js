@@ -103,8 +103,8 @@ function refreshCanvas() {
     var w = 743;
     var h = 608;
 
-    canvas.width = 743;
-    canvas.height = 608;
+//    canvas.width = 743;
+//    canvas.height = 608;
 
     var ctx = canvas.getContext('2d');
 
