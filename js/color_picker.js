@@ -97,12 +97,6 @@ function ColorPicker()
 		$('#dropper span').css("background-color", curColor);
 	}
 
-/*	this.setRGB = function(r,g,b)
-	{
-		// !! Convert r,g,b to HSL 360,100,100
-		this.setHSL(h,s,l);
-	}
-*/
 	this.setHSL = function(h,s,l)
 	{
 		this.curH = h;
