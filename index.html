@@ -93,7 +93,10 @@
                 </span>
                 <span id="fills">
                     <a id="fill_blob" class="active">Fill</a>
-                    <a id="fill_bg">Background Fill</a>
+                    <a id="fill_bg">Color Background Fill</a>
+                    <a id="fill_bg-city">City Background Fill</a>
+                    <a id="fill_bg-liberty">Liberty Background Fill</a>
+                    <a id="fill_bg-desert">Desert Background Fill</a>
                 </span>
                 <span id="brushes">
                     <a id="brush_normal" class="active">Brush</a>
@@ -404,14 +407,44 @@ $("#fill").click( function() {
     document.getElementById("selects").style.display = "none";
 	$("#fill_blob").addClass("active");
 	$("#fill_bg").removeClass("active");
+	$("#fill_bg-city").removeClass("active");
+	$("#fill_bg-liberty").removeClass("active");
+	$("#fill_bg-desert").removeClass("active");
 });
 $("#fill_blob").click( function() {
 	$("#fill_blob").addClass("active");
 	$("#fill_bg").removeClass("active");
+	$("#fill_bg-city").removeClass("active");
+	$("#fill_bg-liberty").removeClass("active");
+	$("#fill_bg-desert").removeClass("active");
 });
 $("#fill_bg").click( function() {
 	$("#fill_blob").removeClass("active");
 	$("#fill_bg").addClass("active");
+	$("#fill_bg-city").removeClass("active");
+	$("#fill_bg-liberty").removeClass("active");
+	$("#fill_bg-desert").removeClass("active");
+});
+$("#fill_bg-city").click( function() {
+	$("#fill_blob").removeClass("active");
+	$("#fill_bg").removeClass("active");
+	$("#fill_bg-city").addClass("active");
+	$("#fill_bg-liberty").removeClass("active");
+	$("#fill_bg-desert").removeClass("active");
+});
+$("#fill_bg-liberty").click( function() {
+	$("#fill_blob").removeClass("active");
+	$("#fill_bg").removeClass("active");
+	$("#fill_bg-city").removeClass("active");
+	$("#fill_bg-liberty").addClass("active");
+	$("#fill_bg-desert").removeClass("active");
+});
+$("#fill_bg-desert").click( function() {
+	$("#fill_blob").removeClass("active");
+	$("#fill_bg").removeClass("active");
+	$("#fill_bg-city").removeClass("active");
+	$("#fill_bg-liberty").removeClass("active");
+	$("#fill_bg-desert").addClass("active");
 });
 
 $("#brush").click( function() {
@@ -564,6 +597,9 @@ if (orienting()) {
 	$("#shape_triangle").click(hideextratoolbar);
 	$("#fill_blob").click(hideextratoolbar);
 	$("#fill_bg").click(hideextratoolbar);
+	$("#fill_bg-city").click(hideextratoolbar);
+	$("#fill_bg-liberty").click(hideextratoolbar);
+	$("#fill_bg-desert").click(hideextratoolbar);
 	$("#brush_normal").click(hideextratoolbar);
 	$("#brush_calligraphy").click(hideextratoolbar);
 	$("#brush_spraycan").click(hideextratoolbar);
