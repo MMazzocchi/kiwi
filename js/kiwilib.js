@@ -904,14 +904,15 @@ $().ready( function() {
             return false;
         }
     });
-
-    $('#drawing_canvas').mousedown( function(event){
-        event.preventDefault();
-        pointerDown(event);
-    });
-    $('#drawing_canvas').mousemove( pointerMove );
-    $('#drawing_canvas').mouseup( pointerEnd );
-    
+	if(!orienting())
+	{
+		$('#drawing_canvas').mousedown( function(event){
+			event.preventDefault();
+			pointerDown(event);
+		});
+		$('#drawing_canvas').mousemove( pointerMove );
+		$('#drawing_canvas').mouseup( pointerEnd );
+    }
     canvas.addEventListener('touchmove', pointerMove );
     canvas.addEventListener('touchstart', pointerDown );
     canvas.addEventListener('touchend', pointerEnd );
