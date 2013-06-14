@@ -83,7 +83,7 @@ function transformCoordinates(e) {
 
     var s = .93;
 //    x = x*s;
-    y = y*s;
+//    y = y*s;
 
    // x = x/zoom;
    // y = y/zoom;
@@ -102,8 +102,8 @@ function refreshCanvas() {
     var w = 743;
     var h = 608;
 
-    canvas.width = 743;
-    canvas.height = 608;
+//    canvas.width = 743;
+//    canvas.height = 608;
 
     var ctx = canvas.getContext('2d');
 
@@ -120,6 +120,15 @@ function refreshCanvas() {
              h = screen.height;
              w = h/r;
         }
+
+        canvas.width = w;
+        canvas.height = h;
+        ctx = canvas.getContext('2d');
+
+
+        orientation = window.orientation;
+        ctx.rotate(-orientation*Math.PI/180);
+        ctx.fillStyle="#FFFFFF";
 
         switch(orientation) {
             case 0:
