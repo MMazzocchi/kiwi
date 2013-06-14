@@ -96,13 +96,15 @@ function refreshCanvas() {
         selectedId = -1;
     }
 
+//    var ctx = canvas.getContext('2d');
+
+    var w = 743;
+    var h = 608;
+
+    canvas.width = 743;
+    canvas.height = 608;
+
     var ctx = canvas.getContext('2d');
-
-    var width = 743;
-    var height = 608;
-
-    ctx.canvas.width = 743;
-    ctx.canvas.height = 608;
 
     if(orienting()) {
         orientation = window.orientation;
@@ -111,9 +113,11 @@ function refreshCanvas() {
 
         switch(orientation) {
             case 0:
-                ctx.canvas.width = height;
-                ctx.canvas.height = width;
-                ctx.fillRect(0,0,height,width);
+                canvas.width = h;
+                canvas.height = w;
+                ctx = canvas.getContext('2d');
+                ctx.fillStyle="#FFFFFF";
+                ctx.fillRect(0,0,h,w);
                 tx=0; ty=0; 
                 break;
             case -90:
