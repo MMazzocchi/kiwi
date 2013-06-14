@@ -1168,9 +1168,5 @@ $().ready( function() {
   $('#slider_line').load(function() {});
 
     // Redraw.
-    if(orienting()) {
-        setInterval(refreshCanvas, 30);
-    } else {
-        setInterval(refreshCanvas, 10);
-    }
+    setInterval(refreshCanvas, 10);
 });
