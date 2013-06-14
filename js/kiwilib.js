@@ -131,7 +131,7 @@ function refreshCanvas() {
                 break;
             case -90:
                 tx=0; ty=-w;
-                ctx.translate(0,-w);
+                ctx.translate(0,-h);
                 ctx.fillRect(0,0,h,w);
                 break;
             case 90:
