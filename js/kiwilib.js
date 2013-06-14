@@ -107,10 +107,9 @@ function refreshCanvas() {
 
     if(orienting()) {
         orientation = window.orientation;
-//        ctx.rotate(-orientation*Math.PI/180);
         ctx.fillStyle="#FFFFFF";
 
-        var r = h/w;
+/*        var r = h/w;
         var b = 1;
         if(screen.width < screen.height*r) {
              w = screen.width;
@@ -120,7 +119,7 @@ function refreshCanvas() {
              w = h/r;
              b = 2;
         }
-
+*/
         canvas.width = w;
         canvas.height = h;
 
@@ -132,7 +131,6 @@ function refreshCanvas() {
             case 0:
                 ctx.fillStyle="#FFFFFF";
                 tx=0; ty=0; 
-//                ctx.scale(1,h/608);
                 break;
             case -90:
                 tx=0; ty=-h;
@@ -145,7 +143,6 @@ function refreshCanvas() {
             case 180:
                 ctx.fillStyle="#FFFFFF";
                 tx=-w; ty=-h;
-//                ctx.scale(1,h/608);
                 ctx.translate(-w,-h);
                 break;
         }
