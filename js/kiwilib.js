@@ -132,7 +132,7 @@ function refreshCanvas() {
 //                ctx = canvas.getContext('2d');
                 ctx.fillStyle="#FFFFFF";
 //                ctx.fillRect(0,0,w,h);
-                ctx.scale(1,w/h);
+                ctx.scale(1,h/608);
                 tx=0; ty=0; 
                 break;
             case -90:
