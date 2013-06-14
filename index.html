@@ -533,7 +533,7 @@ function hideextratoolbar() {
 }
 
 if (orienting()) {
-	$("#select").click(showextratoolbar);
+	//$("#select").click(showextratoolbar);
     $("#stamp").click(showextratoolbar);
 	$("#shape").click(showextratoolbar);
 	$("#fill").click(showextratoolbar);
@@ -547,7 +547,8 @@ if (orienting()) {
             }
             document.getElementById("extratools").style.display = "none";
 	});
-	$("#select_select").click(hideextratoolbar);
+	document.getElementById("selects").style.display = "none";
+	document.getElementById("select_select").style.display = "none";
 	document.getElementById("zoom").style.display = "none";
 	$("#stamp_butterfly").click(hideextratoolbar);
 	$("#stamp_ironman1").click(hideextratoolbar);
