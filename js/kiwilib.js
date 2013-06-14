@@ -97,23 +97,12 @@ function refreshCanvas() {
 
     var ctx = canvas.getContext('2d');
 
-        ctx.canvas.width = 743;
-        ctx.canvas.height = 608;
+    var width = 743;
+    var height = 608;
 
+    ctx.canvas.width = 743;
+    ctx.canvas.height = 608;
 
-/*	ctx.save();
-    var heightoffset = $("#toolbar").height();
-    var widthoffset = $("#toolbar").width();
-    
-    if (window.innerWidth < window.innerHeight) { // portrait
-        ctx.canvas.width  = window.innerWidth;
-        ctx.canvas.height = window.innerHeight - heightoffset;
-    }
-    else { // landscape
-        ctx.canvas.width  = window.innerWidth - widthoffset;
-        ctx.canvas.height = window.innerHeight;
-    }
-*/
     if(orienting()) {
         orientation = window.orientation;
         ctx.rotate(-orientation*Math.PI/180);
@@ -121,12 +110,14 @@ function refreshCanvas() {
 
         switch(orientation) {
             case 0:
+                ctx.canvas.width = height;
+                ctx.canvas.height = width;
                 ctx.fillRect(0,0,window.innerWidth,window.innerHeight);
                 tx=0; ty=0; 
                 break;
             case -90:
                 tx=0; ty=-window.innerWidth;
-                ctx.translate(0,-window.innerWidth);
+                ctx.translate(0,-height);
                 ctx.fillRect(0,0,window.innerHeight,window.innerWidth);
                 break;
             case 90:
@@ -142,19 +133,12 @@ function refreshCanvas() {
         }
     } else {
         ctx.fillStyle="#FFFFFF";
-/*        if (window.innerWidth < window.innerHeight) // portrait
-            ctx.fillRect(0,0,window.innerWidth,window.innerHeight-heightoffset);
-        else // landscape
-            ctx.fillRect(0,0,window.innerWidth-widthoffset,window.innerHeight);
-*/
         ctx.canvas.width = 743;
         ctx.canvas.height = 608;
     }
 	
     //Redraw every object at the current zoom
 
-	//console.log(x1+ " " + y1);
-	//console.log(ctx.canvas.width);
 	ctx.scale(zoom, zoom);
 	ctx.translate(originx, originy);
 
