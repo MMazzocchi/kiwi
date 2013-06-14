@@ -564,7 +564,7 @@ function hideextratoolbar() {
 }
 
 if (orienting()) {
-	//$("#select").click(showextratoolbar);
+	$("#select").click(showextratoolbar);
     $("#stamp").click(showextratoolbar);
 	$("#shape").click(showextratoolbar);
 	$("#fill").click(showextratoolbar);
@@ -578,11 +578,9 @@ if (orienting()) {
             }
             document.getElementById("extratools").style.display = "none";
 	});
-	document.getElementById("selects").style.display = "none";
-	document.getElementById("select_select").style.display = "none";
+	$("#select_select").click(hideextratoolbar);
 	document.getElementById("zoom").style.display = "none";
-	document.getElementById("copy").style.display = "none";
-	document.getElementById("paste").style.display = "none";
+	$("#paste").click(hideextratoolbar);
 	$("#stamp_butterfly").click(hideextratoolbar);
 	$("#stamp_ironman1").click(hideextratoolbar);
 	$("#stamp_ironman2").click(hideextratoolbar);
