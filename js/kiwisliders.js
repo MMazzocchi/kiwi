@@ -57,7 +57,7 @@ function OpacitySlider()
 		ctx.save();
 		ctx.translate(px,0);
 		ctx.rotate(90*Math.PI/180);
-		ctx.globalCompositeOperation = "source-atop";
+		ctx.globalCompositeOperation = "destination-atop";
 		ctx.drawImage(line_img,0,0);
 		ctx.restore();
 	}
