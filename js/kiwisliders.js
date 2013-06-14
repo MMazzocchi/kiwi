@@ -1,7 +1,7 @@
 function OpacitySlider()
 {
-	var CPW = 90;
-	var CPH = 38;
+	var SW = 90;
+	var SH = 38;
 	var xm = 0;
 	var px = 90;
 	var slide_type = "";
@@ -17,13 +17,12 @@ function OpacitySlider()
 		else if(slide_type == "thickness"){
 			slider = document.getElementById('thick_canvas');
 		}
-		slider.width = CPW;
-		slider.height = CPH;
+		slider.width = SW;
+		slider.height = SH;
 
-		// Init Disc
+		// Init Slider
 		ctx = slider.getContext('2d');
 		line_img = document.getElementById("slider_line");
-//		ctx.drawImage(slider_img,0,0);
 		var canvas_name;
 		if(slide_type == "opacity"){
 			canvas_name = "#opac_canvas";
@@ -41,7 +40,7 @@ function OpacitySlider()
   
 	this.setOpacity = function(opac)
 	{
-		alpha = opac/CPW;
+		alpha = opac/SW;
 		myCP.updateColor();
 		this.Refresh();
 	}
@@ -55,16 +54,16 @@ function OpacitySlider()
 	this.Refresh = function()
 	{
 		ctx.save();
+		ctx.clearRect(0, 0, SW, SH);
 		ctx.translate(px,0);
 		ctx.rotate(90*Math.PI/180);
-		ctx.globalCompositeOperation = "destination-atop";
 		ctx.drawImage(line_img,0,0);
 		ctx.restore();
 	}
 
 	this.updateValue = function(x)
 	{
-		if (x >= xm && x <= CPW+xm)
+		if (x >= xm && x <= SW+xm)
 		{
 			px = x;
 			if(slide_type == "opacity"){

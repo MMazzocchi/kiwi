@@ -103,8 +103,6 @@ function refreshCanvas() {
     var w = 743;
     var h = 608;
 
-    var ctx = canvas.getContext('2d');
-
     if(orienting()) {
         orientation = window.orientation;
         ctx.rotate(-orientation*Math.PI/180);
@@ -119,10 +117,11 @@ function refreshCanvas() {
              w = h/r;
         }
 
-        canvas.width = w;
-        canvas.height = h;
+        ctx.canvas.width = w;
+        ctx.canvas.height = h;
+        ctx.canvas.style.width = w;
+        ctx.canvas.style.height = h;
         ctx = canvas.getContext('2d');
-
 
         orientation = window.orientation;
         ctx.rotate(-orientation*Math.PI/180);
@@ -130,35 +129,35 @@ function refreshCanvas() {
 
         switch(orientation) {
             case 0:
-                canvas.width = w;
-                canvas.height = h;
-                ctx = canvas.getContext('2d');
+//                canvas.width = w;
+//                canvas.height = h;
+//                ctx = canvas.getContext('2d');
                 ctx.fillStyle="#FFFFFF";
-                ctx.fillRect(0,0,w,h);
+//                ctx.fillRect(0,0,w,h);
                 tx=0; ty=0; 
                 break;
             case -90:
                 tx=0; ty=-h;
                 ctx.translate(0,-h);
-                ctx.fillRect(0,0,w,h);
+//                ctx.fillRect(0,0,w,h);
                 break;
             case 90:
                 tx=-w; ty=0;
                 ctx.translate(-w,0);
-                ctx.fillRect(0,0,w,h);
+//                ctx.fillRect(0,0,w,h);
                 break;
             case 180:
-                canvas.width = w;
-                canvas.height = h;
-                ctx = canvas.getContext('2d');
-                ctx.rotate(-orientation*Math.PI/180); 
+//                canvas.width = w;
+//                canvas.height = h;
+//                ctx = canvas.getContext('2d');
+//                ctx.rotate(-orientation*Math.PI/180); 
                 ctx.fillStyle="#FFFFFF";
                 tx=-w; ty=-h;
                 ctx.translate(-w,-h);
-                ctx.fillRect(0,0,w,h);
+//                ctx.fillRect(0,0,w,h);
                 break;
         }
-        ctx.scale(canvas.width/743, canvas.height/403);
+        ctx.fillRect(0,0,w,h);
     } else {
         ctx.fillStyle="#FFFFFF";
         ctx.canvas.width = 743;
