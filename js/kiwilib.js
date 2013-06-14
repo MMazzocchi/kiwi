@@ -123,7 +123,7 @@ function refreshCanvas() {
 
         canvas.width = w;
         canvas.height = h;
-        ctx = canvas.getContext('2d');
+//        ctx = canvas.getContext('2d');
 
 //        ctx.scale(608/w,h/608);
 
