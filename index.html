@@ -137,7 +137,7 @@ $("#select").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "none";
-    document.getElementById("selects").style.display = "block";
+        document.getElementById("selects").style.display = "block";
 	$("#select_select").addClass("active");
 	$("#zoom").removeClass("active");
 });
@@ -525,7 +525,7 @@ $("#text").click( function() {
 	document.getElementById("fills").style.display = "none";
 	document.getElementById("brushes").style.display = "none";
 	document.getElementById("texts").style.display = "block";
-    document.getElementById("selects").style.display = "none";
+        document.getElementById("selects").style.display = "none";
 	$("#text_bubble").addClass("active");
 	$("#text_box").removeClass("active");
 });
@@ -556,16 +556,16 @@ $("#dropper").click( function() {
 });
 function showextratoolbar() {
     document.getElementById("extratools").style.display = "block";
-    document.getElementById("right").style.display = "none";
+//    document.getElementById("right").style.display = "none";
 }
 function hideextratoolbar() {
     document.getElementById("extratools").style.display = "none";
-    document.getElementById("right").style.display = "none";
+//    document.getElementById("right").style.display = "none";
 }
 
 if (orienting()) {
 	$("#select").click(showextratoolbar);
-    $("#stamp").click(showextratoolbar);
+        $("#stamp").click(showextratoolbar);
 	$("#shape").click(showextratoolbar);
 	$("#fill").click(showextratoolbar);
 	$("#brush").click(showextratoolbar);

@@ -98,6 +98,10 @@ function refreshCanvas() {
     var ctx = canvas.getContext('2d');
     ctx.save();
 
+    if(screen.width > (743 + 90)) {
+        document.getElementById('right').style.display = 'block';
+    }
+
     var w = 743;
     var h = 608;
     canvas.width = w;
