@@ -791,6 +791,7 @@ function clearAll() {
 function showKeyboard() {
     console.log("Keyboard requested.");
     var txt = "";
+    var str = "";
     if(selectedId == -1) {
         txt = objectList[layerList[layerList.length-1]].theText;
     } else {
@@ -798,12 +799,13 @@ function showKeyboard() {
     }
     if(txt && txt != "") {
         console.log(txt);
+        var lns = [];
         for(var i=0; i<txt.length; i++) {
-            txt[i] = txt[i].join(" ");
+            lns[i] = txt[i].join(" ");
         }
-        txt = txt.join("\n");
+        str = lns.join("\n");
     }
-    $('#t').val(txt);
+    $('#t').val(str);
     $('#t').focus();
 }
 
