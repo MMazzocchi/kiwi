@@ -159,6 +159,7 @@ function ColorPicker()
 	$('#colorpicker_canvas').mousedown( HandleColorClick );
 	$('#colorpicker_canvas').mousemove( HandleColorDrag );
 	$('#colorpicker_canvas').mouseup( HandleColorUp );
+	$('#colorpicker_canvas').mouseout( HandleColorUp );
 	$('#colorpicker_canvas').bind('touchstart', HandleColorClick );
 	$('#colorpicker_canvas').bind('touchmove', HandleColorDrag );
 	$('#colorpicker_canvas').bind('touchend', HandleColorUp );

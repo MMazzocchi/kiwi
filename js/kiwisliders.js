@@ -33,6 +33,7 @@ function OpacitySlider()
 		$(canvas_name).mousedown( HandleClick );
 		$(canvas_name).mousemove( HandleDrag );
 		$(canvas_name).mouseup( HandleUp );
+		$(canvas_name).mouseout( HandleUp );
 		$(canvas_name).bind('touchstart', HandleClick );
 		$(canvas_name).bind('touchmove', HandleDrag );
 		$(canvas_name).bind('touchend', HandleUp );

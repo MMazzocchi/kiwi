@@ -857,6 +857,7 @@ $().ready( function() {
 		});
 		$('#drawing_canvas').mousemove( pointerMove );
 		$('#drawing_canvas').mouseup( pointerEnd );
+		$('#drawing_canvas').mouseout( pointerEnd );
     }
     canvas.addEventListener('touchmove', pointerMove );
     canvas.addEventListener('touchstart', pointerDown );
