@@ -789,6 +789,7 @@ function clearAll() {
 }
 
 function showKeyboard() {
+    $('#t').focus();
     console.log("Keyboard requested.");
     var txt = "";
     var str = "";
@@ -806,7 +807,7 @@ function showKeyboard() {
         str = lns.join("\n");
     }
     $('#t').val(str);
-    $('#t').focus();
+//    $('#t').focus();
 }
 
 function hideKeyboard() {
