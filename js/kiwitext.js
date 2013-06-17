@@ -180,6 +180,7 @@ function createTextBalloon(dObj) {
             var imageData = ctx.getImageData(x, y, 1, 1);
 
             if (imageData.data[3] > 0 || imageData.data[0] > 0) {
+                showKeyboard();
                 if(this.selected) {
                     var pt = transformPoint(x-this.mx,y-this.my,this.mx,this.my,1/this.xScale,1/this.yScale,-this.rotation);
                     x=pt[0]; y=pt[1];
